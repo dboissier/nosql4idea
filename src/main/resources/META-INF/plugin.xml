@@ -1,0 +1,89 @@
+<!--
+  ~ Copyright (c) 2015 David Boissier
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<idea-plugin version="2">
+    <name>NoSql Plugin</name>
+    <description>NoSql database integration for Intellij</description>
+    <version>0.1.0</version>
+    <vendor email="david.boissier [at] gmail [dot] com" url="http://codinjutsu.blogspot.com">David Boissier</vendor>
+
+    <!--<idea-version since-build="135.0" until-build="135.*"/>-->
+    <idea-version since-build="138.0"/>
+
+    <depends>com.intellij.modules.lang</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <projectService serviceInterface="org.codinjutsu.tools.nosql.NoSqlConfiguration"
+                        serviceImplementation="org.codinjutsu.tools.nosql.NoSqlConfiguration"/>
+        <projectService serviceInterface="org.codinjutsu.tools.nosql.view.NoSqlWindowManager"
+                        serviceImplementation="org.codinjutsu.tools.nosql.view.NoSqlWindowManager"/>
+        <projectService serviceInterface="org.codinjutsu.tools.nosql.database.mongo.MongoManager"
+                        serviceImplementation="org.codinjutsu.tools.nosql.database.mongo.MongoManager"/>
+        <projectService serviceInterface="org.codinjutsu.tools.nosql.database.redis.RedisManager"
+                        serviceImplementation="org.codinjutsu.tools.nosql.database.redis.RedisManager"/>
+        <projectService serviceInterface="org.codinjutsu.tools.nosql.database.DatabaseVendorManager"
+                        serviceImplementation="org.codinjutsu.tools.nosql.database.DatabaseVendorManager"/>
+        <projectConfigurable instance="org.codinjutsu.tools.nosql.view.NoSqlConfigurable"
+                             id="preferences.mongoOptions"/>
+        <configurationType implementation="org.codinjutsu.tools.nosql.database.mongo.runner.MongoRunConfigurationType"/>
+        <configurationProducer implementation="org.codinjutsu.tools.nosql.database.mongo.runner.MongoScriptRunConfigurationProducer"/>
+    </extensions>
+
+    <extensionPoints>
+        <extensionPoint name="configurationProducer"
+                        interface="com.intellij.execution.junit.RuntimeConfigurationProducer"/>
+    </extensionPoints>
+
+    <project-components>
+        <component>
+            <implementation-class>org.codinjutsu.tools.nosql.NoSqlComponent</implementation-class>
+        </component>
+    </project-components>
+
+    <application-components>
+        <component>
+            <implementation-class>org.codinjutsu.tools.nosql.view.editor.NoSqlDataEditorProvider</implementation-class>
+        </component>
+        <component>
+            <implementation-class>org.codinjutsu.tools.nosql.view.editor.NoSqlFileSystem</implementation-class>
+        </component>
+    </application-components>
+
+    <actions>
+        <action id="Mongo.Shell.Execute" class="com.intellij.openapi.actionSystem.EmptyAction"
+                text="Execute Mongo Command"
+                description="Execute Mongo command in console">
+            <keyboard-shortcut first-keystroke="control ENTER" keymap="$default"/>
+        </action>
+    </actions>
+
+    <description><![CDATA[
+    <p>
+        This tool allows accessing to NoSql databases and provides CRUD operations on data.<br>
+        Documentation is available on the <a href="https://github.com/dboissier/nosql4idea">GitHub project</a>
+    </p>
+            <br>
+            <br>
+    <p>
+        This tool is free for personal and commercial usage.<br>
+        <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4S464JTADXFMJ">Donations</a> are welcomed
+    </p>
+]]> </description>
+
+    <change-notes><![CDATA[
+<a href="https://github.com/dboissier/nosql4idea/">Changelog</a>
+]]> </change-notes>
+</idea-plugin>
