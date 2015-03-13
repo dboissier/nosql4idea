@@ -20,10 +20,10 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
 import org.codinjutsu.tools.nosql.database.redis.model.RedisDatabase;
-import org.codinjutsu.tools.nosql.view.editor.NoSqlObjectFile;
+import org.codinjutsu.tools.nosql.view.editor.DatabaseObjectFile;
 import org.jetbrains.annotations.NotNull;
 
-public class RedisObjectFile extends NoSqlObjectFile {
+public class RedisObjectFile extends DatabaseObjectFile {
     private RedisDatabase database;
 
     public RedisObjectFile(Project project, ServerConfiguration configuration, RedisDatabase redisDatabase) {

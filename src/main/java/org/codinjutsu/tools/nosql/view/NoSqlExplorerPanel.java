@@ -41,8 +41,8 @@ import org.codinjutsu.tools.nosql.database.redis.model.RedisDatabase;
 import org.codinjutsu.tools.nosql.logic.ConfigurationException;
 import org.codinjutsu.tools.nosql.utils.GuiUtils;
 import org.codinjutsu.tools.nosql.view.action.*;
-import org.codinjutsu.tools.nosql.view.editor.NoSqlFileSystem;
-import org.codinjutsu.tools.nosql.view.editor.NoSqlObjectFile;
+import org.codinjutsu.tools.nosql.view.editor.DatabaseFileSystem;
+import org.codinjutsu.tools.nosql.view.editor.DatabaseObjectFile;
 import org.codinjutsu.tools.nosql.view.editor.mongo.MongoObjectFile;
 import org.codinjutsu.tools.nosql.view.editor.redis.RedisObjectFile;
 
@@ -364,14 +364,14 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
     }
 
     public void loadSelectedCollectionValues() {
-        NoSqlFileSystem.getInstance().openEditor(createNoSqlObjectFile());
+        DatabaseFileSystem.getInstance().openEditor(createNoSqlObjectFile());
     }
 
     public void loadRecords() {
-        NoSqlFileSystem.getInstance().openEditor(createNoSqlObjectFile());
+        DatabaseFileSystem.getInstance().openEditor(createNoSqlObjectFile());
     }
 
-    private NoSqlObjectFile createNoSqlObjectFile() {
+    private DatabaseObjectFile createNoSqlObjectFile() {
 
         ServerConfiguration selectedConfiguration = getConfiguration();
         if (DatabaseVendor.MONGO.equals(selectedConfiguration.getDatabaseVendor())) {

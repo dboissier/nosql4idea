@@ -55,10 +55,10 @@
 
     <application-components>
         <component>
-            <implementation-class>org.codinjutsu.tools.nosql.view.editor.NoSqlDataEditorProvider</implementation-class>
+            <implementation-class>org.codinjutsu.tools.nosql.view.editor.DatabaseDataEditorProvider</implementation-class>
         </component>
         <component>
-            <implementation-class>org.codinjutsu.tools.nosql.view.editor.NoSqlFileSystem</implementation-class>
+            <implementation-class>org.codinjutsu.tools.nosql.view.editor.DatabaseFileSystem</implementation-class>
         </component>
     </application-components>
 

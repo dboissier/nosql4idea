@@ -30,10 +30,7 @@ import org.codinjutsu.tools.nosql.database.redis.model.RedisResult;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Tuple;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class RedisManager implements DatabaseClient {
 
@@ -50,9 +47,13 @@ public class RedisManager implements DatabaseClient {
     @Override
     public void loadServer(DatabaseServer databaseServer) {
         Jedis jedis = createJedis(databaseServer.getConfiguration());
-        List<String> databases = jedis.configGet("databases");
-        assert databases.size() > 0;
-        databaseServer.setDatabases(Arrays.<NoSqlDatabase>asList(new RedisDatabase("0")));
+        List<String> databaseNumberTuple = jedis.configGet("databases");
+        int totalNumberOfDatabase = Integer.parseInt(databaseNumberTuple.get(1));
+        List<NoSqlDatabase> noSqlDatabases = new LinkedList<NoSqlDatabase>();
+        for (int i=0; i < totalNumberOfDatabase; i++) {
+            noSqlDatabases.add(new RedisDatabase(String.valueOf(i)));
+        }
+        databaseServer.setDatabases(noSqlDatabases);
     }
 
     @Override
@@ -65,14 +66,13 @@ public class RedisManager implements DatabaseClient {
 
     }
 
-    public RedisResult loadRecords(ServerConfiguration serverConfiguration, RedisQuery query) {
+    public RedisResult loadRecords(ServerConfiguration serverConfiguration, RedisDatabase database, RedisQuery query) {
         Jedis jedis = createJedis(serverConfiguration);
-        Set<String> keys = jedis.keys("*");
         RedisResult redisResult = new RedisResult();
-        List<String> databases = jedis.configGet("databases");
-        System.out.println("databases = " + databases);
-        jedis.select(0);
+        int index = Integer.parseInt(database.getName());
+        jedis.select(index);
 
+        Set<String> keys = jedis.keys(query.getFilter());
         for (String key : keys) {
             System.out.println("key = " + key);
             RedisKeyType keyType = RedisKeyType.getKeyType(jedis.type(key));

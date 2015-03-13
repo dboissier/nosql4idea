@@ -28,14 +28,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public abstract class NoSqlObjectFile extends VirtualFile {
+public abstract class DatabaseObjectFile extends VirtualFile {
 
     private final Project project;
     private final ServerConfiguration configuration;
     private final String name;
     private final long myModStamp;
 
-    protected NoSqlObjectFile(Project project, ServerConfiguration configuration, String name) {
+    protected DatabaseObjectFile(Project project, ServerConfiguration configuration, String name) {
         this.project = project;
         this.configuration = configuration;
         this.name = name;
@@ -51,7 +51,7 @@ public abstract class NoSqlObjectFile extends VirtualFile {
     @NotNull
     @Override
     public VirtualFileSystem getFileSystem() {
-        return NoSqlFileSystem.getInstance();
+        return DatabaseFileSystem.getInstance();
     }
 
     @NotNull

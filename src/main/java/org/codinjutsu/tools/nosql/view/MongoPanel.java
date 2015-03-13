@@ -40,7 +40,7 @@ import org.codinjutsu.tools.nosql.view.action.*;
 import javax.swing.*;
 import java.awt.*;
 
-public class MongoPanel extends NoSqlResultView {
+public class MongoPanel extends NoSqlResultView<MongoCollection> {
 
     private JPanel rootPanel;
     private Splitter splitter;
@@ -114,7 +114,7 @@ public class MongoPanel extends NoSqlResultView {
     void installResultPanelActions() {
         DefaultActionGroup actionResultGroup = new DefaultActionGroup("MongoResultGroup", true);
         if (ApplicationManager.getApplication() != null) {
-            actionResultGroup.add(new ExecuteQuery(this));
+            actionResultGroup.add(new ExecuteQuery<MongoPanel>(this));
             actionResultGroup.add(new OpenFindAction(this));
             actionResultGroup.add(new EnableAggregateAction(queryPanel));
             actionResultGroup.addSeparator();
@@ -171,7 +171,7 @@ public class MongoPanel extends NoSqlResultView {
         toolBar.add(actionToolBarComponent, BorderLayout.CENTER);
     }
 
-    public MongoCollection getMongoCollection() {
+    public MongoCollection getRecords() {
         return mongoCollection;
     }
 

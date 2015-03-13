@@ -55,7 +55,7 @@ class MongoRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMod
     MongoRunConfiguration(RunConfigurationModule runConfigurationModule, ConfigurationFactory factory) {
         super("Mongo Script", runConfigurationModule, factory);
 
-        mongoShell = NoSqlConfiguration.getInstance(getProject()).getShellPath();
+        mongoShell = NoSqlConfiguration.getInstance(getProject()).getMongoShellPath();
     }
 
     @NotNull

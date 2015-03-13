@@ -32,13 +32,13 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
 
-public class NoSqlDataEditor extends UserDataHolderBase implements FileEditor {
+public class DatabaseDataEditor extends UserDataHolderBase implements FileEditor {
 
 
     private NoSqlResultView panel;
     private boolean disposed;
 
-    public NoSqlDataEditor(NoSqlResultView redisPanel) {
+    public DatabaseDataEditor(NoSqlResultView redisPanel) {
         panel = redisPanel;
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override

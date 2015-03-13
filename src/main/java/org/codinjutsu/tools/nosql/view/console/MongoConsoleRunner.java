@@ -65,7 +65,7 @@ public class MongoConsoleRunner extends AbstractConsoleRunnerWithHistory<MongoCo
     protected Process createProcess() throws ExecutionException {
 
         NoSqlConfiguration noSqlConfiguration = NoSqlConfiguration.getInstance(getProject());
-        String shellPath = noSqlConfiguration.getShellPath();
+        String shellPath = noSqlConfiguration.getMongoShellPath();
         final GeneralCommandLine commandLine = new GeneralCommandLine();
         commandLine.setExePath(shellPath);
 

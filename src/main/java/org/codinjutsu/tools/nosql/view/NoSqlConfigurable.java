@@ -57,8 +57,8 @@ public class NoSqlConfigurable extends BaseConfigurable {
     private JPanel mainPanel;
     private JBTable table;
     private final NoSqlServerTableModel tableModel;
-    private LabeledComponent<TextFieldWithBrowseButton> shellPathField;
-    private JLabel testMongoPathFeedbackLabel;
+    private ShellPathPanel mongoShellPanel;
+    private ShellPathPanel redisShellPanel;
 
 
     public NoSqlConfigurable(Project project) {
@@ -85,15 +85,14 @@ public class NoSqlConfigurable extends BaseConfigurable {
     @Nullable
     @Override
     public JComponent createComponent() {
-        JPanel mongoShellOptionsPanel = new JPanel();
-        mongoShellOptionsPanel.setLayout(new BoxLayout(mongoShellOptionsPanel, BoxLayout.X_AXIS));
-        shellPathField = createShellPathField();
-        mongoShellOptionsPanel.add(new JLabel("Path to Mongo executable:"));
-        mongoShellOptionsPanel.add(shellPathField);
-        mongoShellOptionsPanel.add(createTestButton());
-        mongoShellOptionsPanel.add(createFeedbackLabel());
+        JPanel databaseVendorShellOptionsPanel = new JPanel();
+        databaseVendorShellOptionsPanel.setLayout(new BoxLayout(databaseVendorShellOptionsPanel, BoxLayout.Y_AXIS));
+        mongoShellPanel = new ShellPathPanel("Mongo");
+        databaseVendorShellOptionsPanel.add(mongoShellPanel);
+        redisShellPanel = new ShellPathPanel("Redis");
+        databaseVendorShellOptionsPanel.add(redisShellPanel);
 
-        mainPanel.add(mongoShellOptionsPanel, BorderLayout.NORTH);
+        mainPanel.add(databaseVendorShellOptionsPanel, BorderLayout.NORTH);
 
 
         PanelWithButtons panelWithButtons = new PanelWithButtons() {
@@ -196,50 +195,11 @@ public class NoSqlConfigurable extends BaseConfigurable {
         return mainPanel;
     }
 
-    private JLabel createFeedbackLabel() {
-        testMongoPathFeedbackLabel = new JLabel();
-        return testMongoPathFeedbackLabel;
-    }
-
-    private JButton createTestButton() {
-        JButton testButton = new JButton("Test");
-        testButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                testPath();
-            }
-        });
-        return testButton;
-    }
-
-    private void testPath() {
-        try {
-            testMongoPathFeedbackLabel.setIcon(null);
-            if (MongoUtils.checkMongoShellPath(getShellPath())) {
-                testMongoPathFeedbackLabel.setIcon(ServerConfigurationPanel.SUCCESS);
-            } else {
-                testMongoPathFeedbackLabel.setIcon(ServerConfigurationPanel.FAIL);
-            }
-        } catch (ExecutionException e) {
-            Messages.showErrorDialog(mainPanel, e.getMessage(), "Error During Mongo Shell Path Checking...");
-        }
-    }
-
-    private LabeledComponent<TextFieldWithBrowseButton> createShellPathField() {
-        LabeledComponent<TextFieldWithBrowseButton> shellPathField = new LabeledComponent<TextFieldWithBrowseButton>();
-        TextFieldWithBrowseButton component = new TextFieldWithBrowseButton();
-        component.getChildComponent().setName("shellPathField");
-        shellPathField.setComponent(component);
-        shellPathField.getComponent().addBrowseFolderListener("Mongo shell configuration", "", null,
-                new FileChooserDescriptor(true, false, false, false, false, false));
-
-        shellPathField.getComponent().setText(configuration.getShellPath());
-
-        return shellPathField;
-    }
 
     public boolean isModified() {
-        return areConfigurationsModified() || isShellPathModified();
+        return areConfigurationsModified()
+                || mongoShellPanel.isShellPathModified(NoSqlConfiguration.getInstance(project).getMongoShellPath())
+                || redisShellPanel.isShellPathModified(NoSqlConfiguration.getInstance(project).getRedisShellPath());
     }
 
     @Override
@@ -249,18 +209,17 @@ public class NoSqlConfigurable extends BaseConfigurable {
             configuration.setServerConfigurations(configurations);
         }
 
-        if (isShellPathModified()) {
-            configuration.setShellPath(getShellPath());
+        if (mongoShellPanel.isShellPathModified(NoSqlConfiguration.getInstance(project).getMongoShellPath())) {
+            configuration.setMongoShellPath(mongoShellPanel.getShellPath());
+        }
+
+        if (redisShellPanel.isShellPathModified(NoSqlConfiguration.getInstance(project).getRedisShellPath())) {
+            configuration.setRedisShellPath(redisShellPanel.getShellPath());
         }
 
         NoSqlWindowManager.getInstance(project).apply();
     }
 
-    private boolean isShellPathModified() {
-        String existingShellPath = NoSqlConfiguration.getInstance(project).getShellPath();
-
-        return !StringUtils.equals(existingShellPath, getShellPath());
-    }
 
     private boolean areConfigurationsModified() {
         List<ServerConfiguration> existingConfigurations = NoSqlConfiguration.getInstance(project).getServerConfigurations();
@@ -278,14 +237,6 @@ public class NoSqlConfigurable extends BaseConfigurable {
         return false;
     }
 
-    private String getShellPath() {
-        String shellPath = shellPathField.getComponent().getText();
-        if (StringUtils.isNotBlank(shellPath)) {
-            return shellPath;
-        }
-
-        return null;
-    }
 
     @Override
     public void reset() {
@@ -295,7 +246,6 @@ public class NoSqlConfigurable extends BaseConfigurable {
     public void disposeUIResources() {
         mainPanel = null;
         tableModel.removeTableModelListener(table);
-        shellPathField = null;
         table = null;
     }
 
@@ -309,4 +259,74 @@ public class NoSqlConfigurable extends BaseConfigurable {
         }
     }
 
+    private class ShellPathPanel extends JPanel {
+
+        private LabeledComponent<TextFieldWithBrowseButton> shellPathField;
+        private JLabel testPathFeedbackLabel;
+
+        private ShellPathPanel(String databaseVendorName) {
+            setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+            add(createLabel(databaseVendorName));
+            shellPathField = createShellPathField(databaseVendorName);
+            add(shellPathField);
+            add(createTestButton(databaseVendorName));
+            testPathFeedbackLabel = new JLabel();
+            add(testPathFeedbackLabel);
+        }
+
+        private JLabel createLabel(String databaseVendorName) {
+            return new JLabel(String.format("Path to %s CLI:", databaseVendorName));
+        }
+
+        private JButton createTestButton(final String databaseVendorName) {
+            JButton testButton = new JButton("Test");
+            testButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    testPath(databaseVendorName);
+                }
+            });
+            return testButton;
+        }
+
+
+        private void testPath(String databaseVendorName) {
+            try {
+                testPathFeedbackLabel.setIcon(null);
+                if (MongoUtils.checkMongoShellPath(getShellPath())) {
+                    testPathFeedbackLabel.setIcon(ServerConfigurationPanel.SUCCESS);
+                } else {
+                    testPathFeedbackLabel.setIcon(ServerConfigurationPanel.FAIL);
+                }
+            } catch (ExecutionException e) {
+                Messages.showErrorDialog(mainPanel, e.getMessage(), String.format("Error During %s Shell Path Checking...", databaseVendorName));
+            }
+        }
+
+        public String getShellPath() {
+            String shellPath = shellPathField.getComponent().getText();
+            if (StringUtils.isNotBlank(shellPath)) {
+                return shellPath;
+            }
+
+            return null;
+        }
+
+        public boolean isShellPathModified(String shellPath) {
+            return !StringUtils.equals(shellPath, getShellPath());
+        }
+
+        private LabeledComponent<TextFieldWithBrowseButton> createShellPathField(String databaseVendorName) {
+            LabeledComponent<TextFieldWithBrowseButton> shellPathField = new LabeledComponent<TextFieldWithBrowseButton>();
+            TextFieldWithBrowseButton component = new TextFieldWithBrowseButton();
+            component.getChildComponent().setName("shellPathField");
+            shellPathField.setComponent(component);
+            shellPathField.getComponent().addBrowseFolderListener(String.format("%s CLI configuration", databaseVendorName), "", null,
+                    new FileChooserDescriptor(true, false, false, false, false, false));
+
+            shellPathField.getComponent().setText(configuration.getMongoShellPath());
+
+            return shellPathField;
+        }
+    }
 }

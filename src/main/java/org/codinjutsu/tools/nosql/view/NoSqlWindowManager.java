@@ -51,10 +51,10 @@ public class NoSqlWindowManager {
         ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
         noSqlExplorerPanel = new NoSqlExplorerPanel(project, DatabaseVendorManager.getInstance(project));
         noSqlExplorerPanel.installActions();
-        Content mongoExplorer = ContentFactory.SERVICE.getInstance().createContent(noSqlExplorerPanel, null, false);
+        Content nosqlExplorer = ContentFactory.SERVICE.getInstance().createContent(noSqlExplorerPanel, null, false);
 
         ToolWindow toolNoSqlExplorerWindow = toolWindowManager.registerToolWindow(EXPLORER, false, ToolWindowAnchor.RIGHT);
-        toolNoSqlExplorerWindow.getContentManager().addContent(mongoExplorer);
+        toolNoSqlExplorerWindow.getContentManager().addContent(nosqlExplorer);
         toolNoSqlExplorerWindow.setIcon(ICON);
     }
 

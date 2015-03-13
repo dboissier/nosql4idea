@@ -18,29 +18,29 @@ package org.codinjutsu.tools.nosql.view.action;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import org.codinjutsu.tools.nosql.view.MongoPanel;
+import org.codinjutsu.tools.nosql.view.NoSqlResultView;
 import org.codinjutsu.tools.nosql.view.style.StyleAttributesProvider;
 
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-public class ExecuteQuery extends AnAction {
-    private final MongoPanel mongoPanel;
+public class ExecuteQuery<G extends NoSqlResultView> extends AnAction {
+    private final G resultView;
 
-    public ExecuteQuery(MongoPanel mongoPanel) {
+    public ExecuteQuery(G resultView) {
         super("Execute query", "Execute query with options", StyleAttributesProvider.getExecuteIcon());
-        this.mongoPanel = mongoPanel;
+        this.resultView = resultView;
 
-        registerCustomShortcutSet(KeyEvent.VK_ENTER, InputEvent.CTRL_MASK, mongoPanel);
+        registerCustomShortcutSet(KeyEvent.VK_ENTER, InputEvent.CTRL_MASK, resultView);
     }
 
     @Override
     public void actionPerformed(AnActionEvent anActionEvent) {
-        mongoPanel.executeQuery();
+        resultView.executeQuery();
     }
 
     @Override
     public void update(AnActionEvent event) {
-        event.getPresentation().setEnabled(mongoPanel.getMongoCollection() != null);
+        event.getPresentation().setEnabled(resultView.getRecords() != null);
     }
 }

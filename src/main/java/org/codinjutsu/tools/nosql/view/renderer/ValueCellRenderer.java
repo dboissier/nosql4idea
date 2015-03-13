@@ -16,19 +16,24 @@
 
 package org.codinjutsu.tools.nosql.view.renderer;
 
-import com.intellij.ui.ColoredTreeCellRenderer;
+import com.intellij.ui.ColoredTableCellRenderer;
+import com.intellij.ui.treeStructure.treetable.TreeTable;
+import com.intellij.ui.treeStructure.treetable.TreeTableTree;
 import org.codinjutsu.tools.nosql.view.model.NoSqlTreeNode;
-import org.codinjutsu.tools.nosql.view.nodedescriptor.NodeDescriptor;
-import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.tree.TreePath;
 
-public class MongoKeyCellRenderer extends ColoredTreeCellRenderer {
+public class ValueCellRenderer extends ColoredTableCellRenderer {
 
     @Override
-    public void customizeCellRenderer(@NotNull JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-        NodeDescriptor descriptor = ((NoSqlTreeNode) value).getDescriptor();
+    protected void customizeCellRenderer(JTable table, Object value, boolean selected, boolean hasFocus, int row, int column) {
 
-        descriptor.renderNode(this);
+        TreeTableTree tree = ((TreeTable) table).getTree();
+        TreePath pathForRow = tree.getPathForRow(row);
+
+        final NoSqlTreeNode node = (NoSqlTreeNode) pathForRow.getLastPathComponent();
+
+        node.getDescriptor().renderValue(this, tree.isExpanded(pathForRow));
     }
 }

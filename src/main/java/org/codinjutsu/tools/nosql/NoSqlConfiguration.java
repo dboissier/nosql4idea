@@ -33,7 +33,8 @@ import java.util.List;
 public class NoSqlConfiguration implements PersistentStateComponent<NoSqlConfiguration> {
 
     private List<ServerConfiguration> serverConfigurations = new LinkedList<ServerConfiguration>();
-    private String shellPath;
+    private String mongoShellPath;
+    private String redisShellPath;
 
     public static NoSqlConfiguration getInstance(Project project) {
         return ServiceManager.getService(project, NoSqlConfiguration.class);
@@ -56,11 +57,19 @@ public class NoSqlConfiguration implements PersistentStateComponent<NoSqlConfigu
         return serverConfigurations;
     }
 
-    public String getShellPath() {
-        return shellPath;
+    public String getMongoShellPath() {
+        return mongoShellPath;
     }
 
-    public void setShellPath(String shellPath) {
-        this.shellPath = shellPath;
+    public void setMongoShellPath(String mongoShellPath) {
+        this.mongoShellPath = mongoShellPath;
+    }
+
+    public String getRedisShellPath() {
+        return redisShellPath;
+    }
+
+    public void setRedisShellPath(String redisShellPath) {
+        this.redisShellPath = redisShellPath;
     }
 }

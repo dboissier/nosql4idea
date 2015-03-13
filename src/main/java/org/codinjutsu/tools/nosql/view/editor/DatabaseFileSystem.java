@@ -22,25 +22,23 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileListener;
 import com.intellij.openapi.vfs.VirtualFileSystem;
-import org.codinjutsu.tools.nosql.view.editor.mongo.MongoObjectFile;
-import org.codinjutsu.tools.nosql.view.editor.redis.RedisObjectFile;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
-public class NoSqlFileSystem extends VirtualFileSystem implements ApplicationComponent {
+public class DatabaseFileSystem extends VirtualFileSystem implements ApplicationComponent {
 
     private static final String PROTOCOL = "nosql";
 
-    public static NoSqlFileSystem getInstance() {
-        return ApplicationManager.getApplication().getComponent(NoSqlFileSystem.class);
+    public static DatabaseFileSystem getInstance() {
+        return ApplicationManager.getApplication().getComponent(DatabaseFileSystem.class);
     }
 
-    public void openEditor(final NoSqlObjectFile noSqlObjectFile) {
-        FileEditorManager fileEditorManager = FileEditorManager.getInstance(noSqlObjectFile.getProject());
-        fileEditorManager.openFile(noSqlObjectFile, true);
+    public void openEditor(final DatabaseObjectFile databaseObjectFile) {
+        FileEditorManager fileEditorManager = FileEditorManager.getInstance(databaseObjectFile.getProject());
+        fileEditorManager.openFile(databaseObjectFile, true);
     }
 
     @NotNull

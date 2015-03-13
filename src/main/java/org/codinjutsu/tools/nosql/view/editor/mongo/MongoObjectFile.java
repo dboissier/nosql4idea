@@ -18,21 +18,12 @@ package org.codinjutsu.tools.nosql.view.editor.mongo;
 
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileSystem;
-import com.intellij.util.LocalTimeCounter;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
 import org.codinjutsu.tools.nosql.database.mongo.model.MongoCollection;
-import org.codinjutsu.tools.nosql.view.editor.NoSqlFileSystem;
-import org.codinjutsu.tools.nosql.view.editor.NoSqlObjectFile;
+import org.codinjutsu.tools.nosql.view.editor.DatabaseObjectFile;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-public class MongoObjectFile extends NoSqlObjectFile {
+public class MongoObjectFile extends DatabaseObjectFile {
 
     private MongoCollection collection;
 

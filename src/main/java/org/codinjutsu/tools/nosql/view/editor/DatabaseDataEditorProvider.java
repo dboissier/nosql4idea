@@ -33,7 +33,7 @@ import org.codinjutsu.tools.nosql.view.editor.redis.RedisObjectFile;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
-public class NoSqlDataEditorProvider implements FileEditorProvider, ApplicationComponent, DumbAware {
+public class DatabaseDataEditorProvider implements FileEditorProvider, ApplicationComponent, DumbAware {
 
 
     @Override
@@ -46,10 +46,10 @@ public class NoSqlDataEditorProvider implements FileEditorProvider, ApplicationC
     public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
         if (file instanceof MongoObjectFile) {
             MongoObjectFile mongoObjectFile = (MongoObjectFile) file;
-            return new NoSqlDataEditor(new MongoPanel(project, MongoManager.getInstance(project), mongoObjectFile.getConfiguration(), mongoObjectFile.getCollection()));
+            return new DatabaseDataEditor(new MongoPanel(project, MongoManager.getInstance(project), mongoObjectFile.getConfiguration(), mongoObjectFile.getCollection()));
         } else if (file instanceof RedisObjectFile) {
             RedisObjectFile redisObjectFile = (RedisObjectFile) file;
-            return new NoSqlDataEditor(new RedisPanel(project, RedisManager.getInstance(project), redisObjectFile.getConfiguration(), redisObjectFile.getDatabase()));
+            return new DatabaseDataEditor(new RedisPanel(project, RedisManager.getInstance(project), redisObjectFile.getConfiguration(), redisObjectFile.getDatabase()));
         }
         throw new IllegalStateException("Unsupported file");
     }

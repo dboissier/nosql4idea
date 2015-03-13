@@ -29,8 +29,8 @@ import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.codinjutsu.tools.nosql.view.model.NoSqlTreeNode;
 import org.codinjutsu.tools.nosql.view.nodedescriptor.NodeDescriptor;
-import org.codinjutsu.tools.nosql.view.renderer.MongoKeyCellRenderer;
-import org.codinjutsu.tools.nosql.view.renderer.MongoValueCellRenderer;
+import org.codinjutsu.tools.nosql.view.renderer.KeyCellRenderer;
+import org.codinjutsu.tools.nosql.view.renderer.ValueCellRenderer;
 import org.codinjutsu.tools.nosql.view.table.MongoDatePickerCellEditor;
 import org.codinjutsu.tools.nosql.view.table.MongoValueCellEditor;
 import org.jetbrains.annotations.Nullable;
@@ -81,7 +81,7 @@ public class JsonTreeTableView extends TreeTable {
         tree.setShowsRootHandles(true);
         tree.setRootVisible(false);
         UIUtil.setLineStyleAngled(tree);
-        setTreeCellRenderer(new MongoKeyCellRenderer());
+        setTreeCellRenderer(new KeyCellRenderer());
 
         TreeUtil.expand(tree, 2);
 
@@ -117,7 +117,7 @@ public class JsonTreeTableView extends TreeTable {
     }
 
     private static class ReadOnlyValueColumnInfo extends ColumnInfo<NoSqlTreeNode, NodeDescriptor> {
-        private final TableCellRenderer myRenderer = new MongoValueCellRenderer();
+        private final TableCellRenderer myRenderer = new ValueCellRenderer();
 
         public ReadOnlyValueColumnInfo() {
             super("Value");
@@ -140,7 +140,7 @@ public class JsonTreeTableView extends TreeTable {
 
     private static class WritableColumnInfo extends ColumnInfo<NoSqlTreeNode, Object> {
 
-        private final TableCellRenderer myRenderer = new MongoValueCellRenderer();
+        private final TableCellRenderer myRenderer = new ValueCellRenderer();
         private final TableCellEditor defaultEditor = new MongoValueCellEditor();
 
 

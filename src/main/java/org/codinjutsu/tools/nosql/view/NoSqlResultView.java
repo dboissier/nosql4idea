@@ -20,9 +20,13 @@ import com.intellij.openapi.Disposable;
 
 import javax.swing.*;
 
-public abstract class NoSqlResultView extends JPanel implements Disposable {
+public abstract class NoSqlResultView<R> extends JPanel implements Disposable {
 
     public abstract void showResults();
 
     public abstract JPanel getResultPanel();
+
+    public abstract R getRecords();
+
+    public abstract void executeQuery();
 }

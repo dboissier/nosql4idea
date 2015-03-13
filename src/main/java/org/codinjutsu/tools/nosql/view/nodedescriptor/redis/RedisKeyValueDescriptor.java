@@ -88,6 +88,14 @@ public class RedisKeyValueDescriptor implements NodeDescriptor {
 
     }
 
+    public String getKey() {
+        return key;
+    }
+
+    public RedisKeyType getKeyType() {
+        return keyType;
+    }
+
     protected String getValueAndAbbreviateIfNecessary(String stringifiedValue) {
         if (stringifiedValue.length() > MAX_LENGTH) {
             return StringUtils.abbreviateInCenter(stringifiedValue, MAX_LENGTH);

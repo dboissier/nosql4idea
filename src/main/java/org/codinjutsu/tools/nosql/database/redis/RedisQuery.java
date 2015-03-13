@@ -17,22 +17,14 @@
 package org.codinjutsu.tools.nosql.database.redis;
 
 public class RedisQuery {
-    private String filter;
-    private String databaseName;
 
-    public void setFilter(String filter) {
+    private String filter;
+
+    public RedisQuery(String filter) {
         this.filter = filter;
     }
 
     public String getFilter() {
         return filter;
-    }
-
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
-    }
-
-    public String getDatabaseName() {
-        return databaseName;
     }
 }

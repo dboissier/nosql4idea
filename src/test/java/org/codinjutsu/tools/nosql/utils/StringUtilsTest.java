@@ -18,7 +18,7 @@ package org.codinjutsu.tools.nosql.utils;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class StringUtilsTest {
 
@@ -34,5 +34,14 @@ public class StringUtilsTest {
         assertEquals(1, StringUtils.parseNumber("1"));
         assertEquals(1.000000000001d, StringUtils.parseNumber("1.000000000001"));
         assertEquals(1000000000000000L, StringUtils.parseNumber("1000000000000000"));
+    }
+
+    @Test
+    public void testExplode() throws Exception {
+        assertArrayEquals(new String[]{"a", "b"}, StringUtils.explode("a:b", ":"));
+        assertArrayEquals(new String[]{"a", "b"}, StringUtils.explode("a:b:", ":"));
+        assertArrayEquals(new String[]{"a", "b"}, StringUtils.explode("a::b", ":"));
+        assertArrayEquals(new String[]{"a::b"}, StringUtils.explode("a::b", "_"));
+        assertArrayEquals(new String[]{"a", "b"}, StringUtils.explode(":a:b", ":"));
     }
 }

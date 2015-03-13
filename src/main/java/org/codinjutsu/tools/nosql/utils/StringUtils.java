@@ -45,4 +45,8 @@ public class StringUtils {
         }
         return Double.parseDouble(number);
     }
+
+    public static String[] explode(String key, String separator) {
+        return org.apache.commons.lang.StringUtils.split(key, separator);
+    }
 }

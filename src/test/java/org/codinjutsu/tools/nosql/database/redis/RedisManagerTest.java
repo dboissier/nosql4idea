@@ -18,17 +18,16 @@ package org.codinjutsu.tools.nosql.database.redis;
 
 import org.codinjutsu.tools.nosql.ServerConfiguration;
 import org.codinjutsu.tools.nosql.database.DatabaseVendor;
+import org.codinjutsu.tools.nosql.database.redis.model.RedisDatabase;
 import org.codinjutsu.tools.nosql.database.redis.model.RedisKeyType;
 import org.codinjutsu.tools.nosql.database.redis.model.RedisRecord;
 import org.codinjutsu.tools.nosql.database.redis.model.RedisResult;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import redis.clients.jedis.Jedis;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
@@ -50,10 +49,8 @@ public class RedisManagerTest {
         serverConfiguration.setDatabaseVendor(DatabaseVendor.REDIS);
         serverConfiguration.setServerUrls(Arrays.asList("localhost:6379"));
 
-        RedisQuery query = new RedisQuery();
-        query.setFilter("*");
-        query.setDatabaseName("0");
-        RedisResult result = redisManager.loadRecords(serverConfiguration, query);
+        RedisQuery query = new RedisQuery(null);
+        RedisResult result = redisManager.loadRecords(serverConfiguration, new RedisDatabase("0"), query);
 
         List<RedisRecord> redisRecords = result.getResults();
         assertEquals(4, redisRecords.size());
