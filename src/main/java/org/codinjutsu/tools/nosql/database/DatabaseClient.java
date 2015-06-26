@@ -22,7 +22,7 @@ import org.codinjutsu.tools.nosql.database.mongo.model.MongoDatabase;
 
 public interface DatabaseClient {
 
-    public void connect(ServerConfiguration serverConfiguration);
+    void connect(ServerConfiguration serverConfiguration);
 
     void loadServer(DatabaseServer databaseServer);
 

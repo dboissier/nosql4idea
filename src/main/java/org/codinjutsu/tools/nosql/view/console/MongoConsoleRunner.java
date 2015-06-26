@@ -19,18 +19,17 @@ package org.codinjutsu.tools.nosql.view.console;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.console.ConsoleHistoryController;
+import com.intellij.execution.console.ProcessBackedConsoleExecuteActionHandler;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.runners.AbstractConsoleRunnerWithHistory;
-import com.intellij.execution.runners.ConsoleExecuteActionHandler;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
-import com.intellij.psi.PsiFile;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.nosql.NoSqlConfiguration;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
-import org.codinjutsu.tools.nosql.database.mongo.model.MongoDatabase;
 import org.codinjutsu.tools.nosql.database.mongo.MongoUtils;
+import org.codinjutsu.tools.nosql.database.mongo.model.MongoDatabase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,8 +52,7 @@ public class MongoConsoleRunner extends AbstractConsoleRunnerWithHistory<MongoCo
     protected MongoConsoleView createConsoleView() {
         MongoConsoleView res = new MongoConsoleView(getProject());
 
-        PsiFile file = res.getConsole().getFile();
-        assert file.getContext() == null;
+        VirtualFile file = res.getConsoleEditor().getVirtualFile();
         file.putUserData(MONGO_SHELL_FILE, Boolean.TRUE);
 
         return res;
@@ -103,16 +101,14 @@ public class MongoConsoleRunner extends AbstractConsoleRunnerWithHistory<MongoCo
 
     @NotNull
     @Override
-    protected ConsoleExecuteActionHandler createConsoleExecuteActionHandler() {
-        ConsoleExecuteActionHandler handler = new ConsoleExecuteActionHandler(getProcessHandler(), false) {
+    protected ProcessBackedConsoleExecuteActionHandler createExecuteActionHandler() {
+        ProcessBackedConsoleExecuteActionHandler handler = new ProcessBackedConsoleExecuteActionHandler(getProcessHandler(), false) {
             @Override
             public String getEmptyExecuteAction() {
                 return "Mongo.Shell.Execute";
             }
         };
-        new ConsoleHistoryController("Mongo Shell", null, getLanguageConsole(), handler.getConsoleHistoryModel()).install();
+//        new ConsoleHistoryController("Mongo Shell", null, getConsoleView(), handler.getConsoleHistoryModel()).install();
         return handler;
     }
-
-
 }
