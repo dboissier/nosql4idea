@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 David Boissier
+ * Copyright (c) 2013 David Boissier
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,21 +20,22 @@ import com.intellij.openapi.components.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @State(
         name = "NoSqlConfiguration",
         storages = {
                 @Storage(file = "$PROJECT_FILE$"),
-                @Storage(file = "$PROJECT_CONFIG_DIR$/nosqlSettings.xml", scheme = StorageScheme.DIRECTORY_BASED)
+                @Storage(file = "$PROJECT_CONFIG_DIR$/mongoSettings.xml", scheme = StorageScheme.DIRECTORY_BASED)
         }
 )
 public class NoSqlConfiguration implements PersistentStateComponent<NoSqlConfiguration> {
 
     private List<ServerConfiguration> serverConfigurations = new LinkedList<ServerConfiguration>();
-    private String mongoShellPath;
-    private String redisShellPath;
+    private Map<DatabaseVendor, String> shellPathByDatabaseVendor = new HashMap<DatabaseVendor, String>();
 
     public static NoSqlConfiguration getInstance(Project project) {
         return ServiceManager.getService(project, NoSqlConfiguration.class);
@@ -57,19 +58,15 @@ public class NoSqlConfiguration implements PersistentStateComponent<NoSqlConfigu
         return serverConfigurations;
     }
 
-    public String getMongoShellPath() {
-        return mongoShellPath;
+    public String getShellPath(DatabaseVendor databaseVendor) {
+        return shellPathByDatabaseVendor.get(databaseVendor);
     }
 
-    public void setMongoShellPath(String mongoShellPath) {
-        this.mongoShellPath = mongoShellPath;
+    public void setShellPathByDatabaseVendor(Map<DatabaseVendor, String> shellPathByDatabaseVendor) {
+        this.shellPathByDatabaseVendor = shellPathByDatabaseVendor;
     }
 
-    public String getRedisShellPath() {
-        return redisShellPath;
-    }
-
-    public void setRedisShellPath(String redisShellPath) {
-        this.redisShellPath = redisShellPath;
+    public void setShellPath(DatabaseVendor databaseVendor, String shellPath) {
+        shellPathByDatabaseVendor.put(databaseVendor,shellPath);
     }
 }

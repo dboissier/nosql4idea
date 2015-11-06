@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 David Boissier
+ * Copyright (c) 2013 David Boissier
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,8 @@
 
 package org.codinjutsu.tools.nosql;
 
-import org.apache.commons.lang.StringUtils;
-import org.codinjutsu.tools.nosql.database.DatabaseVendor;
+import com.mongodb.AuthenticationMechanism;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,12 +31,12 @@ public class ServerConfiguration implements Cloneable {
 
     private DatabaseVendor databaseVendor = DatabaseVendor.MONGO;
 
-    private List<String> serverUrls = new LinkedList<String>();
+    private String serverUrl;
 
     private String username;
     private String password;
     private String userDatabase;
-    private boolean userDatabaseAsMySingleDatabase;
+    private String authenticationDatabase;
 
     private boolean connectOnIdeStartup = false;
     private List<String> collectionsToIgnore = new LinkedList<String>();
@@ -47,6 +45,7 @@ public class ServerConfiguration implements Cloneable {
     private String shellWorkingDir;
     private boolean sslConnection;
 
+    private AuthenticationMechanism authenticationMecanism = null;
 
     public DatabaseVendor getDatabaseVendor() {
         return databaseVendor;
@@ -56,14 +55,13 @@ public class ServerConfiguration implements Cloneable {
         this.databaseVendor = databaseVendor;
     }
 
-    public List<String> getServerUrls() {
-        return serverUrls;
+    public String getServerUrl() {
+        return serverUrl;
     }
 
-    public void setServerUrls(List<String> serverUrls) {
-        this.serverUrls = serverUrls;
+    public void setServerUrl(String serverUrl) {
+        this.serverUrl = serverUrl;
     }
-
 
     public boolean isSslConnection() {
         return sslConnection;
@@ -97,14 +95,14 @@ public class ServerConfiguration implements Cloneable {
         return userDatabase;
     }
 
-    public boolean isUserDatabaseAsMySingleDatabase() {
-        return userDatabaseAsMySingleDatabase;
+    public String getAuthenticationDatabase() {
+        return authenticationDatabase;
     }
 
-    public void setUserDatabaseAsMySingleDatabase(boolean userDatabaseAsMySingleDatabase) {
-        this.userDatabaseAsMySingleDatabase = userDatabaseAsMySingleDatabase;
+    public void setAuthenticationDatabase(String authenticationDatabase) {
+        this.authenticationDatabase = authenticationDatabase;
     }
-
+    
     public boolean isConnectOnIdeStartup() {
         return connectOnIdeStartup;
     }
@@ -145,13 +143,18 @@ public class ServerConfiguration implements Cloneable {
         this.shellWorkingDir = shellWorkingDir;
     }
 
-    public String getUrlsInSingleString() {
-        return StringUtils.join(serverUrls, ",");
+    public void setAuthenticationMecanism(AuthenticationMechanism authenticationMecanism) {
+        this.authenticationMecanism = authenticationMecanism;
+    }
+
+    public AuthenticationMechanism getAuthenticationMecanism() {
+        return authenticationMecanism;
     }
 
     public static ServerConfiguration byDefault() {
         ServerConfiguration serverConfiguration = new ServerConfiguration();
-        serverConfiguration.setServerUrls(Arrays.asList(String.format("%s:%s", DEFAULT_URL, DEFAULT_PORT)));
+        serverConfiguration.setDatabaseVendor(DatabaseVendor.MONGO);
+        serverConfiguration.setServerUrl(DatabaseVendor.MONGO.defaultUrl);
         return serverConfiguration;
     }
 
@@ -164,7 +167,7 @@ public class ServerConfiguration implements Cloneable {
     }
 
     public boolean isSingleServer() {
-        return serverUrls.size() == 1;
+        return serverUrl.split(",").length == 1;
     }
 
     @Override
@@ -175,34 +178,38 @@ public class ServerConfiguration implements Cloneable {
         ServerConfiguration that = (ServerConfiguration) o;
 
         if (connectOnIdeStartup != that.connectOnIdeStartup) return false;
-        if (userDatabaseAsMySingleDatabase != that.userDatabaseAsMySingleDatabase) return false;
+        if (sslConnection != that.sslConnection) return false;
+        if (label != null ? !label.equals(that.label) : that.label != null) return false;
+        if (serverUrl != null ? !serverUrl.equals(that.serverUrl) : that.serverUrl != null) return false;
+        if (username != null ? !username.equals(that.username) : that.username != null) return false;
+        if (password != null ? !password.equals(that.password) : that.password != null) return false;
+        if (userDatabase != null ? !userDatabase.equals(that.userDatabase) : that.userDatabase != null) return false;
+        if (authenticationDatabase != null ? !authenticationDatabase.equals(that.authenticationDatabase) : that.authenticationDatabase != null)
+            return false;
         if (collectionsToIgnore != null ? !collectionsToIgnore.equals(that.collectionsToIgnore) : that.collectionsToIgnore != null)
             return false;
-        if (label != null ? !label.equals(that.label) : that.label != null) return false;
-        if (password != null ? !password.equals(that.password) : that.password != null) return false;
-        if (serverUrls != null ? !serverUrls.equals(that.serverUrls) : that.serverUrls != null) return false;
         if (shellArgumentsLine != null ? !shellArgumentsLine.equals(that.shellArgumentsLine) : that.shellArgumentsLine != null)
             return false;
         if (shellWorkingDir != null ? !shellWorkingDir.equals(that.shellWorkingDir) : that.shellWorkingDir != null)
             return false;
-        if (userDatabase != null ? !userDatabase.equals(that.userDatabase) : that.userDatabase != null) return false;
-        if (username != null ? !username.equals(that.username) : that.username != null) return false;
+        return authenticationMecanism == that.authenticationMecanism;
 
-        return true;
     }
 
     @Override
     public int hashCode() {
         int result = label != null ? label.hashCode() : 0;
-        result = 31 * result + (serverUrls != null ? serverUrls.hashCode() : 0);
+        result = 31 * result + (serverUrl != null ? serverUrl.hashCode() : 0);
         result = 31 * result + (username != null ? username.hashCode() : 0);
         result = 31 * result + (password != null ? password.hashCode() : 0);
         result = 31 * result + (userDatabase != null ? userDatabase.hashCode() : 0);
-        result = 31 * result + (userDatabaseAsMySingleDatabase ? 1 : 0);
+        result = 31 * result + (authenticationDatabase != null ? authenticationDatabase.hashCode() : 0);
         result = 31 * result + (connectOnIdeStartup ? 1 : 0);
         result = 31 * result + (collectionsToIgnore != null ? collectionsToIgnore.hashCode() : 0);
         result = 31 * result + (shellArgumentsLine != null ? shellArgumentsLine.hashCode() : 0);
         result = 31 * result + (shellWorkingDir != null ? shellWorkingDir.hashCode() : 0);
+        result = 31 * result + (sslConnection ? 1 : 0);
+        result = 31 * result + (authenticationMecanism != null ? authenticationMecanism.hashCode() : 0);
         return result;
     }
 }

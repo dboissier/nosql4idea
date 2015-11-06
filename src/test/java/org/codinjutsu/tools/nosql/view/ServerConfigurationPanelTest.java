@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 David Boissier
+ * Copyright (c) 2013 David Boissier
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,17 @@
 package org.codinjutsu.tools.nosql.view;
 
 import com.intellij.openapi.command.impl.DummyProject;
+import com.mongodb.AuthenticationMechanism;
+import org.codinjutsu.tools.nosql.DatabaseVendor;
+import org.codinjutsu.tools.nosql.DatabaseVendorManager;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
-import org.codinjutsu.tools.nosql.database.DatabaseVendorManager;
-import org.codinjutsu.tools.nosql.logic.ConfigurationException;
+import org.codinjutsu.tools.nosql.ServerConfigurationPanel;
+import org.codinjutsu.tools.nosql.commons.logic.ConfigurationException;
 import org.fest.swing.edt.GuiActionRunner;
 import org.fest.swing.edt.GuiQuery;
 import org.fest.swing.fixture.Containers;
 import org.fest.swing.fixture.FrameFixture;
+import org.fest.swing.fixture.JComboBoxFixture;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,8 +35,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 
-import java.util.Arrays;
-
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -48,14 +51,14 @@ public class ServerConfigurationPanelTest {
 
     @Before
     public void setUp() throws Exception {
-        databaseVendorManager = Mockito.spy(new DatabaseVendorManager());
+        databaseVendorManager = Mockito.spy(new DatabaseVendorManager(DummyProject.getInstance()));
         configurationPanel = GuiActionRunner.execute(new GuiQuery<ServerConfigurationPanel>() {
             protected ServerConfigurationPanel executeInEDT() {
                 return new ServerConfigurationPanel(DummyProject.getInstance(), databaseVendorManager);
             }
         });
 
-        frameFixture = Containers.showInFrame(configurationPanel.getRootPanel());
+        frameFixture = Containers.showInFrame(configurationPanel);
     }
 
     @After
@@ -65,38 +68,71 @@ public class ServerConfigurationPanelTest {
 
     @Test
     public void validateFormWithOneServerUrl() throws Exception {
+        frameFixture.textBox("labelField").setText("Localhost");
 
-        frameFixture.textBox("serverUrlsField").setText("localhost:25");
+        JComboBoxFixture databaseVendorField = frameFixture.comboBox("databaseVendorField");
+        assertArrayEquals(new String[]{
+                "DatabaseVendor{name='MongoDB'}",
+                "DatabaseVendor{name='RedisDB'}",
+                "DatabaseVendor{name='Couchbase'}"
+        }, databaseVendorField.contents());
+
+        databaseVendorField.requireSelection("DatabaseVendor{name='MongoDB'}");
+
+        databaseVendorField.selectItem("DatabaseVendor{name='RedisDB'}");
+
+        frameFixture.label("databaseTipsLabel").requireText("format: host:port. If cluster: host:port1,host:port2,...");
+
+        frameFixture.textBox("serverUrlField").setText("localhost:25");
         frameFixture.textBox("usernameField").setText("john");
         frameFixture.textBox("passwordField").setText("johnpassword");
 
-        frameFixture.checkBox("userDatabaseAsMySingleDatabaseField").check();
+        frameFixture.textBox("userDatabaseField").setText("mydatabase");
         frameFixture.checkBox("sslConnectionField").check();
         frameFixture.checkBox("autoConnectField").check();
+
+        frameFixture.radioButton("defaultAuthMethod").requireSelected();
+        frameFixture.radioButton("mongoCRAuthField").click();
 
         ServerConfiguration configuration = new ServerConfiguration();
 
         configurationPanel.applyConfigurationData(configuration);
 
-        assertEquals(Arrays.asList("localhost:25"), configuration.getServerUrls());
+        assertEquals("Localhost", configuration.getLabel());
+        assertEquals(DatabaseVendor.REDIS, configuration.getDatabaseVendor());
+        assertEquals("localhost:25", configuration.getServerUrl());
         assertEquals("john", configuration.getUsername());
-        assertTrue(configuration.isUserDatabaseAsMySingleDatabase());
+        assertEquals("mydatabase", configuration.getUserDatabase());
         assertTrue(configuration.isSslConnection());
         assertTrue(configuration.isConnectOnIdeStartup());
+        assertEquals(AuthenticationMechanism.MONGODB_CR, configuration.getAuthenticationMecanism());
     }
 
     @Test
     public void loadFormWithOneServerUrl() throws Exception {
         ServerConfiguration configuration = new ServerConfiguration();
-        configuration.setServerUrls(Arrays.asList("localhost:25"));
+        configuration.setLabel("Localhost");
+        configuration.setDatabaseVendor(DatabaseVendor.COUCHBASE);
+        configuration.setServerUrl("localhost:25");
         configuration.setUsername("john");
         configuration.setPassword("johnpassword");
 
         configurationPanel.loadConfigurationData(configuration);
 
-        frameFixture.textBox("serverUrlsField").requireText("localhost:25");
+        frameFixture.textBox("labelField").requireText("Localhost");
+        frameFixture.comboBox("databaseVendorField").requireSelection("DatabaseVendor{name='Couchbase'}");
+        frameFixture.label("databaseTipsLabel").requireText("format: host:port. If cluster: host:port1,host:port2,...");
+        frameFixture.textBox("serverUrlField").requireText("localhost:25");
         frameFixture.textBox("usernameField").requireText("john");
         frameFixture.textBox("passwordField").requireText("johnpassword");
+    }
+
+    @Test
+    public void validateFormWithEmptyLabelShouldThrowAConfigurationException() {
+        thrown.expect(ConfigurationException.class);
+        thrown.expectMessage("Label should be set");
+
+        configurationPanel.applyConfigurationData(new ServerConfiguration());
     }
 
     @Test
@@ -104,7 +140,8 @@ public class ServerConfigurationPanelTest {
         thrown.expect(ConfigurationException.class);
         thrown.expectMessage("URL(s) should be set");
 
-        frameFixture.textBox("serverUrlsField").setText(null);
+        frameFixture.textBox("labelField").setText("Localhost");
+        frameFixture.textBox("serverUrlField").setText(null);
 
         configurationPanel.applyConfigurationData(new ServerConfiguration());
     }
@@ -113,8 +150,9 @@ public class ServerConfigurationPanelTest {
     public void validateFormWithEmptyMongoUrlShouldThrowAConfigurationException() {
         thrown.expect(ConfigurationException.class);
         thrown.expectMessage("URL(s) should be set");
+        frameFixture.textBox("labelField").setText("Localhost");
 
-        frameFixture.textBox("serverUrlsField").setText("");
+        frameFixture.textBox("serverUrlField").setText("");
 
         configurationPanel.applyConfigurationData(new ServerConfiguration());
     }
@@ -123,8 +161,9 @@ public class ServerConfigurationPanelTest {
     public void validateFormWithBadMongoUrlShouldThrowAConfigurationException() {
         thrown.expect(ConfigurationException.class);
         thrown.expectMessage("URL 'host' format is incorrect. It should be 'host:port'");
+        frameFixture.textBox("labelField").setText("Localhost");
 
-        frameFixture.textBox("serverUrlsField").setText("host");
+        frameFixture.textBox("serverUrlField").setText("host");
 
         configurationPanel.applyConfigurationData(new ServerConfiguration());
     }
@@ -134,8 +173,9 @@ public class ServerConfigurationPanelTest {
     public void validateFormWithBadMongoPortShouldThrowAConfigurationException() {
         thrown.expect(ConfigurationException.class);
         thrown.expectMessage("Port in the URL 'host:port' is incorrect. It should be a number");
+        frameFixture.textBox("labelField").setText("Localhost");
 
-        frameFixture.textBox("serverUrlsField").setText("host:port");
+        frameFixture.textBox("serverUrlField").setText("host:port");
 
         configurationPanel.applyConfigurationData(new ServerConfiguration());
     }
@@ -143,23 +183,24 @@ public class ServerConfigurationPanelTest {
 
     @Test
     public void validateFormWithReplicatSet() throws Exception {
-
-        frameFixture.textBox("serverUrlsField").setText(" localhost:25, localhost:26 ");
+        frameFixture.textBox("labelField").setText("Localhost");
+        frameFixture.textBox("serverUrlField").setText("localhost:25, localhost:26");
 
         ServerConfiguration configuration = new ServerConfiguration();
 
         configurationPanel.applyConfigurationData(configuration);
 
-        assertEquals(Arrays.asList("localhost:25", "localhost:26"), configuration.getServerUrls());
+        assertEquals("localhost:25, localhost:26", configuration.getServerUrl());
     }
 
     @Test
     public void loadFormWithReplicatSet() throws Exception {
         ServerConfiguration configuration = new ServerConfiguration();
-        configuration.setServerUrls(Arrays.asList("localhost:25", "localhost:26"));
+
+        configuration.setServerUrl("localhost:25, localhost:26");
 
         configurationPanel.loadConfigurationData(configuration);
 
-        frameFixture.textBox("serverUrlsField").requireText("localhost:25,localhost:26");
+        frameFixture.textBox("serverUrlField").requireText("localhost:25, localhost:26");
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 David Boissier
+ * Copyright (c) 2013 David Boissier
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.codinjutsu.tools.nosql;
 
 import com.intellij.openapi.components.AbstractProjectComponent;
 import com.intellij.openapi.project.Project;
-import org.codinjutsu.tools.nosql.view.NoSqlWindowManager;
 import org.jetbrains.annotations.NotNull;
 
 

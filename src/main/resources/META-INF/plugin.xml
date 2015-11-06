@@ -21,25 +21,26 @@
     <vendor email="david.boissier [at] gmail [dot] com" url="http://codinjutsu.blogspot.com">David Boissier</vendor>
 
     <!--<idea-version since-build="135.0" until-build="135.*"/>-->
-    <idea-version since-build="138.0"/>
+    <idea-version since-build="140.0" until-build="141.999999"/>
 
     <depends>com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <projectService serviceInterface="org.codinjutsu.tools.nosql.NoSqlConfiguration"
                         serviceImplementation="org.codinjutsu.tools.nosql.NoSqlConfiguration"/>
-        <projectService serviceInterface="org.codinjutsu.tools.nosql.view.NoSqlWindowManager"
-                        serviceImplementation="org.codinjutsu.tools.nosql.view.NoSqlWindowManager"/>
-        <projectService serviceInterface="org.codinjutsu.tools.nosql.database.mongo.MongoManager"
-                        serviceImplementation="org.codinjutsu.tools.nosql.database.mongo.MongoManager"/>
-        <projectService serviceInterface="org.codinjutsu.tools.nosql.database.redis.RedisManager"
-                        serviceImplementation="org.codinjutsu.tools.nosql.database.redis.RedisManager"/>
-        <projectService serviceInterface="org.codinjutsu.tools.nosql.database.DatabaseVendorManager"
-                        serviceImplementation="org.codinjutsu.tools.nosql.database.DatabaseVendorManager"/>
-        <projectConfigurable instance="org.codinjutsu.tools.nosql.view.NoSqlConfigurable"
+        <projectService serviceInterface="org.codinjutsu.tools.nosql.NoSqlWindowManager"
+                        serviceImplementation="org.codinjutsu.tools.nosql.NoSqlWindowManager"/>
+
+        <projectService serviceInterface="org.codinjutsu.tools.nosql.DatabaseVendorManager"
+                        serviceImplementation="org.codinjutsu.tools.nosql.DatabaseVendorManager"/>
+        <projectService serviceInterface="org.codinjutsu.tools.nosql.mongo.logic.MongoManager"
+                        serviceImplementation="org.codinjutsu.tools.nosql.mongo.logic.MongoManager"/>
+        <projectService serviceInterface="org.codinjutsu.tools.nosql.redis.logic.RedisManager"
+                        serviceImplementation="org.codinjutsu.tools.nosql.redis.logic.RedisManager"/>
+        <projectConfigurable instance="org.codinjutsu.tools.nosql.NoSqlConfigurable"
                              id="preferences.mongoOptions"/>
-        <configurationType implementation="org.codinjutsu.tools.nosql.database.mongo.runner.MongoRunConfigurationType"/>
-        <configurationProducer implementation="org.codinjutsu.tools.nosql.database.mongo.runner.MongoScriptRunConfigurationProducer"/>
+        <configurationType implementation="org.codinjutsu.tools.nosql.mongo.runner.MongoRunConfigurationType"/>
+        <configurationProducer implementation="org.codinjutsu.tools.nosql.mongo.runner.MongoScriptRunConfigurationProducer"/>
     </extensions>
 
     <extensionPoints>
@@ -55,10 +56,10 @@
 
     <application-components>
         <component>
-            <implementation-class>org.codinjutsu.tools.nosql.view.editor.DatabaseDataEditorProvider</implementation-class>
+            <implementation-class>org.codinjutsu.tools.nosql.commons.view.editor.NoSqlDatabaseDataEditorProvider</implementation-class>
         </component>
         <component>
-            <implementation-class>org.codinjutsu.tools.nosql.view.editor.DatabaseFileSystem</implementation-class>
+            <implementation-class>org.codinjutsu.tools.nosql.commons.view.editor.NoSqlDatabaseFileSystem</implementation-class>
         </component>
     </application-components>
 
@@ -72,18 +73,18 @@
 
     <description><![CDATA[
     <p>
-        This tool allows accessing to NoSql databases and provides CRUD operations on data.<br>
-        Documentation is available on the <a href="https://github.com/dboissier/nosql4idea">GitHub project</a>
+        This tool allows accessing to NoSql databases and provides CRUD operations.<br>
+        Documentation is available on the <a href="https://github.com/dboissier/mongo4idea/blob/mongo4idea-0.7.2/README.md">GitHub project</a>
     </p>
             <br>
             <br>
     <p>
         This tool is free for personal and commercial usage.<br>
-        <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4S464JTADXFMJ">Donations</a> are welcomed
+        <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4S464JTADXFMJ">Donations</a> are welcomed.
     </p>
 ]]> </description>
 
     <change-notes><![CDATA[
-<a href="https://github.com/dboissier/nosql4idea/">Changelog</a>
+<a href="https://github.com/dboissier/mongo4idea/blob/nosql4idea-0.1.0/CHANGELOG.txt">Changelog</a>
 ]]> </change-notes>
 </idea-plugin>
