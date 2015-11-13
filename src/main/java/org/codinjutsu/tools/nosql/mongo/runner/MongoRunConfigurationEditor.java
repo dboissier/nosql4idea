@@ -29,7 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
 import org.codinjutsu.tools.nosql.commons.model.Database;
 import org.codinjutsu.tools.nosql.commons.model.DatabaseServer;
-import org.codinjutsu.tools.nosql.mongo.logic.MongoManager;
+import org.codinjutsu.tools.nosql.mongo.logic.MongoClient;
 import org.codinjutsu.tools.nosql.mongo.model.MongoDatabase;
 import org.jetbrains.annotations.NotNull;
 
@@ -107,7 +107,7 @@ public class MongoRunConfigurationEditor extends SettingsEditor<MongoRunConfigur
     }
 
     private DatabaseServer[] getAvailableMongoServers(Project project) {
-        List<DatabaseServer> mongoServers = MongoManager.getInstance(project).getServers();
+        List<DatabaseServer> mongoServers = MongoClient.getInstance(project).getServers();
         List<DatabaseServer> availableMongoServers = new LinkedList<DatabaseServer>();
         for (DatabaseServer mongoServer : mongoServers) {
             if (mongoServer.hasDatabases()) {

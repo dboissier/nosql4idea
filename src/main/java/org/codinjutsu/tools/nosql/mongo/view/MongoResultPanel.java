@@ -33,7 +33,7 @@ import com.mongodb.DBObject;
 import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.nosql.commons.view.NoSqlTreeNode;
 import org.codinjutsu.tools.nosql.commons.view.nodedescriptor.NodeDescriptor;
-import org.codinjutsu.tools.nosql.mongo.model.MongoCollectionResult;
+import org.codinjutsu.tools.nosql.mongo.model.MongoResult;
 import org.codinjutsu.tools.nosql.commons.utils.GuiUtils;
 import org.codinjutsu.tools.nosql.mongo.view.action.CopyResultAction;
 import org.codinjutsu.tools.nosql.mongo.view.action.EditMongoDocumentAction;
@@ -99,8 +99,8 @@ public class MongoResultPanel extends JPanel implements Disposable {
         });
     }
 
-    public void updateResultTableTree(MongoCollectionResult mongoCollectionResult) {
-        resultTableView = new JsonTreeTableView(JsonTreeModel.buildJsonTree(mongoCollectionResult), JsonTreeTableView.COLUMNS_FOR_READING);
+    public void updateResultTableTree(MongoResult mongoResult) {
+        resultTableView = new JsonTreeTableView(JsonTreeModel.buildJsonTree(mongoResult), JsonTreeTableView.COLUMNS_FOR_READING);
         resultTableView.setName("resultTreeTable");
 
         resultTableView.addMouseListener(new MouseAdapter() {

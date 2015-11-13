@@ -22,7 +22,7 @@ import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 import org.apache.commons.io.IOUtils;
 import org.codinjutsu.tools.nosql.commons.view.TableCellReader;
-import org.codinjutsu.tools.nosql.mongo.model.MongoCollectionResult;
+import org.codinjutsu.tools.nosql.mongo.model.MongoResult;
 import org.fest.swing.edt.GuiActionRunner;
 import org.fest.swing.edt.GuiQuery;
 import org.fest.swing.fixture.Containers;
@@ -207,13 +207,13 @@ public class MongoResultPanelTest {
                 mongoResultPanel.getSelectedNodeStringifiedValue());
     }
 
-    private MongoCollectionResult createCollectionResults(String data, String collectionName) throws IOException {
+    private MongoResult createCollectionResults(String data, String collectionName) throws IOException {
         DBObject jsonObject = (DBObject) JSON.parse(IOUtils.toString(getClass().getResourceAsStream(data)));
 
-        MongoCollectionResult mongoCollectionResult = new MongoCollectionResult(collectionName);
-        mongoCollectionResult.add(jsonObject);
+        MongoResult mongoResult = new MongoResult(collectionName);
+        mongoResult.add(jsonObject);
 
-        return mongoCollectionResult;
+        return mongoResult;
     }
 
 }

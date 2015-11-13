@@ -18,6 +18,7 @@ package org.codinjutsu.tools.nosql.redis.logic;
 
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
+import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
 import org.codinjutsu.tools.nosql.commons.model.Database;
 import org.codinjutsu.tools.nosql.commons.logic.DatabaseClient;
@@ -34,10 +35,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class RedisManager implements DatabaseClient {
+public class RedisClient implements DatabaseClient {
 
-    public static RedisManager getInstance(Project project) {
-        return ServiceManager.getService(project, RedisManager.class);
+    public static RedisClient getInstance(Project project) {
+        return ServiceManager.getService(project, RedisClient.class);
     }
 
 
@@ -51,10 +52,15 @@ public class RedisManager implements DatabaseClient {
     public void loadServer(DatabaseServer databaseServer) {
         Jedis jedis = createJedis(databaseServer.getConfiguration());
         List<String> databaseNumberTuple = jedis.configGet("databases");
-        int totalNumberOfDatabase = Integer.parseInt(databaseNumberTuple.get(1));
-        List<Database> databases = new LinkedList<Database>();
-        for (int i=0; i < totalNumberOfDatabase; i++) {
-            databases.add(new RedisDatabase(String.valueOf(i)));
+        List<Database> databases = new LinkedList<>();
+        String userDatabase = databaseServer.getConfiguration().getUserDatabase();
+        if (StringUtils.isNotEmpty(userDatabase)) {
+            databases.add(new RedisDatabase(userDatabase));
+        } else {
+            int totalNumberOfDatabase = Integer.parseInt(databaseNumberTuple.get(1));
+            for (int i = 0; i < totalNumberOfDatabase; i++) {
+                databases.add(new RedisDatabase(String.valueOf(i)));
+            }
         }
         databaseServer.setDatabases(databases);
     }
@@ -78,7 +84,6 @@ public class RedisManager implements DatabaseClient {
 
         Set<String> keys = jedis.keys(query.getFilter());
         for (String key : keys) {
-            System.out.println("key = " + key);
             RedisKeyType keyType = RedisKeyType.getKeyType(jedis.type(key));
             if (RedisKeyType.LIST.equals(keyType)) {
                 List<String> values = jedis.lrange(key, 0, -1);

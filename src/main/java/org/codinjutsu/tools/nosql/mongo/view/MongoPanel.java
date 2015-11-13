@@ -34,9 +34,9 @@ import com.mongodb.DBObject;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
 import org.codinjutsu.tools.nosql.commons.view.NoSqlResultView;
 import org.codinjutsu.tools.nosql.commons.view.action.ExecuteQuery;
-import org.codinjutsu.tools.nosql.mongo.logic.MongoManager;
+import org.codinjutsu.tools.nosql.mongo.logic.MongoClient;
 import org.codinjutsu.tools.nosql.mongo.model.MongoCollection;
-import org.codinjutsu.tools.nosql.mongo.model.MongoCollectionResult;
+import org.codinjutsu.tools.nosql.mongo.model.MongoResult;
 import org.codinjutsu.tools.nosql.commons.utils.GuiUtils;
 import org.codinjutsu.tools.nosql.commons.view.ErrorPanel;
 import org.codinjutsu.tools.nosql.mongo.view.action.*;
@@ -55,12 +55,12 @@ public class MongoPanel extends NoSqlResultView<MongoCollection> {
     private final MongoResultPanel resultPanel;
     private final QueryPanel queryPanel;
 
-    private final MongoManager mongoManager;
+    private final MongoClient mongoClient;
     private final ServerConfiguration configuration;
     private final MongoCollection mongoCollection;
 
-    public MongoPanel(Project project, final MongoManager mongoManager, final ServerConfiguration configuration, final MongoCollection mongoCollection) {
-        this.mongoManager = mongoManager;
+    public MongoPanel(Project project, final MongoClient mongoClient, final ServerConfiguration configuration, final MongoCollection mongoCollection) {
+        this.mongoClient = mongoClient;
         this.mongoCollection = mongoCollection;
         this.configuration = configuration;
 
@@ -72,16 +72,16 @@ public class MongoPanel extends NoSqlResultView<MongoCollection> {
         resultPanel = createResultPanel(project, new MongoDocumentOperations() {
 
             public DBObject getMongoDocument(Object _id) {
-                return mongoManager.findMongoDocument(configuration, mongoCollection, _id);
+                return mongoClient.findMongoDocument(configuration, mongoCollection, _id);
             }
 
             public void updateMongoDocument(DBObject mongoDocument) {
-                mongoManager.update(configuration, mongoCollection, mongoDocument);
+                mongoClient.update(configuration, mongoCollection, mongoDocument);
                 executeQuery();
             }
 
             public void deleteMongoDocument(Object objectId) {
-                mongoManager.delete(configuration, mongoCollection, objectId);
+                mongoClient.delete(configuration, mongoCollection, objectId);
                 executeQuery();
             }
         });
@@ -202,11 +202,11 @@ public class MongoPanel extends NoSqlResultView<MongoCollection> {
                         }
                     });
 
-                    final MongoCollectionResult mongoCollectionResult = mongoManager.loadCollectionValues(configuration, mongoCollection, queryPanel.getQueryOptions(rowLimitField.getText()));
+                    final MongoResult mongoResult = mongoClient.loadCollectionValues(configuration, mongoCollection, queryPanel.getQueryOptions(rowLimitField.getText()));
                     GuiUtils.runInSwingThread(new Runnable() {
                         @Override
                         public void run() {
-                            resultPanel.updateResultTableTree(mongoCollectionResult);
+                            resultPanel.updateResultTableTree(mongoResult);
 
                         }
                     });

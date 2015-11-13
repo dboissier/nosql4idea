@@ -32,7 +32,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
-public class RedisManagerTest {
+public class RedisClientTest {
 
     private Jedis jedis;
 
@@ -45,13 +45,13 @@ public class RedisManagerTest {
         jedis.zadd("reviews", 14.0d, "reading");
         jedis.zadd("reviews", 15.0d, "maths");
 
-        RedisManager redisManager = new RedisManager();
+        RedisClient redisClient = new RedisClient();
         ServerConfiguration serverConfiguration = new ServerConfiguration();
         serverConfiguration.setDatabaseVendor(DatabaseVendor.REDIS);
         serverConfiguration.setServerUrl("localhost:6379");
 
         RedisQuery query = new RedisQuery("*");
-        RedisResult result = redisManager.loadRecords(serverConfiguration, new RedisDatabase("1"), query);
+        RedisResult result = redisClient.loadRecords(serverConfiguration, new RedisDatabase("1"), query);
 
         List<RedisRecord> redisRecords = result.getResults();
         assertEquals(4, redisRecords.size());

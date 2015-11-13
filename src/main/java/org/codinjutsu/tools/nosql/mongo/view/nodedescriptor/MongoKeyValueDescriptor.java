@@ -32,7 +32,6 @@ import java.util.Locale;
 
 public class MongoKeyValueDescriptor implements NodeDescriptor {
 
-    private static final String STRING_SURROUNDED = "\"%s\"";
     protected static final String TO_STRING_TEMPLATE = "\"%s\" : %s";
 
     protected final String key;
@@ -80,7 +79,7 @@ public class MongoKeyValueDescriptor implements NodeDescriptor {
         } else if (value instanceof ObjectId) {
             return new MongoKeyValueDescriptor(key, value, StyleAttributesProvider.getObjectIdAttribute());
         } else if (value instanceof DBObject) {
-            return new MongoKeyValueDescriptor(key, value, StyleAttributesProvider.getDBObjectAttribute());
+            return new MongoKeyValueDescriptor(key, value, StyleAttributesProvider.getObjectAttribute());
         } else {
             return new MongoKeyValueDescriptor(key, value, StyleAttributesProvider.getStringAttribute());
         }
@@ -103,7 +102,7 @@ public class MongoKeyValueDescriptor implements NodeDescriptor {
     }
 
     public String getFormattedKey() {
-        return String.format(STRING_SURROUNDED, key);
+        return key;
     }
 
     public String getFormattedValue() {
@@ -148,6 +147,7 @@ public class MongoKeyValueDescriptor implements NodeDescriptor {
 
     private static class MongoKeyStringValueDescriptor extends MongoKeyValueDescriptor {
 
+        private static final String STRING_SURROUNDED = "\"%s\"";
         private static final String TO_STRING_FOR_STRING_VALUE_TEMPLATE = "\"%s\" : \"%s\"";
 
         private MongoKeyStringValueDescriptor(String key, String value) {

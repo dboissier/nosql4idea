@@ -20,9 +20,9 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import org.codinjutsu.tools.nosql.commons.logic.DatabaseClient;
 import org.codinjutsu.tools.nosql.commons.model.DatabaseServer;
-import org.codinjutsu.tools.nosql.couchbase.logic.CouchbaseManager;
-import org.codinjutsu.tools.nosql.mongo.logic.MongoManager;
-import org.codinjutsu.tools.nosql.redis.logic.RedisManager;
+import org.codinjutsu.tools.nosql.couchbase.logic.CouchbaseClient;
+import org.codinjutsu.tools.nosql.mongo.logic.MongoClient;
+import org.codinjutsu.tools.nosql.redis.logic.RedisClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,9 +32,9 @@ public class DatabaseVendorManager {
     private static final Map<DatabaseVendor, Class<? extends DatabaseClient>> dataClientByVendor = new HashMap<DatabaseVendor, Class<? extends DatabaseClient>>();
 
     static {
-        dataClientByVendor.put(DatabaseVendor.MONGO, MongoManager.class);
-        dataClientByVendor.put(DatabaseVendor.REDIS, RedisManager.class);
-//        dataClientByVendor.put(DatabaseVendor.COUCHBASE, CouchbaseManager.class);
+        dataClientByVendor.put(DatabaseVendor.MONGO, MongoClient.class);
+        dataClientByVendor.put(DatabaseVendor.REDIS, RedisClient.class);
+        dataClientByVendor.put(DatabaseVendor.COUCHBASE, CouchbaseClient.class);
     }
 
     private final Project project;

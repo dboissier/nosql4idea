@@ -59,7 +59,7 @@ public class MongoValueDescriptor implements NodeDescriptor {
         } else if (value instanceof Date) {
             return new MongoDateValueDescriptor(index, (Date) value);
         } else if (value instanceof DBObject) {
-            return new MongoValueDescriptor(index, value, StyleAttributesProvider.getDBObjectAttribute());
+            return new MongoValueDescriptor(index, value, StyleAttributesProvider.getObjectAttribute());
         } else {
             return new MongoValueDescriptor(index, value, StyleAttributesProvider.getStringAttribute());
         }

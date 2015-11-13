@@ -33,10 +33,14 @@
 
         <projectService serviceInterface="org.codinjutsu.tools.nosql.DatabaseVendorManager"
                         serviceImplementation="org.codinjutsu.tools.nosql.DatabaseVendorManager"/>
-        <projectService serviceInterface="org.codinjutsu.tools.nosql.mongo.logic.MongoManager"
-                        serviceImplementation="org.codinjutsu.tools.nosql.mongo.logic.MongoManager"/>
-        <projectService serviceInterface="org.codinjutsu.tools.nosql.redis.logic.RedisManager"
-                        serviceImplementation="org.codinjutsu.tools.nosql.redis.logic.RedisManager"/>
+        <projectService serviceInterface="org.codinjutsu.tools.nosql.mongo.logic.MongoClient"
+                        serviceImplementation="org.codinjutsu.tools.nosql.mongo.logic.MongoClient"/>
+        <projectService serviceInterface="org.codinjutsu.tools.nosql.redis.logic.RedisClient"
+                        serviceImplementation="org.codinjutsu.tools.nosql.redis.logic.RedisClient"/>
+        <projectService serviceInterface="org.codinjutsu.tools.nosql.couchbase.logic.CouchbaseClient"
+                        serviceImplementation="org.codinjutsu.tools.nosql.couchbase.logic.CouchbaseClient"/>
+
+
         <projectConfigurable instance="org.codinjutsu.tools.nosql.NoSqlConfigurable"
                              id="preferences.mongoOptions"/>
         <configurationType implementation="org.codinjutsu.tools.nosql.mongo.runner.MongoRunConfigurationType"/>

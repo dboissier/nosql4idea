@@ -21,10 +21,9 @@ import com.intellij.openapi.project.Project;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
 import org.codinjutsu.tools.nosql.commons.view.TableCellReader;
 import org.codinjutsu.tools.nosql.redis.model.RedisQuery;
-import org.codinjutsu.tools.nosql.redis.logic.RedisManager;
+import org.codinjutsu.tools.nosql.redis.logic.RedisClient;
 import org.codinjutsu.tools.nosql.redis.model.RedisDatabase;
 import org.codinjutsu.tools.nosql.redis.model.RedisResult;
-import org.fest.swing.core.MouseButton;
 import org.fest.swing.edt.GuiActionRunner;
 import org.fest.swing.edt.GuiQuery;
 import org.fest.swing.fixture.Containers;
@@ -43,13 +42,19 @@ import static org.mockito.Mockito.when;
 
 public class RedisPanelTest {
 
-    private RedisPanel redisPanel;
+    private RedisPanel redisPanelWrapper;
 
     private FrameFixture frameFixture;
 
     private Project dummyProject = DummyProject.getInstance();
 
-    private RedisManager redisManagerMock = Mockito.mock(RedisManager.class);
+    private RedisClient redisClientMock = Mockito.mock(RedisClient.class);
+    private RedisPanel redisPanel = new RedisPanel(dummyProject, redisClientMock, new ServerConfiguration(), new RedisDatabase("0")) {
+        @Override
+        protected void addCommonsActions() {
+
+        }
+    };
 
     @After
     public void tearDown() {
@@ -58,45 +63,39 @@ public class RedisPanelTest {
 
     @Before
     public void setUp() throws Exception {
-        when(redisManagerMock.loadRecords(any(ServerConfiguration.class), any(RedisDatabase.class), any(RedisQuery.class))).thenReturn(new RedisResult());
+        when(redisClientMock.loadRecords(any(ServerConfiguration.class), any(RedisDatabase.class), any(RedisQuery.class))).thenReturn(new RedisResult());
 
-        redisPanel = GuiActionRunner.execute(new GuiQuery<RedisPanel>() {
+        redisPanelWrapper = GuiActionRunner.execute(new GuiQuery<RedisPanel>() {
             protected RedisPanel executeInEDT() {
-                redisManagerMock = Mockito.mock(RedisManager.class);
-                return new RedisPanel(dummyProject, redisManagerMock, new ServerConfiguration(), new RedisDatabase("0")) {
-                    @Override
-                    protected void addCommonsActions() {
-
-                    }
-                };
+                return redisPanel;
             }
         });
 
-        frameFixture = Containers.showInFrame(redisPanel);
+        frameFixture = Containers.showInFrame(redisPanelWrapper);
     }
 
     @Test
     public void displayTreeWithEachSupportedKeyType() throws Exception {
 
-        redisPanel.updateResultTableTree(createRedisResults(), "");
+        redisPanelWrapper.updateResultTableTree(createRedisResults(), "");
 
         frameFixture.table("resultTreeTable").cellReader(new TableCellReader())
                 .requireColumnCount(2)
                 .requireContents(new String[][]{
-                        {"\"foo:bar\"", "john"},
-                        {"\"fun:bar\"", "[drink, some, beer]"},
+                        {"foo:bar", "john"},
+                        {"fun:bar", "[drink, some, beer]"},
                         {"[0]", "drink"},
                         {"[1]", "some"},
                         {"[2]", "beer"},
-                        {"\"stuff:countries\"", "{France, Canada, Japan}"},
+                        {"stuff:countries", "{France, Canada, Japan}"},
                         {"-", "France"},
                         {"-", "Canada"},
                         {"-", "Japan"},
-                        {"\"stuff:aliases\"", "{david=dada, mickael=mike, bruno=nono}"},
-                        {"\"david\"", "dada"},
-                        {"\"mickael\"", "mike"},
-                        {"\"bruno\"", "nono"},
-                        {"\"stuff:games:critics\"", "{(unreal, 8.0), (quake, 9.0), (half-life, 10.0)}"},
+                        {"stuff:aliases", "{david=dada, mickael=mike, bruno=nono}"},
+                        {"david", "dada"},
+                        {"mickael", "mike"},
+                        {"bruno", "nono"},
+                        {"stuff:games:critics", "{(unreal, 8.0), (quake, 9.0), (half-life, 10.0)}"},
                         {"-", "(unreal, 8.0)"},
                         {"-", "(quake, 9.0)"},
                         {"-", "(half-life, 10.0)"},
@@ -105,26 +104,38 @@ public class RedisPanelTest {
 
     @Test
     public void testDisplayTreeWithFragmentedKey() throws Exception {
-        RedisResult redisResult = new RedisResult();
-        redisResult.setSeparator(":");
-        redisResult.addString("foo:bar", "john");
-        redisResult.addList("fun:bar", Arrays.asList("drink", "some", "beer"));
-
-        redisPanel.updateResultTableTree(redisResult, ":");
+        redisPanelWrapper.updateResultTableTree(createRedisResults(), ":");
+        redisPanel.expandAll();
 
 
         JTableFixture resultTreeTable = frameFixture.table("resultTreeTable");
         resultTreeTable.cellReader(new TableCellReader())
                 .requireColumnCount(2)
                 .requireContents(new String[][]{
-                        {"\"foo\"", ""},
-                        {"\"bar\"", "john"},
-                        {"\"fun\"", ""},
-                        {"\"bar\"", "[drink, some, beer]"},
+                        {"foo", ""},
+                        {"bar", "john"},
+                        {"fun", ""},
+                        {"bar", "[drink, some, beer]"},
                         {"[0]", "drink"},
                         {"[1]", "some"},
                         {"[2]", "beer"},
+                        {"stuff", ""},
+                        {"countries", "{France, Canada, Japan}"},
+                        {"-", "France"},
+                        {"-", "Canada"},
+                        {"-", "Japan"},
+                        {"aliases", "{david=dada, mickael=mike, bruno=nono}"},
+                        {"david", "dada"},
+                        {"mickael", "mike"},
+                        {"bruno", "nono"},
+                        {"games", ""},
+                        {"critics", "{(unreal, 8.0), (quake, 9.0), (half-life, 10.0)}"},
+                        {"-", "(unreal, 8.0)"},
+                        {"-", "(quake, 9.0)"},
+                        {"-", "(half-life, 10.0)"},
                 });
+
+
     }
 
     private RedisResult createRedisResults() {

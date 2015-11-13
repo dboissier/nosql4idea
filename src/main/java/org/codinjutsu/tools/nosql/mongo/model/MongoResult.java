@@ -21,12 +21,12 @@ import com.mongodb.DBObject;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MongoCollectionResult {
+public class MongoResult {
 
     private final String collectionName;
     private final List<DBObject> mongoObjects = new LinkedList<DBObject>();
 
-    public MongoCollectionResult(String collectionName) {
+    public MongoResult(String collectionName) {
         this.collectionName = collectionName;
     }
 

@@ -24,6 +24,7 @@ import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.LoadingDecorator;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
@@ -33,7 +34,7 @@ import com.intellij.util.ui.tree.TreeUtil;
 import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
 import org.codinjutsu.tools.nosql.commons.view.NoSqlTreeNode;
-import org.codinjutsu.tools.nosql.redis.logic.RedisManager;
+import org.codinjutsu.tools.nosql.redis.logic.RedisClient;
 import org.codinjutsu.tools.nosql.redis.model.RedisQuery;
 import org.codinjutsu.tools.nosql.redis.model.RedisDatabase;
 import org.codinjutsu.tools.nosql.redis.model.RedisResult;
@@ -52,26 +53,32 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
     private JPanel errorPanel;
     private JPanel resultPanel;
     private JPanel mainPanel;
+    private final LoadingDecorator loadingDecorator;
+
 
     private JsonTreeTableView resultTableView;
 
     private final Project project;
-    private final RedisManager redisManager;
+    private final RedisClient redisClient;
     private final ServerConfiguration configuration;
     private final RedisDatabase database;
     private JBTextField separatorField;
     private JBTextField filterField;
     private RedisResult redisResult;
 
-    public RedisPanel(Project project, RedisManager redisManager, ServerConfiguration configuration, RedisDatabase database) {
+    public RedisPanel(Project project, RedisClient redisClient, ServerConfiguration configuration, RedisDatabase database) {
         this.project = project;
-        this.redisManager = redisManager;
+        this.redisClient = redisClient;
         this.configuration = configuration;
         this.database = database;
+        this.resultPanel = new JPanel(new BorderLayout());
 
 
         buildQueryToolBar();
 
+        loadingDecorator = new LoadingDecorator(resultPanel, this, 0);
+
+        containerPanel.add(loadingDecorator.getComponent());
         loadAndDisplayResults(getFilter(), getSeparator());
 
         setLayout(new BorderLayout());
@@ -79,7 +86,7 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
     }
 
     private void loadAndDisplayResults(String filter, String separator) {
-        redisResult = redisManager.loadRecords(configuration, database, new RedisQuery(filter));
+        redisResult = redisClient.loadRecords(configuration, database, new RedisQuery(filter));
         updateResultTableTree(redisResult, separator);
     }
 
@@ -188,10 +195,6 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
     }
 
     public void updateResultTableTree(RedisResult redisResult, String separator) {
-        if (redisResult == null) {
-            return; //todo fixme
-        }
-
         NoSqlTreeNode rootNode = RedisTreeModel.buildTree(redisResult);
         DefaultMutableTreeNode targetRootNode = RedisFragmentedKeyTreeModel.wrapNodes(rootNode, separator);
         resultTableView = new JsonTreeTableView(targetRootNode, JsonTreeTableView.COLUMNS_FOR_READING);

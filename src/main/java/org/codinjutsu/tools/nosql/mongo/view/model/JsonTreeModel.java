@@ -22,7 +22,7 @@ import com.mongodb.DBObject;
 import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.nosql.commons.view.NoSqlTreeNode;
 import org.codinjutsu.tools.nosql.commons.view.nodedescriptor.NodeDescriptor;
-import org.codinjutsu.tools.nosql.mongo.model.MongoCollectionResult;
+import org.codinjutsu.tools.nosql.mongo.model.MongoResult;
 import org.codinjutsu.tools.nosql.mongo.view.nodedescriptor.MongoKeyValueDescriptor;
 import org.codinjutsu.tools.nosql.mongo.view.nodedescriptor.MongoResultDescriptor;
 import org.codinjutsu.tools.nosql.mongo.view.nodedescriptor.MongoValueDescriptor;
@@ -35,15 +35,15 @@ import java.util.List;
 public class JsonTreeModel extends DefaultTreeModel {
 
 
-    public JsonTreeModel(MongoCollectionResult mongoCollectionResult) {
-        super(buildJsonTree(mongoCollectionResult));
+    public JsonTreeModel(MongoResult mongoResult) {
+        super(buildJsonTree(mongoResult));
     }
 
 
-    public static TreeNode buildJsonTree(MongoCollectionResult mongoCollectionResult) {
-        NoSqlTreeNode rootNode = new NoSqlTreeNode(new MongoResultDescriptor(mongoCollectionResult.getCollectionName()));
+    public static TreeNode buildJsonTree(MongoResult mongoResult) {
+        NoSqlTreeNode rootNode = new NoSqlTreeNode(new MongoResultDescriptor(mongoResult.getCollectionName()));
 
-        List<DBObject> mongoObjects = mongoCollectionResult.getMongoObjects();
+        List<DBObject> mongoObjects = mongoResult.getMongoObjects();
         int i = 0;
         for (DBObject mongoObject : mongoObjects) {
             if (mongoObject instanceof BasicDBList) {

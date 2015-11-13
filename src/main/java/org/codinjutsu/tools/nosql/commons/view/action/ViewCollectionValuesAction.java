@@ -33,11 +33,12 @@ public class ViewCollectionValuesAction extends AnAction implements DumbAware {
 
     @Override
     public void actionPerformed(AnActionEvent anActionEvent) {
-        noSqlExplorerPanel.loadSelectedCollectionValues();
+        noSqlExplorerPanel.loadRecords();
     }
 
     public void update(AnActionEvent event) {
         event.getPresentation().setVisible(noSqlExplorerPanel.getSelectedCollection() != null
-                || noSqlExplorerPanel.getSelectedRedisDatabase() != null);
+                || noSqlExplorerPanel.getSelectedRedisDatabase() != null
+                || noSqlExplorerPanel.getSelectedCouchaseDatabase() != null);
     }
 }

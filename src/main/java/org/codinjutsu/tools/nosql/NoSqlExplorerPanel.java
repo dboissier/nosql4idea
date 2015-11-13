@@ -38,6 +38,8 @@ import org.codinjutsu.tools.nosql.commons.utils.GuiUtils;
 import org.codinjutsu.tools.nosql.commons.view.action.OpenPluginSettingsAction;
 import org.codinjutsu.tools.nosql.commons.view.action.RefreshServerAction;
 import org.codinjutsu.tools.nosql.commons.view.editor.NoSqlDatabaseObjectFile;
+import org.codinjutsu.tools.nosql.couchbase.model.CouchbaseDatabase;
+import org.codinjutsu.tools.nosql.couchbase.view.editor.CouchbaseObjectFile;
 import org.codinjutsu.tools.nosql.mongo.model.MongoCollection;
 import org.codinjutsu.tools.nosql.mongo.model.MongoDatabase;
 import org.codinjutsu.tools.nosql.mongo.view.action.DropCollectionAction;
@@ -176,9 +178,12 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
     private void addDatabasesIfAny(DatabaseServer databaseServer, DefaultMutableTreeNode serverNode) {
         for (Database database : databaseServer.getDatabases()) {
             DefaultMutableTreeNode databaseNode = new DefaultMutableTreeNode(database);
-//            for (MongoCollection collection : mongoDatabase.getCollections()) {
-//                databaseNode.add(new DefaultMutableTreeNode(collection));
-//            }
+            if (database instanceof MongoDatabase) {
+                MongoDatabase mongoDatabase = (MongoDatabase) database;
+                for (MongoCollection collection : mongoDatabase.getCollections()) {
+                    databaseNode.add(new DefaultMutableTreeNode(collection));
+                }
+            }
             serverNode.add(databaseNode);
         }
     }
@@ -225,7 +230,7 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
         });
 
 
-        DefaultActionGroup actionGroup = new DefaultActionGroup("MongoExplorerGroup", false);
+        DefaultActionGroup actionGroup = new DefaultActionGroup("NoSqlExplorerGroup", false);
         ViewCollectionValuesAction viewCollectionValuesAction = new ViewCollectionValuesAction(this);
         RefreshServerAction refreshServerAction = new RefreshServerAction(this);
         if (ApplicationManager.getApplication() != null) {
@@ -267,9 +272,13 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
                         reloadServerConfiguration(getSelectedServerNode(), true);
                     }
                     if (treeNode.getUserObject() instanceof MongoCollection) {
-                        loadSelectedCollectionValues();
+                        loadRecords();
                     }
                     if (treeNode.getUserObject() instanceof RedisDatabase) {
+                        loadRecords();
+                    }
+
+                    if (treeNode.getUserObject() instanceof CouchbaseDatabase) {
                         loadRecords();
                     }
                 }
@@ -361,6 +370,19 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
 
     }
 
+    public CouchbaseDatabase getSelectedCouchaseDatabase() {
+        DefaultMutableTreeNode databaseNode = getSelectedDatabaseNode();
+        if (databaseNode == null) {
+            return null;
+        }
+
+        Object database = databaseNode.getUserObject();
+        if (!(database instanceof CouchbaseDatabase)) {
+            return null;
+        }
+        return (CouchbaseDatabase) database;
+    }
+
     public MongoDatabase getSelectedMongoDatabase() {
         DefaultMutableTreeNode databaseNode = getSelectedDatabaseNode();
         if (databaseNode == null) {
@@ -385,12 +407,8 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
         return (MongoCollection) collectionNode.getUserObject();
     }
 
-    public void loadSelectedCollectionValues() {
-        NoSqlDatabaseFileSystem.getInstance().openEditor(createNoSqlObjectFile());
-    }
-
     public void loadRecords() {
-        this.loadSelectedCollectionValues();
+        NoSqlDatabaseFileSystem.getInstance().openEditor(createNoSqlObjectFile());
     }
 
     @NotNull
@@ -398,6 +416,8 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
         ServerConfiguration selectedConfiguration = getConfiguration();
         if (DatabaseVendor.MONGO.equals(selectedConfiguration.getDatabaseVendor())) {
             return new MongoObjectFile(project, selectedConfiguration, getSelectedCollection());
+        } else if (DatabaseVendor.COUCHBASE.equals(selectedConfiguration.getDatabaseVendor())) {
+            return new CouchbaseObjectFile(project, selectedConfiguration, getSelectedCouchaseDatabase());
         }
         return new RedisObjectFile(project, selectedConfiguration, getSelectedRedisDatabase());
     }

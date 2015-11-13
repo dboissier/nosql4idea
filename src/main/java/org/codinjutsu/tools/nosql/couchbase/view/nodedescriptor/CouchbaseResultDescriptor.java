@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 David Boissier
+ * Copyright (c) 2013 David Boissier
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,47 +14,33 @@
  * limitations under the License.
  */
 
-package org.codinjutsu.tools.nosql.redis.view.nodedescriptor;
+package org.codinjutsu.tools.nosql.couchbase.view.nodedescriptor;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.ui.ColoredTableCellRenderer;
 import com.intellij.ui.ColoredTreeCellRenderer;
-import com.intellij.ui.SimpleTextAttributes;
 import org.codinjutsu.tools.nosql.commons.view.nodedescriptor.NodeDescriptor;
-import org.codinjutsu.tools.nosql.commons.style.StyleAttributesProvider;
 
-public class FragmentedKeyNodeDescriptor implements NodeDescriptor {
+public class CouchbaseResultDescriptor implements NodeDescriptor {
 
-    private final String keyFragment;
-    private final SimpleTextAttributes keyAttribute;
+    private final String formattedText;
 
-    public FragmentedKeyNodeDescriptor(String keyFragment, SimpleTextAttributes keyAttribute) {
-        this.keyFragment = keyFragment;
-        this.keyAttribute = keyAttribute;
+    public CouchbaseResultDescriptor(String collectionName) {
+        formattedText = String.format("results of '%s'", collectionName);
     }
 
-    public static FragmentedKeyNodeDescriptor createDescriptor(String key) {
-        return new FragmentedKeyNodeDescriptor(key, StyleAttributesProvider.getKeyValueAttribute());
+    public CouchbaseResultDescriptor() {
+        this("");
     }
 
-    public String getKeyFragment() {
-        return keyFragment;
-    }
-
-    @Override
     public void renderValue(ColoredTableCellRenderer cellRenderer, boolean isNodeExpanded) {
-
     }
 
-    @Override
     public void renderNode(ColoredTreeCellRenderer cellRenderer) {
-        cellRenderer.setIcon(AllIcons.Nodes.Advice);
-        cellRenderer.append(keyFragment, keyAttribute);
+
     }
 
-    @Override
     public String getFormattedKey() {
-        return keyFragment;
+        return formattedText;
     }
 
     @Override
@@ -63,7 +49,7 @@ public class FragmentedKeyNodeDescriptor implements NodeDescriptor {
     }
 
     @Override
-    public Object getValue() {
+    public String getValue() {
         return null;
     }
 

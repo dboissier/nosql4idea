@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 David Boissier
+ * Copyright (c) 2013 David Boissier
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,81 +14,83 @@
  * limitations under the License.
  */
 
-package org.codinjutsu.tools.nosql.redis.view.nodedescriptor;
+package org.codinjutsu.tools.nosql.couchbase.view.nodedescriptor;
 
 import com.intellij.ui.ColoredTableCellRenderer;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
-import org.codinjutsu.tools.nosql.commons.view.nodedescriptor.NodeDescriptor;
 import org.codinjutsu.tools.nosql.commons.style.StyleAttributesProvider;
-import redis.clients.jedis.Tuple;
+import org.codinjutsu.tools.nosql.commons.utils.StringUtils;
+import org.codinjutsu.tools.nosql.commons.view.nodedescriptor.NodeDescriptor;
 
-public class RedisValueDescriptor implements NodeDescriptor {
+public class CouchbaseValueDescriptor implements NodeDescriptor {
 
     private final int index;
     protected Object value;
     private final SimpleTextAttributes valueTextAttributes;
 
-    public static RedisValueDescriptor createDescriptor(int index, Object value) {
-        return new RedisValueDescriptor(index, value, StyleAttributesProvider.getStringAttribute());
+    public static CouchbaseValueDescriptor createDescriptor(int index, Object value) {
+        if (value instanceof String) {
+            return new CouchbaseStringValueDescriptor(index, (String) value);
+        }
+        return new CouchbaseValueDescriptor(index, value, StyleAttributesProvider.getStringAttribute());
+
     }
 
-    public static RedisValueDescriptor createUnindexedDescriptor(Object value) {
-        return new RedisUnindexedValueDescriptor(value, StyleAttributesProvider.getStringAttribute());
-    }
-
-    private RedisValueDescriptor(int index, Object value, SimpleTextAttributes valueTextAttributes) {
-
+    private CouchbaseValueDescriptor(int index, Object value, SimpleTextAttributes valueTextAttributes) {
         this.index = index;
         this.value = value;
         this.valueTextAttributes = valueTextAttributes;
     }
 
-    @Override
     public void renderValue(ColoredTableCellRenderer cellRenderer, boolean isNodeExpanded) {
         if (!isNodeExpanded) {
             cellRenderer.append(getFormattedValue(), valueTextAttributes);
         }
     }
 
-    @Override
     public void renderNode(ColoredTreeCellRenderer cellRenderer) {
         cellRenderer.append(getFormattedKey(), StyleAttributesProvider.getIndexAttribute());
     }
 
-    @Override
     public String getFormattedKey() {
         return String.format("[%s]", index);
     }
 
-    @Override
     public String getFormattedValue() {
-        if (getValue() instanceof Tuple) {
-            Tuple tupleValue = (Tuple) getValue();
-            return String.format("(%s, %s)", tupleValue.getElement(), tupleValue.getScore());
-        }
-        return String.valueOf(getValue());
+        return String.format("%s", getValueAndAbbreviateIfNecessary());
     }
 
-    @Override
+    protected String getValueAndAbbreviateIfNecessary() {
+        String stringifiedValue = value.toString();
+        if (stringifiedValue.length() > MAX_LENGTH) {
+            return StringUtils.abbreviateInCenter(stringifiedValue, MAX_LENGTH);
+        }
+        return stringifiedValue;
+    }
+
     public Object getValue() {
         return value;
     }
 
-    @Override
     public void setValue(Object value) {
-
+        this.value = value;
     }
 
-    private static class RedisUnindexedValueDescriptor extends RedisValueDescriptor {
+    @Override
+    public String toString() {
+        return value.toString();
+    }
 
-        private RedisUnindexedValueDescriptor(Object value, SimpleTextAttributes valueTextAttributes) {
-            super(0, value, valueTextAttributes);
+    private static class CouchbaseStringValueDescriptor extends CouchbaseValueDescriptor {
+
+        private CouchbaseStringValueDescriptor(int index, String value) {
+            super(index, value, StyleAttributesProvider.getStringAttribute());
         }
 
         @Override
-        public String getFormattedKey() {
-            return "-";
+        public String getFormattedValue() {
+            return String.format("\"%s\"", getValueAndAbbreviateIfNecessary());
         }
     }
 }

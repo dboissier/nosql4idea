@@ -16,6 +16,7 @@
 
 package org.codinjutsu.tools.nosql.redis.view.nodedescriptor;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.ui.ColoredTableCellRenderer;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
@@ -29,7 +30,6 @@ import redis.clients.jedis.Tuple;
 import java.util.Set;
 
 public class RedisKeyValueDescriptor implements NodeDescriptor {
-    private static final String STRING_SURROUNDED = "\"%s\"";
 
 
     private final RedisKeyType keyType;
@@ -58,12 +58,13 @@ public class RedisKeyValueDescriptor implements NodeDescriptor {
 
 
     public void renderNode(ColoredTreeCellRenderer cellRenderer) {
+        cellRenderer.setIcon(AllIcons.Nodes.Advice);
         cellRenderer.append(getFormattedKey(), StyleAttributesProvider.getKeyValueAttribute());
     }
 
     @Override
     public String getFormattedKey() {
-        return String.format(STRING_SURROUNDED, key);
+        return key;
     }
 
     @Override

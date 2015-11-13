@@ -27,7 +27,7 @@ import org.codinjutsu.tools.nosql.commons.model.Database;
 import org.codinjutsu.tools.nosql.commons.logic.DatabaseClient;
 import org.codinjutsu.tools.nosql.commons.model.DatabaseServer;
 import org.codinjutsu.tools.nosql.mongo.model.MongoCollection;
-import org.codinjutsu.tools.nosql.mongo.model.MongoCollectionResult;
+import org.codinjutsu.tools.nosql.mongo.model.MongoResult;
 import org.codinjutsu.tools.nosql.mongo.model.MongoDatabase;
 import org.codinjutsu.tools.nosql.commons.logic.ConfigurationException;
 import org.codinjutsu.tools.nosql.mongo.model.MongoQueryOptions;
@@ -36,17 +36,17 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.*;
 
-public class MongoManager implements DatabaseClient {
+public class MongoClient implements DatabaseClient {
 
-    private static final Logger LOG = Logger.getLogger(MongoManager.class);
+    private static final Logger LOG = Logger.getLogger(MongoClient.class);
     private final List<DatabaseServer> databaseServers = new LinkedList<DatabaseServer>();
 
-    public static MongoManager getInstance(Project project) {
-        return ServiceManager.getService(project, MongoManager.class);
+    public static MongoClient getInstance(Project project) {
+        return ServiceManager.getService(project, MongoClient.class);
     }
 
     public void connect(ServerConfiguration configuration) {
-        MongoClient mongo = null;
+        com.mongodb.MongoClient mongo = null;
         try {
             String userDatabase = configuration.getUserDatabase();
             mongo = createMongoClient(configuration);
@@ -91,7 +91,7 @@ public class MongoManager implements DatabaseClient {
     }
 
     List<Database> loadDatabaseCollections(ServerConfiguration configuration) {
-        MongoClient mongo = null;
+        com.mongodb.MongoClient mongo = null;
         List<Database> mongoDatabases = new LinkedList<Database>();
         try {
             String userDatabase = configuration.getUserDatabase();
@@ -134,7 +134,7 @@ public class MongoManager implements DatabaseClient {
     }
 
     public void update(ServerConfiguration configuration, MongoCollection mongoCollection, DBObject mongoDocument) {
-        MongoClient mongo = null;
+        com.mongodb.MongoClient mongo = null;
         try {
             String databaseName = mongoCollection.getDatabaseName();
             mongo = createMongoClient(configuration);
@@ -153,7 +153,7 @@ public class MongoManager implements DatabaseClient {
     }
 
     public void delete(ServerConfiguration configuration, MongoCollection mongoCollection, Object _id) {
-        MongoClient mongo = null;
+        com.mongodb.MongoClient mongo = null;
         try {
             String databaseName = mongoCollection.getDatabaseName();
             mongo = createMongoClient(configuration);
@@ -172,7 +172,7 @@ public class MongoManager implements DatabaseClient {
     }
 
     public void dropCollection(ServerConfiguration configuration, MongoCollection mongoCollection) {
-        MongoClient mongo = null;
+        com.mongodb.MongoClient mongo = null;
         try {
             String databaseName = mongoCollection.getDatabaseName();
             mongo = createMongoClient(configuration);
@@ -191,7 +191,7 @@ public class MongoManager implements DatabaseClient {
     }
 
     public void dropDatabase(ServerConfiguration configuration, MongoDatabase selectedDatabase) {
-        MongoClient mongo = null;
+        com.mongodb.MongoClient mongo = null;
         try {
             mongo = createMongoClient(configuration);
             mongo.dropDatabase(selectedDatabase.getName());
@@ -204,8 +204,8 @@ public class MongoManager implements DatabaseClient {
         }
     }
 
-    public MongoCollectionResult loadCollectionValues(ServerConfiguration configuration, MongoCollection mongoCollection, MongoQueryOptions mongoQueryOptions) {
-        MongoClient mongo = null;
+    public MongoResult loadCollectionValues(ServerConfiguration configuration, MongoCollection mongoCollection, MongoQueryOptions mongoQueryOptions) {
+        com.mongodb.MongoClient mongo = null;
         try {
             String databaseName = mongoCollection.getDatabaseName();
             mongo = createMongoClient(configuration);
@@ -213,12 +213,12 @@ public class MongoManager implements DatabaseClient {
             DB database = mongo.getDB(databaseName);
             DBCollection collection = database.getCollection(mongoCollection.getName());
 
-            MongoCollectionResult mongoCollectionResult = new MongoCollectionResult(mongoCollection.getName());
+            MongoResult mongoResult = new MongoResult(mongoCollection.getName());
             if (mongoQueryOptions.isAggregate()) {
-                return aggregate(mongoQueryOptions, mongoCollectionResult, collection);
+                return aggregate(mongoQueryOptions, mongoResult, collection);
             }
 
-            return find(mongoQueryOptions, mongoCollectionResult, collection);
+            return find(mongoQueryOptions, mongoResult, collection);
 
         } catch (UnknownHostException ex) {
             throw new ConfigurationException(ex);
@@ -230,7 +230,7 @@ public class MongoManager implements DatabaseClient {
     }
 
     public DBObject findMongoDocument(ServerConfiguration configuration, MongoCollection mongoCollection, Object _id) {
-        MongoClient mongo = null;
+        com.mongodb.MongoClient mongo = null;
         try {
             String databaseName = mongoCollection.getDatabaseName();
             mongo = createMongoClient(configuration);
@@ -248,17 +248,17 @@ public class MongoManager implements DatabaseClient {
         }
     }
 
-    private MongoCollectionResult aggregate(MongoQueryOptions mongoQueryOptions, MongoCollectionResult mongoCollectionResult, DBCollection collection) {
+    private MongoResult aggregate(MongoQueryOptions mongoQueryOptions, MongoResult mongoResult, DBCollection collection) {
         AggregationOutput aggregate = collection.aggregate(mongoQueryOptions.getOperations());
         int index = 0;
         Iterator<DBObject> iterator = aggregate.results().iterator();
         while (iterator.hasNext() && index < mongoQueryOptions.getResultLimit()) {
-            mongoCollectionResult.add(iterator.next());
+            mongoResult.add(iterator.next());
         }
-        return mongoCollectionResult;
+        return mongoResult;
     }
 
-    private MongoCollectionResult find(MongoQueryOptions mongoQueryOptions, MongoCollectionResult mongoCollectionResult, DBCollection collection) {
+    private MongoResult find(MongoQueryOptions mongoQueryOptions, MongoResult mongoResult, DBCollection collection) {
         DBObject filter = mongoQueryOptions.getFilter();
         DBObject projection = mongoQueryOptions.getProjection();
         DBObject sort = mongoQueryOptions.getSort();
@@ -277,16 +277,16 @@ public class MongoManager implements DatabaseClient {
         try {
             int index = 0;
             while (cursor.hasNext() && index < mongoQueryOptions.getResultLimit()) {
-                mongoCollectionResult.add(cursor.next());
+                mongoResult.add(cursor.next());
                 index++;
             }
         } finally {
             cursor.close();
         }
-        return mongoCollectionResult;
+        return mongoResult;
     }
 
-    private MongoClient createMongoClient(ServerConfiguration configuration) throws UnknownHostException {
+    private com.mongodb.MongoClient createMongoClient(ServerConfiguration configuration) throws UnknownHostException {
         String serverUrl = configuration.getServerUrl();
         if (StringUtils.isEmpty(serverUrl)) {
             throw new ConfigurationException("server host is not set");
@@ -306,7 +306,7 @@ public class MongoManager implements DatabaseClient {
             uriBuilder.sslEnabled();
         }
 
-        return new MongoClient(new MongoClientURI(uriBuilder.build()));
+        return new com.mongodb.MongoClient(new MongoClientURI(uriBuilder.build()));
     }
 
 }
