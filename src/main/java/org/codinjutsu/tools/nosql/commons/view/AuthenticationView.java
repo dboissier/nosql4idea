@@ -16,7 +16,12 @@
 
 package org.codinjutsu.tools.nosql.commons.view;
 
+import org.codinjutsu.tools.nosql.ServerConfiguration;
+
 public interface AuthenticationView {
 
 
+    void loadConfiguration(ServerConfiguration configuration);
+
+    void applyConfiguration(ServerConfiguration configuration);
 }
