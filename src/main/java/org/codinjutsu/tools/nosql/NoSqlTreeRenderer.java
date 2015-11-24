@@ -16,6 +16,7 @@
 
 package org.codinjutsu.tools.nosql;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.JBColor;
 import org.apache.commons.lang.StringUtils;
@@ -31,8 +32,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 public class NoSqlTreeRenderer extends ColoredTreeCellRenderer {
 
     private static final Icon DATABASE = GuiUtils.loadIcon("database.png");
-    private static final Icon MONGO_COLLECTION = GuiUtils.loadIcon("folder.png");
-    private static final Icon MONGO_SERVER_ERROR = GuiUtils.loadIcon("mongo_warning.png");
+    private static final Icon MONGO_COLLECTION = AllIcons.Nodes.Folder;
 
     @Override
     public void customizeCellRenderer(@NotNull JTree mongoTree, Object value, boolean isSelected, boolean isExpanded, boolean isLeaf, int row, boolean focus) {
@@ -51,7 +51,6 @@ public class NoSqlTreeRenderer extends ColoredTreeCellRenderer {
                 setIcon(mongoServer.getConfiguration().getDatabaseVendor().icon);
             } else {
                 setForeground(JBColor.RED);
-                setIcon(MONGO_SERVER_ERROR);
                 setToolTipText("Unable to connect");
             }
         } else if (userObject instanceof Database) {

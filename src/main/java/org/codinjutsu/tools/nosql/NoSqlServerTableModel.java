@@ -25,10 +25,11 @@ import java.util.List;
 class NoSqlServerTableModel extends AbstractTableModel implements ItemRemovable {
     private final String[] columnNames = new String[]{
             "Label",
+            "Vendor",
             "URL",
             "Autoconnect"
     };
-    private final Class[] columnClasses = new Class[]{String.class, String.class, Boolean.class};
+    private final Class[] columnClasses = new Class[]{String.class, DatabaseVendor.class, String.class, Boolean.class};
 
     private final List<ServerConfiguration> mongoServerConfigurations;
 
@@ -45,7 +46,7 @@ class NoSqlServerTableModel extends AbstractTableModel implements ItemRemovable 
     }
 
     public int getColumnCount() {
-        return 3;
+        return columnNames.length;
     }
 
     public int getRowCount() {
@@ -63,10 +64,13 @@ class NoSqlServerTableModel extends AbstractTableModel implements ItemRemovable 
             case 0: { // "Label" column
                 return configuration.getLabel();
             }
-            case 1: { // "URL" column
+            case 1: { // "Vendor" column
+                return configuration.getDatabaseVendor();
+            }
+            case 2: { // "URL" column
                 return configuration.getServerUrl();
             }
-            case 2: { // "Autoconnect" column
+            case 3: { // "Autoconnect" column
                 return configuration.isConnectOnIdeStartup();
             }
             default: {
@@ -83,10 +87,14 @@ class NoSqlServerTableModel extends AbstractTableModel implements ItemRemovable 
                 break;
             }
             case 1: {
-                //do nothing url = serverHosts
+                //do nothing ??
                 break;
             }
             case 2: {
+                //do nothing url = serverHosts
+                break;
+            }
+            case 3: {
                 configuration.setConnectOnIdeStartup((Boolean) value);
                 break;
             }

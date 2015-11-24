@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 David Boissier
+ * Copyright (c) 2015 David Boissier
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,10 +77,10 @@ public class MongoEditionPanelTest {
         frameFixture.table("editionTreeTable").cellReader(new JsonTableCellReader())
                 .requireColumnCount(2)
                 .requireContents(new String[][]{
-                        {"\"_id\"", "50b8d63414f85401b9268b99"},
-                        {"\"label\"", "toto"},
-                        {"\"visible\"", "false"},
-                        {"\"image\"", "null"}
+                        {"_id", "50b8d63414f85401b9268b99"},
+                        {"label", "toto"},
+                        {"visible", "false"},
+                        {"image", "null"}
                 });
     }
 
@@ -127,12 +127,12 @@ public class MongoEditionPanelTest {
         mongoEditionPanel.addKey("numberKey", "1.1");
 
         editionTreeTable.requireContents(new String[][]{
-                {"\"_id\"", "50b8d63414f85401b9268b99"},
-                {"\"label\"", "toto"},
-                {"\"visible\"", "false"},
-                {"\"image\"", "null"},
-                {"\"stringKey\"", "pouet"},
-                {"\"numberKey\"", "1.1"},
+                {"_id", "50b8d63414f85401b9268b99"},
+                {"label", "toto"},
+                {"visible", "false"},
+                {"image", "null"},
+                {"stringKey", "pouet"},
+                {"numberKey", "1.1"},
         });
     }
 
@@ -143,13 +143,13 @@ public class MongoEditionPanelTest {
         JTableFixture editionTreeTable = frameFixture.table("editionTreeTable").cellReader(new JsonTableCellReader());
 
         editionTreeTable.requireContents(new String[][]{
-                {"\"_id\"", "50b8d63414f85401b9268b99"},
-                {"\"title\"", "XP by example"},
-                {"\"tags\"", "[ \"pair programming\" , \"tdd\" , \"agile\"]"},
+                {"_id", "50b8d63414f85401b9268b99"},
+                {"title", "XP by example"},
+                {"tags", "[ \"pair programming\" , \"tdd\" , \"agile\"]"},
                 {"[0]", "pair programming"},
                 {"[1]", "tdd"},
                 {"[2]", "agile"},
-                {"\"innerList\"", "[ [ 1 , 2 , 3 , 4] , [ false , true] , [ { \"tagName\" : \"pouet\"} , { \"tagName\" : \"paf\"}]]"},
+                {"innerList", "[ [ 1 , 2 , 3 , 4] , [ false , true] , [ { \"tagName\" : \"pouet\"} , { \"tagName\" : \"paf\"}]]"},
                 {"[0]", "[ 1 , 2 , 3 , 4]"},
                 {"[1]", "[ false , true]"},
                 {"[2]", "[ { \"tagName\" : \"pouet\"} , { \"tagName\" : \"paf\"}]"}});
@@ -158,14 +158,14 @@ public class MongoEditionPanelTest {
         mongoEditionPanel.addValue("refactor");
 
         editionTreeTable.requireContents(new String[][]{
-                {"\"_id\"", "50b8d63414f85401b9268b99"},
-                {"\"title\"", "XP by example"},
-                {"\"tags\"", "[ \"pair programming\" , \"tdd\" , \"agile\"]"},
+                {"_id", "50b8d63414f85401b9268b99"},
+                {"title", "XP by example"},
+                {"tags", "[ \"pair programming\" , \"tdd\" , \"agile\"]"},
                 {"[0]", "pair programming"},
                 {"[1]", "tdd"},
                 {"[2]", "agile"},
                 {"[3]", "refactor"},
-                {"\"innerList\"", "[ [ 1 , 2 , 3 , 4] , [ false , true] , [ { \"tagName\" : \"pouet\"} , { \"tagName\" : \"paf\"}]]"},
+                {"innerList", "[ [ 1 , 2 , 3 , 4] , [ false , true] , [ { \"tagName\" : \"pouet\"} , { \"tagName\" : \"paf\"}]]"},
                 {"[0]", "[ 1 , 2 , 3 , 4]"},
                 {"[1]", "[ false , true]"},
                 {"[2]", "[ { \"tagName\" : \"pouet\"} , { \"tagName\" : \"paf\"}]"}});

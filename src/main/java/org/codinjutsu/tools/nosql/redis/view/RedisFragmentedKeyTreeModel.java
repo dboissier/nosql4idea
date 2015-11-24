@@ -139,6 +139,7 @@ public class RedisFragmentedKeyTreeModel extends DefaultTreeModel {
             RedisKeyValueDescriptor descriptor = (RedisKeyValueDescriptor) clonedChildNode.getDescriptor();
             String[] explodedKey = StringUtils.explode(descriptor.getKey(), separator);
             if (explodedKey.length == 1) {
+                addChildren(clonedChildNode, originalChildNode);
                 targetRootNode.add(clonedChildNode);
             } else {
                 updateTree(targetRootNode, originalChildNode, explodedKey, descriptor);

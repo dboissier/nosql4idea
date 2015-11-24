@@ -68,9 +68,9 @@
     </application-components>
 
     <actions>
-        <action id="Mongo.Shell.Execute" class="com.intellij.openapi.actionSystem.EmptyAction"
-                text="Execute Mongo Command"
-                description="Execute Mongo command in console">
+        <action id="NoSql.Shell.Execute" class="com.intellij.openapi.actionSystem.EmptyAction"
+                text="Execute DB Command"
+                description="Execute DB command in console">
             <keyboard-shortcut first-keystroke="control ENTER" keymap="$default"/>
         </action>
     </actions>

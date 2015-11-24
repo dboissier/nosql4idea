@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 David Boissier
+ * Copyright (c) 2015 David Boissier
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package org.codinjutsu.tools.nosql.mongo.view.action;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAware;
@@ -26,7 +27,7 @@ import javax.swing.*;
 
 public class DropCollectionAction extends AnAction implements DumbAware {
 
-    private static final Icon REMOVE_ICON = StyleAttributesProvider.getClearAllIcon();
+    private static final Icon REMOVE_ICON = AllIcons.Actions.GC;
 
     private final NoSqlExplorerPanel noSqlExplorerPanel;
 

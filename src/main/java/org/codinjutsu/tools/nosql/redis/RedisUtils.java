@@ -17,6 +17,8 @@
 package org.codinjutsu.tools.nosql.redis;
 
 import org.apache.commons.lang.StringUtils;
+import org.codinjutsu.tools.nosql.ServerConfiguration;
+import org.codinjutsu.tools.nosql.redis.model.RedisDatabase;
 import redis.clients.jedis.Tuple;
 
 import java.util.LinkedList;
@@ -41,5 +43,9 @@ public class RedisUtils {
 
     public static String stringifyTuple(Tuple tuple) {
         return String.format("(%s, %s)", tuple.getElement(), tuple.getScore());
+    }
+
+    public static String buildUrl(ServerConfiguration serverConfiguration, RedisDatabase database) {
+        return String.format("-n %s", database.getName());
     }
 }

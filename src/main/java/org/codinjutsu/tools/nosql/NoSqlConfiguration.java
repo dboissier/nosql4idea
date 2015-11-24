@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 David Boissier
+ * Copyright (c) 2015 David Boissier
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 @State(
         name = "NoSqlConfiguration",
         storages = {
                 @Storage(file = "$PROJECT_FILE$"),
-                @Storage(file = "$PROJECT_CONFIG_DIR$/mongoSettings.xml", scheme = StorageScheme.DIRECTORY_BASED)
+                @Storage(file = "$PROJECT_CONFIG_DIR$/noSqlSettings.xml", scheme = StorageScheme.DIRECTORY_BASED)
         }
 )
 public class NoSqlConfiguration implements PersistentStateComponent<NoSqlConfiguration> {
@@ -64,6 +65,10 @@ public class NoSqlConfiguration implements PersistentStateComponent<NoSqlConfigu
 
     public void setShellPathByDatabaseVendor(Map<DatabaseVendor, String> shellPathByDatabaseVendor) {
         this.shellPathByDatabaseVendor = shellPathByDatabaseVendor;
+    }
+
+    public Map<DatabaseVendor, String> getShellPathByDatabaseVendor() {
+        return shellPathByDatabaseVendor;
     }
 
     public void setShellPath(DatabaseVendor databaseVendor, String shellPath) {

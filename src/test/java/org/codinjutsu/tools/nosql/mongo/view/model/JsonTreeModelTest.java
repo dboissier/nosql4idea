@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 David Boissier
+ * Copyright (c) 2015 David Boissier
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ public class JsonTreeModelTest {
 
         NoSqlTreeNode treeNode = (NoSqlTreeNode) JsonTreeModel.buildJsonTree(jsonObject);
         NoSqlTreeNode objectIdNode = (NoSqlTreeNode) treeNode.getChildAt(0);
-        assertEquals("\"_id\"", objectIdNode.getDescriptor().getFormattedKey());
+        assertEquals("_id", objectIdNode.getDescriptor().getFormattedKey());
 
         assertNull(JsonTreeModel.findObjectIdNode(treeNode));
         assertEquals(objectIdNode, JsonTreeModel.findObjectIdNode((NoSqlTreeNode) treeNode.getChildAt(0)));

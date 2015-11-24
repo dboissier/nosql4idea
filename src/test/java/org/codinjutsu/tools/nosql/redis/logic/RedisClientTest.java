@@ -59,14 +59,15 @@ public class RedisClientTest {
         assertEquals(RedisKeyType.SET, redisRecord.getKeyType());
         assertEquals("books", redisRecord.getKey());
         redisRecord = redisRecords.get(1);
-        assertEquals(RedisKeyType.ZSET, redisRecord.getKeyType());
-        assertEquals("reviews", redisRecord.getKey());
-        redisRecord = redisRecords.get(2);
-        assertEquals(RedisKeyType.LIST, redisRecord.getKeyType());
-        assertEquals("todos", redisRecord.getKey());
-        redisRecord = redisRecords.get(3);
         assertEquals(RedisKeyType.STRING, redisRecord.getKeyType());
         assertEquals("status", redisRecord.getKey());
+        redisRecord = redisRecords.get(2);
+        assertEquals(RedisKeyType.ZSET, redisRecord.getKeyType());
+        assertEquals("reviews", redisRecord.getKey());
+        redisRecord = redisRecords.get(3);
+        assertEquals(RedisKeyType.LIST, redisRecord.getKeyType());
+        assertEquals("todos", redisRecord.getKey());
+
     }
 
     @Before

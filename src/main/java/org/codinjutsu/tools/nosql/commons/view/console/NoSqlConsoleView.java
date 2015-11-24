@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 David Boissier
+ * Copyright (c) 2015 David Boissier
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package org.codinjutsu.tools.nosql.mongo.view.console;
+package org.codinjutsu.tools.nosql.commons.view.console;
 
 import com.intellij.execution.console.LanguageConsoleImpl;
 import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.project.Project;
+import org.codinjutsu.tools.nosql.ServerConfiguration;
 
-public class MongoConsoleView extends LanguageConsoleImpl {
-    public MongoConsoleView(Project project) {
-        super(project, "Mongo Console", StdFileTypes.PLAIN_TEXT.getLanguage());
+public class NoSqlConsoleView extends LanguageConsoleImpl {
+    public NoSqlConsoleView(Project project, String title, ServerConfiguration configuration) {
+        super(project, title, StdFileTypes.PLAIN_TEXT.getLanguage());
+        setPrompt(String.format("%s> ", configuration.getServerUrl()));
     }
 }

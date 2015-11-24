@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 2013 David Boissier
+ * Copyright (c) 2015 David Boissier
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,13 +32,14 @@ import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.nosql.DatabaseVendor;
 import org.codinjutsu.tools.nosql.NoSqlConfiguration;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
+import org.codinjutsu.tools.nosql.commons.view.console.NoSqlConsoleView;
 import org.codinjutsu.tools.nosql.mongo.model.MongoDatabase;
 import org.codinjutsu.tools.nosql.mongo.MongoUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
-public class MongoConsoleRunner extends AbstractConsoleRunnerWithHistory<MongoConsoleView> {
+public class MongoConsoleRunner extends AbstractConsoleRunnerWithHistory<NoSqlConsoleView> {
 
     private static final Key<Boolean> MONGO_SHELL_FILE = Key.create("MONGO_SHELL_FILE");
     private final ServerConfiguration serverConfiguration;
@@ -53,8 +54,8 @@ public class MongoConsoleRunner extends AbstractConsoleRunnerWithHistory<MongoCo
     }
 
     @Override
-    protected MongoConsoleView createConsoleView() {
-        MongoConsoleView res = new MongoConsoleView(getProject());
+    protected NoSqlConsoleView createConsoleView() {
+        NoSqlConsoleView res = new NoSqlConsoleView(getProject(), "Mongo Console", serverConfiguration);
 
         PsiFile file = res.getFile();
         assert file.getContext() == null;
@@ -76,7 +77,7 @@ public class MongoConsoleRunner extends AbstractConsoleRunnerWithHistory<MongoCo
 
         String shellWorkingDir = serverConfiguration.getShellWorkingDir();
         if (StringUtils.isNotBlank(shellWorkingDir)) {
-            commandLine.setWorkDirectory(shellWorkingDir);
+            commandLine.withWorkDirectory(shellWorkingDir);
         }
 
         String username = serverConfiguration.getUsername();
@@ -122,7 +123,7 @@ public class MongoConsoleRunner extends AbstractConsoleRunnerWithHistory<MongoCo
         ProcessBackedConsoleExecuteActionHandler handler = new ProcessBackedConsoleExecuteActionHandler(getProcessHandler(), false) {
             @Override
             public String getEmptyExecuteAction() {
-                return "Mongo.Shell.Execute";
+                return "NoSql.Shell.Execute";
             }
         };
         new ConsoleHistoryController(new ConsoleRootType("Mongo Shell", null) {}, null, getConsoleView()).install();

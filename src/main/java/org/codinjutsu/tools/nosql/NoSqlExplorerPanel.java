@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 David Boissier
+ * Copyright (c) 2015 David Boissier
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ import org.codinjutsu.tools.nosql.mongo.model.MongoCollection;
 import org.codinjutsu.tools.nosql.mongo.model.MongoDatabase;
 import org.codinjutsu.tools.nosql.mongo.view.action.DropCollectionAction;
 import org.codinjutsu.tools.nosql.mongo.view.action.DropDatabaseAction;
-import org.codinjutsu.tools.nosql.mongo.view.action.MongoConsoleAction;
+import org.codinjutsu.tools.nosql.commons.view.action.NoSqlDatabaseConsoleAction;
 import org.codinjutsu.tools.nosql.commons.view.action.ViewCollectionValuesAction;
 import org.codinjutsu.tools.nosql.commons.view.editor.NoSqlDatabaseFileSystem;
 import org.codinjutsu.tools.nosql.mongo.view.editor.MongoObjectFile;
@@ -235,7 +235,7 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
         RefreshServerAction refreshServerAction = new RefreshServerAction(this);
         if (ApplicationManager.getApplication() != null) {
             actionGroup.add(refreshServerAction);
-            actionGroup.add(new MongoConsoleAction(this));
+            actionGroup.add(new NoSqlDatabaseConsoleAction(this));
             actionGroup.add(viewCollectionValuesAction);
             actionGroup.add(expandAllAction);
             actionGroup.add(collapseAllAction);

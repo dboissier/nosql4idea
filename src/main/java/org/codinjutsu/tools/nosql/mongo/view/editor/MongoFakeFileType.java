@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 David Boissier
+ * Copyright (c) 2015 David Boissier
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import javax.swing.*;
 
 public class MongoFakeFileType extends FakeFileType {
 
-    public static final Icon MONGO_ICON = GuiUtils.loadIcon("mongo_logo.png");
+    public static final Icon MONGO_ICON = GuiUtils.loadIcon("mongodb.png");
 
     public static final FileType INSTANCE = new MongoFakeFileType();
 

@@ -27,6 +27,9 @@ import org.codinjutsu.tools.nosql.commons.utils.StringUtils;
 import org.codinjutsu.tools.nosql.commons.style.StyleAttributesProvider;
 import redis.clients.jedis.Tuple;
 
+import javax.swing.*;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class RedisKeyValueDescriptor implements NodeDescriptor {
@@ -37,6 +40,7 @@ public class RedisKeyValueDescriptor implements NodeDescriptor {
     private final Object value;
 
     private final SimpleTextAttributes valueTextAttributes;
+    private final Icon icon;
 
     public static RedisKeyValueDescriptor createDescriptor(RedisKeyType keyType, String key, Object value) {
         return new RedisKeyValueDescriptor(keyType, key, value, StyleAttributesProvider.getStringAttribute());
@@ -46,7 +50,17 @@ public class RedisKeyValueDescriptor implements NodeDescriptor {
         this.keyType = keyType;
         this.key = key;
         this.value = value;
+        this.icon = findIcon(value);
         this.valueTextAttributes = valueTextAttributes;
+    }
+
+    private Icon findIcon(Object object) {
+        if (object instanceof List) {
+            return AllIcons.Json.Property_brackets;
+        } else if(object instanceof Set || object instanceof Map) {
+            return AllIcons.Json.Property_braces;
+        }
+        return null;
     }
 
     @Override
@@ -58,7 +72,7 @@ public class RedisKeyValueDescriptor implements NodeDescriptor {
 
 
     public void renderNode(ColoredTreeCellRenderer cellRenderer) {
-        cellRenderer.setIcon(AllIcons.Nodes.Advice);
+        cellRenderer.setIcon(this.icon);
         cellRenderer.append(getFormattedKey(), StyleAttributesProvider.getKeyValueAttribute());
     }
 

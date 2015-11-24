@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 David Boissier
+ * Copyright (c) 2015 David Boissier
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,9 @@ import javax.swing.*;
 
 public class NoSqlWindowManager {
 
-    private static final Icon NOSQL_ICON = GuiUtils.loadIcon("nosql_logo.png");
+    private static final Icon NOSQL_ICON = GuiUtils.loadIcon("nosql_13x13.png");
 
     public static final String NOSQL_RUNNER = "NoSql Runner";
-
     private static final String NOSQL_EXPLORER = "NoSql Explorer";
 
     private final Project project;

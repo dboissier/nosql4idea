@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 David Boissier
+ * Copyright (c) 2015 David Boissier
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,10 +90,10 @@ public class MongoResultPanelTest {
                 .requireColumnCount(2)
                 .requireContents(new String[][]{
                         {"[0]", "{ \"_id\" : \"50b8d63414f85401b9268b99\" , \"label\" : \"toto\" , \"visible\" : false , \"image\" :  null }"},
-                        {"\"_id\"", "\"50b8d63414f85401b9268b99\""},
-                        {"\"label\"", "\"toto\""},
-                        {"\"visible\"", "false"},
-                        {"\"image\"", "null"}
+                        {"_id", "\"50b8d63414f85401b9268b99\""},
+                        {"label", "\"toto\""},
+                        {"visible", "false"},
+                        {"image", "null"}
                 });
     }
 
@@ -106,13 +106,13 @@ public class MongoResultPanelTest {
                 .requireColumnCount(2)
                 .requireContents(new String[][]{
                         {"[0]", "{ \"id\" : 0 , \"label\" : \"toto\" , \"visible\" : false , \"doc\" : { \"title\" : \"hello\" , \"nbPages\" : 10 , \"keyWord\" : [ \"toto\" , true , 10]}}"},
-                        {"\"id\"", "0"},
-                        {"\"label\"", "\"toto\""},
-                        {"\"visible\"", "false"},
-                        {"\"doc\"", "{ \"title\" : \"hello\" , \"nbPages\" : 10 , \"keyWord\" : [ \"toto\" , true , 10]}"},
-                        {"\"title\"", "\"hello\""},
-                        {"\"nbPages\"", "10"},
-                        {"\"keyWord\"", "[ \"toto\" , true , 10]"},
+                        {"id", "0"},
+                        {"label", "\"toto\""},
+                        {"visible", "false"},
+                        {"doc", "{ \"title\" : \"hello\" , \"nbPages\" : 10 , \"keyWord\" : [ \"toto\" , true , 10]}"},
+                        {"title", "\"hello\""},
+                        {"nbPages", "10"},
+                        {"keyWord", "[ \"toto\" , true , 10]"},
                         {"[0]", "\"toto\""},
                         {"[1]", "true"},
                         {"[2]", "10"},
@@ -129,24 +129,24 @@ public class MongoResultPanelTest {
                 .requireContents(new String[][]{
 
                         {"[0]", "{ \"id\" : 0 , \"label\" : \"toto\" , \"visible\" : false , \"doc\" : { \"title\" : \"hello\" , \"nbPages\" : 10 , \"keyWord\" : [ \"toto\" , true , 10]}}"},
-                        {"\"id\"", "0"},
-                        {"\"label\"", "\"toto\""},
-                        {"\"visible\"", "false"},
-                        {"\"doc\"", "{ \"title\" : \"hello\" , \"nbPages\" : 10 , \"keyWord\" : [ \"toto\" , true , 10]}"},
-                        {"\"title\"", "\"hello\""},
-                        {"\"nbPages\"", "10"},
-                        {"\"keyWord\"", "[ \"toto\" , true , 10]"},
+                        {"id", "0"},
+                        {"label", "\"toto\""},
+                        {"visible", "false"},
+                        {"doc", "{ \"title\" : \"hello\" , \"nbPages\" : 10 , \"keyWord\" : [ \"toto\" , true , 10]}"},
+                        {"title", "\"hello\""},
+                        {"nbPages", "10"},
+                        {"keyWord", "[ \"toto\" , true , 10]"},
                         {"[0]", "\"toto\""},
                         {"[1]", "true"},
                         {"[2]", "10"},
                         {"[1]", "{ \"id\" : 1 , \"label\" : \"tata\" , \"visible\" : true , \"doc\" : { \"title\" : \"ola\" , \"nbPages\" : 1 , \"keyWord\" : [ \"tutu\" , false , 10]}}"},
-                        {"\"id\"", "1"},
-                        {"\"label\"", "\"tata\""},
-                        {"\"visible\"", "true"},
-                        {"\"doc\"", "{ \"title\" : \"ola\" , \"nbPages\" : 1 , \"keyWord\" : [ \"tutu\" , false , 10]}"},
-                        {"\"title\"", "\"ola\""},
-                        {"\"nbPages\"", "1"},
-                        {"\"keyWord\"", "[ \"tutu\" , false , 10]"},
+                        {"id", "1"},
+                        {"label", "\"tata\""},
+                        {"visible", "true"},
+                        {"doc", "{ \"title\" : \"ola\" , \"nbPages\" : 1 , \"keyWord\" : [ \"tutu\" , false , 10]}"},
+                        {"title", "\"ola\""},
+                        {"nbPages", "1"},
+                        {"keyWord", "[ \"tutu\" , false , 10]"},
                         {"[0]", "\"tutu\""},
                         {"[1]", "false"},
                         {"[2]", "10"},
@@ -177,24 +177,24 @@ public class MongoResultPanelTest {
         frameFixture.table("resultTreeTable").cellReader(new TableCellReader())
                 .requireContents(new String[][]{
                         {"[0]", "{ \"id\" : 0 , \"label\" : \"toto\" , \"visible\" : false , \"doc\" : { \"title\" : \"hello\" , \"nbPages\" : 10 , \"keyWord\" : [ \"toto\" , true , 10]}}"},
-                        {"\"id\"", "0"},
-                        {"\"label\"", "\"toto\""},
-                        {"\"visible\"", "false"},
-                        {"\"doc\"", "{ \"title\" : \"hello\" , \"nbPages\" : 10 , \"keyWord\" : [ \"toto\" , true , 10]}"},
-                        {"\"title\"", "\"hello\""},
-                        {"\"nbPages\"", "10"},
-                        {"\"keyWord\"", "[ \"toto\" , true , 10]"},
+                        {"id", "0"},
+                        {"label", "\"toto\""},
+                        {"visible", "false"},
+                        {"doc", "{ \"title\" : \"hello\" , \"nbPages\" : 10 , \"keyWord\" : [ \"toto\" , true , 10]}"},
+                        {"title", "\"hello\""},
+                        {"nbPages", "10"},
+                        {"keyWord", "[ \"toto\" , true , 10]"},
                         {"[0]", "\"toto\""},
                         {"[1]", "true"},
                         {"[2]", "10"},
                         {"[1]", "{ \"id\" : 1 , \"label\" : \"tata\" , \"visible\" : true , \"doc\" : { \"title\" : \"ola\" , \"nbPages\" : 1 , \"keyWord\" : [ \"tutu\" , false , 10]}}"},
-                        {"\"id\"", "1"},
-                        {"\"label\"", "\"tata\""},
-                        {"\"visible\"", "true"},
-                        {"\"doc\"", "{ \"title\" : \"ola\" , \"nbPages\" : 1 , \"keyWord\" : [ \"tutu\" , false , 10]}"},
-                        {"\"title\"", "\"ola\""},
-                        {"\"nbPages\"", "1"},
-                        {"\"keyWord\"", "[ \"tutu\" , false , 10]"},
+                        {"id", "1"},
+                        {"label", "\"tata\""},
+                        {"visible", "true"},
+                        {"doc", "{ \"title\" : \"ola\" , \"nbPages\" : 1 , \"keyWord\" : [ \"tutu\" , false , 10]}"},
+                        {"title", "\"ola\""},
+                        {"nbPages", "1"},
+                        {"keyWord", "[ \"tutu\" , false , 10]"},
                         {"[0]", "\"tutu\""},
                         {"[1]", "false"},
                         {"[2]", "10"},

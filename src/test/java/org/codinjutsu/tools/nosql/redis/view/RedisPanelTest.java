@@ -49,12 +49,6 @@ public class RedisPanelTest {
     private Project dummyProject = DummyProject.getInstance();
 
     private RedisClient redisClientMock = Mockito.mock(RedisClient.class);
-    private RedisPanel redisPanel = new RedisPanel(dummyProject, redisClientMock, new ServerConfiguration(), new RedisDatabase("0")) {
-        @Override
-        protected void addCommonsActions() {
-
-        }
-    };
 
     @After
     public void tearDown() {
@@ -67,7 +61,10 @@ public class RedisPanelTest {
 
         redisPanelWrapper = GuiActionRunner.execute(new GuiQuery<RedisPanel>() {
             protected RedisPanel executeInEDT() {
-                return redisPanel;
+                return new RedisPanel(dummyProject, redisClientMock, new ServerConfiguration(), new RedisDatabase("0")) {
+                    @Override
+                    protected void addCommonsActions() { }
+                };
             }
         });
 
@@ -83,7 +80,7 @@ public class RedisPanelTest {
                 .requireColumnCount(2)
                 .requireContents(new String[][]{
                         {"foo:bar", "john"},
-                        {"fun:bar", "[drink, some, beer]"},
+                        {"stuff:bar", "[drink, some, beer]"},
                         {"[0]", "drink"},
                         {"[1]", "some"},
                         {"[2]", "beer"},
@@ -105,7 +102,7 @@ public class RedisPanelTest {
     @Test
     public void testDisplayTreeWithFragmentedKey() throws Exception {
         redisPanelWrapper.updateResultTableTree(createRedisResults(), ":");
-        redisPanel.expandAll();
+        redisPanelWrapper.expandAll();
 
 
         JTableFixture resultTreeTable = frameFixture.table("resultTreeTable");
@@ -114,12 +111,11 @@ public class RedisPanelTest {
                 .requireContents(new String[][]{
                         {"foo", ""},
                         {"bar", "john"},
-                        {"fun", ""},
+                        {"stuff", ""},
                         {"bar", "[drink, some, beer]"},
                         {"[0]", "drink"},
                         {"[1]", "some"},
                         {"[2]", "beer"},
-                        {"stuff", ""},
                         {"countries", "{France, Canada, Japan}"},
                         {"-", "France"},
                         {"-", "Canada"},
@@ -142,20 +138,20 @@ public class RedisPanelTest {
         RedisResult redisResult = new RedisResult();
         redisResult.setSeparator(":");
         redisResult.addString("foo:bar", "john");
-        redisResult.addList("fun:bar", Arrays.asList("drink", "some", "beer"));
-        Set<String> countries = new HashSet<String>();
+        redisResult.addList("stuff:bar", Arrays.asList("drink", "some", "beer"));
+        Set<String> countries = new HashSet<>();
         countries.add("France");
         countries.add("Japan");
         countries.add("Canada");
         redisResult.addSet("stuff:countries", countries);
 
-        Map<String, String> aliasByPeopleName = new HashMap<String, String>();
+        Map<String, String> aliasByPeopleName = new HashMap<>();
         aliasByPeopleName.put("david", "dada");
         aliasByPeopleName.put("mickael", "mike");
         aliasByPeopleName.put("bruno", "nono");
         redisResult.addHash("stuff:aliases", aliasByPeopleName);
 
-        SortedSet<Tuple> scoreByGameTitle = new TreeSet<Tuple>();
+        SortedSet<Tuple> scoreByGameTitle = new TreeSet<>();
         scoreByGameTitle.add(new Tuple("quake", 9d));
         scoreByGameTitle.add(new Tuple("half-life", 10d));
         scoreByGameTitle.add(new Tuple("unreal", 8d));

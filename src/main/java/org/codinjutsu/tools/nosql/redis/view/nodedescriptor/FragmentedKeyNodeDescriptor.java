@@ -48,8 +48,8 @@ public class FragmentedKeyNodeDescriptor implements NodeDescriptor {
 
     @Override
     public void renderNode(ColoredTreeCellRenderer cellRenderer) {
-        cellRenderer.setIcon(AllIcons.Nodes.Advice);
         cellRenderer.append(keyFragment, keyAttribute);
+        cellRenderer.setIcon(AllIcons.Nodes.Advice);
     }
 
     @Override

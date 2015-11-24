@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 David Boissier
+ * Copyright (c) 2015 David Boissier
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,15 @@
 
 package org.codinjutsu.tools.nosql;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+import com.intellij.openapi.progress.ProcessCanceledException;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.ComponentWithBrowseButton;
-import com.intellij.openapi.ui.TextComponentAccessor;
-import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.ui.*;
+import com.intellij.openapi.util.Ref;
 import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.IdeBorderFactory;
 import com.intellij.ui.RawCommandLineEditor;
@@ -29,7 +32,6 @@ import com.mongodb.AuthenticationMechanism;
 import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.nosql.commons.logic.ConfigurationException;
 import org.codinjutsu.tools.nosql.mongo.logic.MongoConnectionException;
-import org.codinjutsu.tools.nosql.commons.utils.GuiUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -44,8 +46,7 @@ import java.util.List;
 
 public class ServerConfigurationPanel extends JPanel {
 
-    public static final Icon SUCCESS = GuiUtils.loadIcon("success.png");
-    public static final Icon FAIL = GuiUtils.loadIcon("fail.png");
+    public static final Icon FAIL = AllIcons.General.Error;
 
     private JPanel rootPanel;
 
@@ -129,25 +130,32 @@ public class ServerConfigurationPanel extends JPanel {
             public void actionPerformed(ActionEvent actionEvent) {
                 try {
                     validateUrls();
-                    testConnectionButton.setEnabled(false);
-                    testConnectionButton.setText("Connecting...");
-                    testConnectionButton.repaint();
-                    ApplicationManager.getApplication().invokeLater(new Runnable() {
+                    final DatabaseVendor databaseVendor = getDatabaseVendor();
+                    final Ref<Exception> excRef = new Ref<>();
+                    final ProgressManager progressManager = ProgressManager.getInstance();
+                    progressManager.runProcessWithProgressSynchronously(new Runnable() {
                         @Override
                         public void run() {
-                            try {
-                                databaseVendorManager.get(getDatabaseVendor()).connect(createServerConfigurationForTesting());
+                            ServerConfiguration configuration = createServerConfigurationForTesting();
 
-                                feedbackLabel.setIcon(SUCCESS);
-                                feedbackLabel.setText("Connection successfull");
-                            } catch (MongoConnectionException ex) {
-                                setErrorMessage(ex.getMessage());
-                            } finally {
-                                testConnectionButton.setEnabled(true);
-                                testConnectionButton.setText("Test connection");
+                            final ProgressIndicator progressIndicator = progressManager.getProgressIndicator();
+                            if (progressIndicator != null) {
+                                progressIndicator.setText("Connecting to " + configuration.getServerUrl());
+                            }
+                            try {
+                                databaseVendorManager.get(databaseVendor).connect(configuration);
+                            } catch (Exception ex) {
+                                excRef.set(ex);
                             }
                         }
-                    });
+
+                    }, "Testing connection for " + databaseVendor.name, true, ServerConfigurationPanel.this.project);
+
+                    if (!excRef.isNull()) {
+                        Messages.showErrorDialog(rootPanel, excRef.get().getMessage(), "Connection test failed");
+                    } else {
+                        Messages.showInfoMessage(rootPanel, "Connection test successful for " + databaseVendor.name, "Connection test successful");
+                    }
                 } catch (ConfigurationException ex) {
                     setErrorMessage(ex.getMessage());
                 }
@@ -256,7 +264,7 @@ public class ServerConfigurationPanel extends JPanel {
         AuthenticationMechanism authentificationMethod = configuration.getAuthenticationMecanism();
         if (AuthenticationMechanism.MONGODB_CR.equals(authentificationMethod)) {
             mongoCRAuthRadioButton.setSelected(true);
-        } else if (AuthenticationMechanism.SCRAM_SHA_1.equals(authentificationMethod)){
+        } else if (AuthenticationMechanism.SCRAM_SHA_1.equals(authentificationMethod)) {
             scramSHA1AuthRadioButton.setSelected(true);
         } else {
             defaultAuthMethodRadioButton.setSelected(true);
@@ -380,7 +388,6 @@ public class ServerConfigurationPanel extends JPanel {
     }
 
     public void setErrorMessage(String message) {
-        feedbackLabel.setIcon(FAIL);
         feedbackLabel.setText(message);
     }
 }

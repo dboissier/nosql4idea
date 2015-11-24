@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 David Boissier
+ * Copyright (c) 2015 David Boissier
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,13 +70,5 @@ public class StyleAttributesProvider {
 
     public static SimpleTextAttributes getObjectIdAttribute() {
         return OBJECT_ID_TEXT_ATTRIBUTE;
-    }
-
-    public static Icon getClearAllIcon() {
-        return GuiUtils.loadIcon("clearAll.png", "clearAll_dark.png");
-    }
-
-    public static Icon getDataSchemaIcon() {
-        return GuiUtils.loadIcon("dataSchema.png", "dataSchema_dark.png");
     }
 }
