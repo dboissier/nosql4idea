@@ -17,7 +17,9 @@
 package org.codinjutsu.tools.nosql;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
@@ -29,10 +31,7 @@ import com.intellij.ui.RawCommandLineEditor;
 import com.mongodb.AuthenticationMechanism;
 import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.nosql.commons.logic.ConfigurationException;
-import org.codinjutsu.tools.nosql.commons.view.AuthenticationView;
-import org.codinjutsu.tools.nosql.couchbase.view.CouchbaseAuthenticationPanel;
-import org.codinjutsu.tools.nosql.mongo.view.MongoAuthenticationPanel;
-import org.codinjutsu.tools.nosql.redis.view.RedisAuthenticationPanel;
+import org.codinjutsu.tools.nosql.mongo.logic.MongoConnectionException;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -48,60 +47,81 @@ import java.util.List;
 public class ServerConfigurationPanel extends JPanel {
 
     public static final Icon FAIL = AllIcons.General.Error;
+
     private JPanel rootPanel;
 
     private JLabel feedbackLabel;
 
-    private JTextField labelField;
+    private JCheckBox sslConnectionField;
 
+    private JTextField labelField;
     private JComboBox databaseVendorField;
+
+    private JPanel authenticationPanel;
     private JTextField serverUrlField;
+    private JTextField usernameField;
+    private JPasswordField passwordField;
+    private JTextField authenticationDatabaseField;
+    private final ButtonGroup authMethodGroup;
+    private JRadioButton mongoCRAuthRadioButton;
+    private JRadioButton scramSHA1AuthRadioButton;
+
+    private JRadioButton defaultAuthMethodRadioButton;
+
     private JTextField userDatabaseField;
+
     private JCheckBox autoConnectCheckBox;
+
     private JButton testConnectionButton;
+    private JTextField collectionsToIgnoreField;
     private JPanel mongoShellOptionsPanel;
     private TextFieldWithBrowseButton shellWorkingDirField;
-
     private RawCommandLineEditor shellArgumentsLineField;
     private JLabel databaseTipsLabel;
+
     private final Project project;
-
     private final DatabaseVendorManager databaseVendorManager;
-
-    private JPanel authenticationParentPanel;
-    private AuthenticationView currentAuthenticationView = null;
 
 
     public ServerConfigurationPanel(Project project, DatabaseVendorManager databaseVendorManager) {
         this.project = project;
         this.databaseVendorManager = databaseVendorManager;
-
         setLayout(new BorderLayout());
         add(rootPanel, BorderLayout.CENTER);
-        mongoShellOptionsPanel.setBorder(IdeBorderFactory.createTitledBorder("Shell options", true));
 
         labelField.setName("labelField");
         databaseVendorField.setName("databaseVendorField");
         databaseTipsLabel.setName("databaseTipsLabel");
         feedbackLabel.setName("feedbackLabel");
+
+        sslConnectionField.setName("sslConnectionField");
+        authenticationPanel.setBorder(IdeBorderFactory.createTitledBorder("Authentication settings", true));
         serverUrlField.setName("serverUrlField");
-        authenticationParentPanel.setBorder(IdeBorderFactory.createTitledBorder("Authentication settings", true));
+        usernameField.setName("usernameField");
+        passwordField.setName("passwordField");
+        mongoCRAuthRadioButton.setName("mongoCRAuthField");
+        scramSHA1AuthRadioButton.setName("scramSHA1AuthField");
+        defaultAuthMethodRadioButton.setName("defaultAuthMethod");
+
         userDatabaseField.setName("userDatabaseField");
         userDatabaseField.setToolTipText("If your access is restricted to a specific database (e.g.: MongoLab), you can set it right here");
+
         autoConnectCheckBox.setName("autoConnectField");
-        shellArgumentsLineField.setDialogCaption("CLI arguments");
+
+        mongoShellOptionsPanel.setBorder(IdeBorderFactory.createTitledBorder("Mongo shell options", true));
+        shellArgumentsLineField.setDialogCaption("Mongo arguments");
+
         testConnectionButton.setName("testConnection");
 
+        authMethodGroup = new ButtonGroup();
+        authMethodGroup.add(mongoCRAuthRadioButton);
+        authMethodGroup.add(scramSHA1AuthRadioButton);
+        authMethodGroup.add(defaultAuthMethodRadioButton);
+
+        defaultAuthMethodRadioButton.setSelected(true);
+        defaultAuthMethodRadioButton.setToolTipText("Let the driver resolves the auth. mecanism");
         shellWorkingDirField.setText(null);
-
-        registerDatabaseAuthentication();
         initListeners();
-    }
-
-    private void registerDatabaseAuthentication() {
-        authenticationParentPanel.add(new MongoAuthenticationPanel(), DatabaseVendor.MONGO.name);
-        authenticationParentPanel.add(new RedisAuthenticationPanel(), DatabaseVendor.REDIS.name);
-        authenticationParentPanel.add(new CouchbaseAuthenticationPanel(), DatabaseVendor.COUCHBASE.name);
     }
 
     private void initListeners() {
@@ -161,8 +181,6 @@ public class ServerConfigurationPanel extends JPanel {
                 }
                 serverUrlField.setText(selected.defaultUrl);
                 databaseTipsLabel.setText(selected.tips);
-                CardLayout cardLayout = (CardLayout)(authenticationParentPanel.getLayout());
-                cardLayout.show(authenticationParentPanel, selected.name);
             }
         });
 
@@ -174,7 +192,12 @@ public class ServerConfigurationPanel extends JPanel {
         ServerConfiguration configuration = ServerConfiguration.byDefault();
         configuration.setDatabaseVendor(getDatabaseVendor());
         configuration.setServerUrl(getServerUrls());
-        //TODO
+        configuration.setUsername(getUsername());
+        configuration.setPassword(getPassword());
+        configuration.setAuthenticationDatabase(getAuthenticationDatabase());
+        configuration.setUserDatabase(getUserDatabase());
+        configuration.setAuthenticationMecanism(getAuthenticationMethod());
+        configuration.setSslConnection(isSslConnection());
         return configuration;
     }
 
@@ -185,13 +208,16 @@ public class ServerConfigurationPanel extends JPanel {
         configuration.setLabel(getLabel());
         configuration.setDatabaseVendor(getDatabaseVendor());
         configuration.setServerUrl(getServerUrls());
-
+        configuration.setSslConnection(isSslConnection());
+        configuration.setUsername(getUsername());
+        configuration.setPassword(getPassword());
         configuration.setUserDatabase(getUserDatabase());
+        configuration.setAuthenticationDatabase(getAuthenticationDatabase());
+        configuration.setCollectionsToIgnore(getCollectionsToIgnore());
         configuration.setShellArgumentsLine(getShellArgumentsLine());
         configuration.setShellWorkingDir(getShellWorkingDir());
         configuration.setConnectOnIdeStartup(isAutoConnect());
-
-
+        configuration.setAuthenticationMecanism(getAuthenticationMethod());
     }
 
     private void validateLabel() {
@@ -225,12 +251,39 @@ public class ServerConfigurationPanel extends JPanel {
         labelField.setText(configuration.getLabel());
         databaseVendorField.setSelectedItem(configuration.getDatabaseVendor());
         serverUrlField.setText(configuration.getServerUrl());
+        usernameField.setText(configuration.getUsername());
+        passwordField.setText(configuration.getPassword());
         userDatabaseField.setText(configuration.getUserDatabase());
+        authenticationDatabaseField.setText(configuration.getAuthenticationDatabase());
+        sslConnectionField.setSelected(configuration.isSslConnection());
+        collectionsToIgnoreField.setText(StringUtils.join(configuration.getCollectionsToIgnore(), ","));
         shellArgumentsLineField.setText(configuration.getShellArgumentsLine());
         shellWorkingDirField.setText(configuration.getShellWorkingDir());
         autoConnectCheckBox.setSelected(configuration.isConnectOnIdeStartup());
 
-        //TODO
+        AuthenticationMechanism authentificationMethod = configuration.getAuthenticationMecanism();
+        if (AuthenticationMechanism.MONGODB_CR.equals(authentificationMethod)) {
+            mongoCRAuthRadioButton.setSelected(true);
+        } else if (AuthenticationMechanism.SCRAM_SHA_1.equals(authentificationMethod)) {
+            scramSHA1AuthRadioButton.setSelected(true);
+        } else {
+            defaultAuthMethodRadioButton.setSelected(true);
+        }
+    }
+
+
+    private List<String> getCollectionsToIgnore() {
+        String collectionsToIgnoreText = collectionsToIgnoreField.getText();
+        if (StringUtils.isNotBlank(collectionsToIgnoreText)) {
+            String[] collectionsToIgnore = collectionsToIgnoreText.split(",");
+
+            List<String> collections = new LinkedList<String>();
+            for (String collectionToIgnore : collectionsToIgnore) {
+                collections.add(StringUtils.trim(collectionToIgnore));
+            }
+            return collections;
+        }
+        return Collections.emptyList();
     }
 
     private DatabaseVendor getDatabaseVendor() {
@@ -253,6 +306,33 @@ public class ServerConfigurationPanel extends JPanel {
         return null;
     }
 
+    private boolean isSslConnection() {
+        return sslConnectionField.isSelected();
+    }
+
+    private String getUsername() {
+        String username = usernameField.getText();
+        if (StringUtils.isNotBlank(username)) {
+            return username;
+        }
+        return null;
+    }
+
+    private String getPassword() {
+        char[] password = passwordField.getPassword();
+        if (password != null && password.length != 0) {
+            return String.valueOf(password);
+        }
+        return null;
+    }
+
+    private String getAuthenticationDatabase() {
+        String authenticationDatabase = authenticationDatabaseField.getText();
+        if (StringUtils.isNotBlank(authenticationDatabase)) {
+            return authenticationDatabase;
+        }
+        return null;
+    }
 
     private String getUserDatabase() {
         String userDatabase = userDatabaseField.getText();
@@ -262,6 +342,14 @@ public class ServerConfigurationPanel extends JPanel {
         return null;
     }
 
+    private AuthenticationMechanism getAuthenticationMethod() {
+        if (mongoCRAuthRadioButton.isSelected()) {
+            return AuthenticationMechanism.MONGODB_CR;
+        } else if (scramSHA1AuthRadioButton.isSelected()) {
+            return AuthenticationMechanism.SCRAM_SHA_1;
+        }
+        return null;
+    }
 
     private String getShellArgumentsLine() {
         String shellArgumentsLine = shellArgumentsLineField.getText();
@@ -289,7 +377,7 @@ public class ServerConfigurationPanel extends JPanel {
         shellWorkingDirField = new TextFieldWithBrowseButton();
         FileChooserDescriptor fileChooserDescriptor = new FileChooserDescriptor(false, true, false, false, false, false);
         ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseFolderActionListener =
-                new ComponentWithBrowseButton.BrowseFolderActionListener<>("Shell working directory",
+                new ComponentWithBrowseButton.BrowseFolderActionListener<JTextField>("Mongo shell working directory",
                         null,
                         shellWorkingDirField,
                         null,
@@ -300,7 +388,6 @@ public class ServerConfigurationPanel extends JPanel {
     }
 
     public void setErrorMessage(String message) {
-        feedbackLabel.setIcon(AllIcons.General.Error);
         feedbackLabel.setText(message);
     }
 }
