@@ -28,4 +28,6 @@ public interface DatabaseClient {
     void cleanUpServers();
 
     void registerServer(DatabaseServer databaseServer);
+
+    ServerConfiguration defaultConfiguration();
 }

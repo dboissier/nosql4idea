@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package org.codinjutsu.tools.nosql.view;
+package org.codinjutsu.tools.nosql.mongo.view;
 
 import com.intellij.openapi.command.impl.DummyProject;
 import com.mongodb.AuthenticationMechanism;
 import org.codinjutsu.tools.nosql.DatabaseVendor;
-import org.codinjutsu.tools.nosql.DatabaseVendorManager;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
-import org.codinjutsu.tools.nosql.ServerConfigurationPanel;
 import org.codinjutsu.tools.nosql.commons.logic.ConfigurationException;
+import org.codinjutsu.tools.nosql.commons.logic.DatabaseClient;
+import org.codinjutsu.tools.nosql.commons.model.AuthenticationSettings;
+import org.codinjutsu.tools.nosql.commons.view.ServerConfigurationPanel;
+import org.codinjutsu.tools.nosql.mongo.logic.MongoExtraSettings;
 import org.fest.swing.edt.GuiActionRunner;
 import org.fest.swing.edt.GuiQuery;
 import org.fest.swing.fixture.Containers;
 import org.fest.swing.fixture.FrameFixture;
-import org.fest.swing.fixture.JComboBoxFixture;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -35,7 +36,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -45,16 +45,20 @@ public class ServerConfigurationPanelTest {
     public ExpectedException thrown = ExpectedException.none();
 
     private ServerConfigurationPanel configurationPanel;
-    private DatabaseVendorManager databaseVendorManager;
+    private DatabaseClient databaseClientMock;
 
     private FrameFixture frameFixture;
 
     @Before
     public void setUp() throws Exception {
-        databaseVendorManager = Mockito.spy(new DatabaseVendorManager(DummyProject.getInstance()));
+        databaseClientMock = Mockito.mock(DatabaseClient.class);
         configurationPanel = GuiActionRunner.execute(new GuiQuery<ServerConfigurationPanel>() {
             protected ServerConfigurationPanel executeInEDT() {
-                return new ServerConfigurationPanel(DummyProject.getInstance(), databaseVendorManager);
+                return new ServerConfigurationPanel(DummyProject.getInstance(),
+                        DatabaseVendor.MONGO,
+                        databaseClientMock,
+                        new MongoAuthenticationPanel()
+                );
             }
         });
 
@@ -67,64 +71,72 @@ public class ServerConfigurationPanelTest {
     }
 
     @Test
-    public void validateFormWithOneServerUrl() throws Exception {
+    public void createMongoConfiguration() throws Exception {
         frameFixture.textBox("labelField").setText("Localhost");
 
-        JComboBoxFixture databaseVendorField = frameFixture.comboBox("databaseVendorField");
-        assertArrayEquals(new String[]{
-                "DatabaseVendor{name='MongoDB'}",
-                "DatabaseVendor{name='RedisDB'}",
-                "DatabaseVendor{name='Couchbase'}"
-        }, databaseVendorField.contents());
-
-        databaseVendorField.requireSelection("DatabaseVendor{name='MongoDB'}");
-
-        databaseVendorField.selectItem("DatabaseVendor{name='RedisDB'}");
-
-        frameFixture.label("databaseTipsLabel").requireText("format: host:port. If cluster: host:port1,host:port2,...");
+        frameFixture.label("databaseVendorLabel").requireText("MongoDB");
+        frameFixture.label("databaseTipsLabel").requireText("format: host:port. If replicat set: host:port1,host:port2,...");
 
         frameFixture.textBox("serverUrlField").setText("localhost:25");
         frameFixture.textBox("usernameField").setText("john");
         frameFixture.textBox("passwordField").setText("johnpassword");
 
         frameFixture.textBox("userDatabaseField").setText("mydatabase");
-        frameFixture.checkBox("sslConnectionField").check();
-        frameFixture.checkBox("autoConnectField").check();
 
+        frameFixture.textBox("authenticationDatabaseField").setText("admin");
         frameFixture.radioButton("defaultAuthMethod").requireSelected();
         frameFixture.radioButton("mongoCRAuthField").click();
 
+        frameFixture.checkBox("sslConnectionField").check();
+        frameFixture.checkBox("autoConnectField").check();
         ServerConfiguration configuration = new ServerConfiguration();
 
         configurationPanel.applyConfigurationData(configuration);
 
         assertEquals("Localhost", configuration.getLabel());
-        assertEquals(DatabaseVendor.REDIS, configuration.getDatabaseVendor());
+        assertEquals(DatabaseVendor.MONGO, configuration.getDatabaseVendor());
         assertEquals("localhost:25", configuration.getServerUrl());
-        assertEquals("john", configuration.getUsername());
+        AuthenticationSettings authenticationSettings = configuration.getAuthenticationSettings();
+        assertEquals("john", authenticationSettings.getUsername());
+        assertEquals("johnpassword", authenticationSettings.getPassword());
+
+        MongoExtraSettings mongoExtraSettings = new MongoExtraSettings(authenticationSettings.getExtras());
+
+        assertEquals("admin", mongoExtraSettings.getAuthenticationDatabase());
+        assertEquals(AuthenticationMechanism.MONGODB_CR, mongoExtraSettings.getAuthenticationMechanism());
         assertEquals("mydatabase", configuration.getUserDatabase());
-        assertTrue(configuration.isSslConnection());
         assertTrue(configuration.isConnectOnIdeStartup());
-        assertEquals(AuthenticationMechanism.MONGODB_CR, configuration.getAuthenticationMecanism());
     }
 
     @Test
-    public void loadFormWithOneServerUrl() throws Exception {
+    public void loadMongoConfiguration() throws Exception {
         ServerConfiguration configuration = new ServerConfiguration();
         configuration.setLabel("Localhost");
-        configuration.setDatabaseVendor(DatabaseVendor.COUCHBASE);
+        configuration.setDatabaseVendor(DatabaseVendor.MONGO);
         configuration.setServerUrl("localhost:25");
-        configuration.setUsername("john");
-        configuration.setPassword("johnpassword");
+
+        AuthenticationSettings authenticationSettings = new AuthenticationSettings();
+        authenticationSettings.setUsername("john");
+        authenticationSettings.setPassword("johnpassword");
+        MongoExtraSettings mongoExtraSettings = new MongoExtraSettings();
+        mongoExtraSettings.setAuthenticationDatabase("admin");
+        mongoExtraSettings.setAuthenticationMechanism(AuthenticationMechanism.SCRAM_SHA_1);
+        mongoExtraSettings.setSsl(true);
+
+        authenticationSettings.setExtras(mongoExtraSettings.get());
+
+        configuration.setAuthenticationSettings(authenticationSettings);
+        configuration.setUserDatabase("mydatabase");
 
         configurationPanel.loadConfigurationData(configuration);
 
         frameFixture.textBox("labelField").requireText("Localhost");
-        frameFixture.comboBox("databaseVendorField").requireSelection("DatabaseVendor{name='Couchbase'}");
-        frameFixture.label("databaseTipsLabel").requireText("format: host:port. If cluster: host:port1,host:port2,...");
         frameFixture.textBox("serverUrlField").requireText("localhost:25");
         frameFixture.textBox("usernameField").requireText("john");
         frameFixture.textBox("passwordField").requireText("johnpassword");
+        frameFixture.textBox("authenticationDatabaseField").requireText("admin");
+        frameFixture.checkBox("sslConnectionField").requireSelected();
+        frameFixture.radioButton("scramSHA1AuthField").requireSelected();
     }
 
     @Test
@@ -168,7 +180,6 @@ public class ServerConfigurationPanelTest {
         configurationPanel.applyConfigurationData(new ServerConfiguration());
     }
 
-
     @Test
     public void validateFormWithBadMongoPortShouldThrowAConfigurationException() {
         thrown.expect(ConfigurationException.class);
@@ -179,7 +190,6 @@ public class ServerConfigurationPanelTest {
 
         configurationPanel.applyConfigurationData(new ServerConfiguration());
     }
-
 
     @Test
     public void validateFormWithReplicatSet() throws Exception {
@@ -196,6 +206,7 @@ public class ServerConfigurationPanelTest {
     @Test
     public void loadFormWithReplicatSet() throws Exception {
         ServerConfiguration configuration = new ServerConfiguration();
+        configuration.setAuthenticationSettings(new AuthenticationSettings());
 
         configuration.setServerUrl("localhost:25, localhost:26");
 

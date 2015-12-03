@@ -20,6 +20,7 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
+import org.codinjutsu.tools.nosql.commons.model.AuthenticationSettings;
 import org.codinjutsu.tools.nosql.commons.model.Database;
 import org.codinjutsu.tools.nosql.commons.logic.DatabaseClient;
 import org.codinjutsu.tools.nosql.commons.model.DatabaseServer;
@@ -73,6 +74,13 @@ public class RedisClient implements DatabaseClient {
     @Override
     public void registerServer(DatabaseServer databaseServer) {
 
+    }
+
+    @Override
+    public ServerConfiguration defaultConfiguration() {
+        ServerConfiguration configuration = ServerConfiguration.byDefault();
+        configuration.setAuthenticationSettings(new AuthenticationSettings());
+        return configuration;
     }
 
 

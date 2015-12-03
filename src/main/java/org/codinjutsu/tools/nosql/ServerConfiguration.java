@@ -16,10 +16,7 @@
 
 package org.codinjutsu.tools.nosql;
 
-import com.mongodb.AuthenticationMechanism;
-
-import java.util.LinkedList;
-import java.util.List;
+import org.codinjutsu.tools.nosql.commons.model.AuthenticationSettings;
 
 public class ServerConfiguration implements Cloneable {
 
@@ -29,19 +26,14 @@ public class ServerConfiguration implements Cloneable {
 
     private String serverUrl;
 
-    private String username;
-    private String password;
     private String userDatabase;
-    private String authenticationDatabase;
 
     private boolean connectOnIdeStartup = false;
-    private List<String> collectionsToIgnore = new LinkedList<String>();
 
     private String shellArgumentsLine;
     private String shellWorkingDir;
-    private boolean sslConnection;
 
-    private AuthenticationMechanism authenticationMecanism = null;
+    private AuthenticationSettings authenticationSettings = new AuthenticationSettings();
 
     public DatabaseVendor getDatabaseVendor() {
         return databaseVendor;
@@ -59,30 +51,6 @@ public class ServerConfiguration implements Cloneable {
         this.serverUrl = serverUrl;
     }
 
-    public boolean isSslConnection() {
-        return sslConnection;
-    }
-
-    public void setSslConnection(boolean sslConnection) {
-        this.sslConnection = sslConnection;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public void setUserDatabase(String userDatabase) {
         this.userDatabase = userDatabase;
     }
@@ -91,28 +59,12 @@ public class ServerConfiguration implements Cloneable {
         return userDatabase;
     }
 
-    public String getAuthenticationDatabase() {
-        return authenticationDatabase;
-    }
-
-    public void setAuthenticationDatabase(String authenticationDatabase) {
-        this.authenticationDatabase = authenticationDatabase;
-    }
-    
     public boolean isConnectOnIdeStartup() {
         return connectOnIdeStartup;
     }
 
     public void setConnectOnIdeStartup(boolean connectOnIdeStartup) {
         this.connectOnIdeStartup = connectOnIdeStartup;
-    }
-
-    public void setCollectionsToIgnore(List<String> collectionsToIgnore) {
-        this.collectionsToIgnore = collectionsToIgnore;
-    }
-
-    public List<String> getCollectionsToIgnore() {
-        return collectionsToIgnore;
     }
 
     public String getLabel() {
@@ -139,19 +91,24 @@ public class ServerConfiguration implements Cloneable {
         this.shellWorkingDir = shellWorkingDir;
     }
 
-    public void setAuthenticationMecanism(AuthenticationMechanism authenticationMecanism) {
-        this.authenticationMecanism = authenticationMecanism;
-    }
-
-    public AuthenticationMechanism getAuthenticationMecanism() {
-        return authenticationMecanism;
-    }
-
     public static ServerConfiguration byDefault() {
         ServerConfiguration serverConfiguration = new ServerConfiguration();
         serverConfiguration.setDatabaseVendor(DatabaseVendor.MONGO);
         serverConfiguration.setServerUrl(DatabaseVendor.MONGO.defaultUrl);
         return serverConfiguration;
+    }
+
+    public boolean isSingleServer() {
+        return serverUrl.split(",").length == 1;
+    }
+
+    public void setAuthenticationSettings(AuthenticationSettings authenticationSettings) {
+        this.authenticationSettings = authenticationSettings;
+    }
+
+
+    public AuthenticationSettings getAuthenticationSettings() {
+        return authenticationSettings;
     }
 
     public ServerConfiguration clone() {
@@ -162,10 +119,6 @@ public class ServerConfiguration implements Cloneable {
         }
     }
 
-    public boolean isSingleServer() {
-        return serverUrl.split(",").length == 1;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -174,38 +127,28 @@ public class ServerConfiguration implements Cloneable {
         ServerConfiguration that = (ServerConfiguration) o;
 
         if (connectOnIdeStartup != that.connectOnIdeStartup) return false;
-        if (sslConnection != that.sslConnection) return false;
-        if (label != null ? !label.equals(that.label) : that.label != null) return false;
-        if (serverUrl != null ? !serverUrl.equals(that.serverUrl) : that.serverUrl != null) return false;
-        if (username != null ? !username.equals(that.username) : that.username != null) return false;
-        if (password != null ? !password.equals(that.password) : that.password != null) return false;
+        if (!label.equals(that.label)) return false;
+        if (databaseVendor != that.databaseVendor) return false;
+        if (!serverUrl.equals(that.serverUrl)) return false;
         if (userDatabase != null ? !userDatabase.equals(that.userDatabase) : that.userDatabase != null) return false;
-        if (authenticationDatabase != null ? !authenticationDatabase.equals(that.authenticationDatabase) : that.authenticationDatabase != null)
-            return false;
-        if (collectionsToIgnore != null ? !collectionsToIgnore.equals(that.collectionsToIgnore) : that.collectionsToIgnore != null)
-            return false;
         if (shellArgumentsLine != null ? !shellArgumentsLine.equals(that.shellArgumentsLine) : that.shellArgumentsLine != null)
             return false;
         if (shellWorkingDir != null ? !shellWorkingDir.equals(that.shellWorkingDir) : that.shellWorkingDir != null)
             return false;
-        return authenticationMecanism == that.authenticationMecanism;
+        return !(authenticationSettings != null ? !authenticationSettings.equals(that.authenticationSettings) : that.authenticationSettings != null);
 
     }
 
     @Override
     public int hashCode() {
-        int result = label != null ? label.hashCode() : 0;
-        result = 31 * result + (serverUrl != null ? serverUrl.hashCode() : 0);
-        result = 31 * result + (username != null ? username.hashCode() : 0);
-        result = 31 * result + (password != null ? password.hashCode() : 0);
+        int result = label.hashCode();
+        result = 31 * result + databaseVendor.hashCode();
+        result = 31 * result + serverUrl.hashCode();
         result = 31 * result + (userDatabase != null ? userDatabase.hashCode() : 0);
-        result = 31 * result + (authenticationDatabase != null ? authenticationDatabase.hashCode() : 0);
         result = 31 * result + (connectOnIdeStartup ? 1 : 0);
-        result = 31 * result + (collectionsToIgnore != null ? collectionsToIgnore.hashCode() : 0);
         result = 31 * result + (shellArgumentsLine != null ? shellArgumentsLine.hashCode() : 0);
         result = 31 * result + (shellWorkingDir != null ? shellWorkingDir.hashCode() : 0);
-        result = 31 * result + (sslConnection ? 1 : 0);
-        result = 31 * result + (authenticationMecanism != null ? authenticationMecanism.hashCode() : 0);
+        result = 31 * result + (authenticationSettings != null ? authenticationSettings.hashCode() : 0);
         return result;
     }
 }

@@ -47,7 +47,7 @@ public class NoSqlWindowManager {
         this.project = project;
 
         ToolWindowManager toolWindowManager = ToolWindowManager.getInstance(project);
-        noSqlExplorerPanel = new NoSqlExplorerPanel(project, DatabaseVendorManager.getInstance(project));
+        noSqlExplorerPanel = new NoSqlExplorerPanel(project, DatabaseVendorClientManager.getInstance(project));
         noSqlExplorerPanel.installActions();
         Content nosqlExplorer = ContentFactory.SERVICE.getInstance().createContent(noSqlExplorerPanel, null, false);
 

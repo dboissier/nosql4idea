@@ -24,15 +24,8 @@ import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.codinjutsu.tools.nosql.couchbase.logic.CouchbaseClient;
-import org.codinjutsu.tools.nosql.couchbase.view.CouchbasePanel;
-import org.codinjutsu.tools.nosql.couchbase.view.editor.CouchbaseObjectFile;
-import org.codinjutsu.tools.nosql.mongo.logic.MongoClient;
-import org.codinjutsu.tools.nosql.mongo.view.MongoPanel;
-import org.codinjutsu.tools.nosql.mongo.view.editor.MongoObjectFile;
-import org.codinjutsu.tools.nosql.redis.logic.RedisClient;
-import org.codinjutsu.tools.nosql.redis.view.RedisPanel;
-import org.codinjutsu.tools.nosql.redis.view.editor.RedisObjectFile;
+import org.codinjutsu.tools.nosql.DatabaseVendorUIManager;
+import org.codinjutsu.tools.nosql.commons.DatabaseUI;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,23 +34,19 @@ public class NoSqlDatabaseDataEditorProvider implements FileEditorProvider, Appl
 
     @Override
     public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
-        return file instanceof MongoObjectFile || file instanceof RedisObjectFile || file instanceof CouchbaseObjectFile;
+        return DatabaseVendorUIManager.getInstance(project).accept(file);
     }
 
     @NotNull
     @Override
     public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
-        if (file instanceof MongoObjectFile) {
-            MongoObjectFile mongoObjectFile = (MongoObjectFile) file;
-            return new NoSqlDatabaseDataEditor(new MongoPanel(project, MongoClient.getInstance(project), mongoObjectFile.getConfiguration(), mongoObjectFile.getCollection()));
-        } else if (file instanceof RedisObjectFile) {
-            RedisObjectFile redisObjectFile = (RedisObjectFile) file;
-            return new NoSqlDatabaseDataEditor(new RedisPanel(project, RedisClient.getInstance(project), redisObjectFile.getConfiguration(), redisObjectFile.getDatabase()));
-        } else if (file instanceof CouchbaseObjectFile) {
-            CouchbaseObjectFile couchbaseObjectFile = (CouchbaseObjectFile) file;
-            return new NoSqlDatabaseDataEditor(new CouchbasePanel(project, CouchbaseClient.getInstance(project), couchbaseObjectFile.getConfiguration(), couchbaseObjectFile.getDatabase()));
+        NoSqlDatabaseObjectFile objectFile = (NoSqlDatabaseObjectFile) file;
+        DatabaseUI databaseUI = DatabaseVendorUIManager.getInstance(project).get(objectFile.getConfiguration().getDatabaseVendor());
+
+        if (databaseUI == null) {
+            throw new IllegalStateException("Unsupported file");
         }
-        throw new IllegalStateException("Unsupported file");
+        return new NoSqlDatabaseDataEditor(databaseUI.createResultPanel(project, objectFile));
     }
 
     @Override
@@ -66,14 +55,10 @@ public class NoSqlDatabaseDataEditorProvider implements FileEditorProvider, Appl
     }
 
     @Override
-    public void initComponent() {
-
-    }
+    public void initComponent() { }
 
     @Override
-    public void disposeComponent() {
-
-    }
+    public void disposeComponent() { }
 
     @NotNull
     @Override
@@ -82,9 +67,7 @@ public class NoSqlDatabaseDataEditorProvider implements FileEditorProvider, Appl
     }
 
     @Override
-    public void writeState(@NotNull FileEditorState state, @NotNull Project project, @NotNull Element targetElement) {
-
-    }
+    public void writeState(@NotNull FileEditorState state, @NotNull Project project, @NotNull Element targetElement) { }
 
     @NotNull
     @Override

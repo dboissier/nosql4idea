@@ -23,14 +23,12 @@ import com.mongodb.client.MongoIterable;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
-import org.codinjutsu.tools.nosql.commons.model.Database;
-import org.codinjutsu.tools.nosql.commons.logic.DatabaseClient;
-import org.codinjutsu.tools.nosql.commons.model.DatabaseServer;
-import org.codinjutsu.tools.nosql.mongo.model.MongoCollection;
-import org.codinjutsu.tools.nosql.mongo.model.MongoResult;
-import org.codinjutsu.tools.nosql.mongo.model.MongoDatabase;
 import org.codinjutsu.tools.nosql.commons.logic.ConfigurationException;
-import org.codinjutsu.tools.nosql.mongo.model.MongoQueryOptions;
+import org.codinjutsu.tools.nosql.commons.logic.DatabaseClient;
+import org.codinjutsu.tools.nosql.commons.model.AuthenticationSettings;
+import org.codinjutsu.tools.nosql.commons.model.Database;
+import org.codinjutsu.tools.nosql.commons.model.DatabaseServer;
+import org.codinjutsu.tools.nosql.mongo.model.*;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -39,7 +37,7 @@ import java.util.*;
 public class MongoClient implements DatabaseClient {
 
     private static final Logger LOG = Logger.getLogger(MongoClient.class);
-    private final List<DatabaseServer> databaseServers = new LinkedList<DatabaseServer>();
+    private final List<DatabaseServer> databaseServers = new LinkedList<>();
 
     public static MongoClient getInstance(Project project) {
         return ServiceManager.getService(project, MongoClient.class);
@@ -79,6 +77,11 @@ public class MongoClient implements DatabaseClient {
         databaseServers.add(databaseServer);
     }
 
+    @Override
+    public ServerConfiguration defaultConfiguration() {
+        return ServerConfiguration.byDefault();
+    }
+
     public List<DatabaseServer> getServers() {
         return databaseServers;
     }
@@ -92,7 +95,7 @@ public class MongoClient implements DatabaseClient {
 
     List<Database> loadDatabaseCollections(ServerConfiguration configuration) {
         com.mongodb.MongoClient mongo = null;
-        List<Database> mongoDatabases = new LinkedList<Database>();
+        List<Database> mongoDatabases = new LinkedList<>();
         try {
             String userDatabase = configuration.getUserDatabase();
 
@@ -294,15 +297,18 @@ public class MongoClient implements DatabaseClient {
 
         MongoClientURIBuilder uriBuilder = MongoClientURIBuilder.builder();
         uriBuilder.setServerAddresses(serverUrl);
-        if (StringUtils.isNotEmpty(configuration.getUsername())) {
-            uriBuilder.setCredential(configuration.getUsername(), configuration.getPassword(), configuration.getUserDatabase());
+        AuthenticationSettings authenticationSettings = configuration.getAuthenticationSettings();
+        MongoExtraSettings mongoExtraSettings = new MongoExtraSettings(authenticationSettings.getExtras());
+        if (StringUtils.isNotEmpty(authenticationSettings.getUsername())) {
+            uriBuilder.setCredential(authenticationSettings.getUsername(), authenticationSettings.getPassword(), mongoExtraSettings.getAuthenticationDatabase());
         }
 
-        if (configuration.getAuthenticationMecanism() != null) {
-            uriBuilder.setAuthenticationMecanism(configuration.getAuthenticationMecanism());
+
+        if (mongoExtraSettings.getAuthenticationMechanism() != null) {
+            uriBuilder.setAuthenticationMecanism(mongoExtraSettings.getAuthenticationMechanism());
         }
 
-        if (configuration.isSslConnection()) {
+        if (mongoExtraSettings.isSsl()) {
             uriBuilder.sslEnabled();
         }
 

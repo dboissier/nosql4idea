@@ -65,6 +65,7 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
     private JBTextField separatorField;
     private JBTextField filterField;
     private RedisResult redisResult;
+    private boolean groupData;
 
     public RedisPanel(Project project, RedisClient redisClient, ServerConfiguration configuration, RedisDatabase database) {
         this.project = project;
@@ -107,6 +108,7 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
         westPanel.add(filterPanel, BorderLayout.WEST);
 
         NonOpaquePanel separatorPanel = new NonOpaquePanel();
+//        separatorPanel.add();
         separatorPanel.add(new JLabel("Separator: "), BorderLayout.WEST);
         separatorPanel.add(separatorField, BorderLayout.CENTER);
         separatorPanel.add(Box.createHorizontalStrut(5), BorderLayout.EAST);
@@ -229,5 +231,19 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
     @Override
     public void dispose() {
 
+    }
+
+    public boolean isGroupDataEnabled() {
+        return this.groupData;
+    }
+
+    public void toggleGroupData(boolean state) {
+        this.groupData = state;
+    }
+
+    public void renderRecords() {
+        if (this.groupData) {
+            //TODO
+        }
     }
 }

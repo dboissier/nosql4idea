@@ -19,6 +19,8 @@ package org.codinjutsu.tools.nosql;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import org.codinjutsu.tools.nosql.commons.logic.ConfigurationException;
+import org.codinjutsu.tools.nosql.commons.view.ServerConfigurationPanel;
+import org.codinjutsu.tools.nosql.commons.view.ServerConfigurationPanelFactory;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -26,15 +28,15 @@ import java.awt.*;
 
 class ConfigurationDialog extends DialogWrapper {
 
-    private final Project project;
-    private final DatabaseVendorManager databaseVendorManager;
+    private final ServerConfigurationPanelFactory serverConfigurationPanelFactory;
     private final ServerConfiguration configuration;
     private ServerConfigurationPanel serverConfigurationPanel;
 
-    ConfigurationDialog(Component parent, Project project, DatabaseVendorManager databaseVendorManager, ServerConfiguration configuration) {
+    ConfigurationDialog(Component parent,
+                        ServerConfigurationPanelFactory serverConfigurationPanelFactory,
+                        ServerConfiguration configuration) {
         super(parent, true);
-        this.project = project;
-        this.databaseVendorManager = databaseVendorManager;
+        this.serverConfigurationPanelFactory = serverConfigurationPanelFactory;
         this.configuration = configuration;
 
         init();
@@ -43,7 +45,7 @@ class ConfigurationDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        serverConfigurationPanel = new ServerConfigurationPanel(project, databaseVendorManager);
+        serverConfigurationPanel = this.serverConfigurationPanelFactory.create(configuration.getDatabaseVendor());
         serverConfigurationPanel.loadConfigurationData(configuration);
         return serverConfigurationPanel;
     }

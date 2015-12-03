@@ -32,9 +32,11 @@ import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.nosql.DatabaseVendor;
 import org.codinjutsu.tools.nosql.NoSqlConfiguration;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
+import org.codinjutsu.tools.nosql.commons.model.AuthenticationSettings;
 import org.codinjutsu.tools.nosql.commons.view.console.NoSqlConsoleView;
-import org.codinjutsu.tools.nosql.mongo.model.MongoDatabase;
 import org.codinjutsu.tools.nosql.mongo.MongoUtils;
+import org.codinjutsu.tools.nosql.mongo.logic.MongoExtraSettings;
+import org.codinjutsu.tools.nosql.mongo.model.MongoDatabase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -80,25 +82,28 @@ public class MongoConsoleRunner extends AbstractConsoleRunnerWithHistory<NoSqlCo
             commandLine.withWorkDirectory(shellWorkingDir);
         }
 
-        String username = serverConfiguration.getUsername();
+        AuthenticationSettings authenticationSettings = serverConfiguration.getAuthenticationSettings();
+
+        String username = authenticationSettings.getUsername();
         if (StringUtils.isNotBlank(username)) {
             commandLine.addParameter("--username");
             commandLine.addParameter(username);
         }
 
-        String password = serverConfiguration.getPassword();
+        String password = authenticationSettings.getPassword();
         if (StringUtils.isNotBlank(password)) {
             commandLine.addParameter("--password");
             commandLine.addParameter(password);
         }
 
-        String authenticationDatabase = serverConfiguration.getAuthenticationDatabase();
+        MongoExtraSettings mongoExtraSettings = new MongoExtraSettings(authenticationSettings.getExtras());
+        String authenticationDatabase = mongoExtraSettings.getAuthenticationDatabase();
         if (StringUtils.isNotBlank(authenticationDatabase)) {
             commandLine.addParameter("--authenticationDatabase");
             commandLine.addParameter(authenticationDatabase);
         }
 
-        AuthenticationMechanism authenticationMecanism = serverConfiguration.getAuthenticationMecanism();
+        AuthenticationMechanism authenticationMecanism = mongoExtraSettings.getAuthenticationMechanism();
         if (authenticationMecanism != null) {
             commandLine.addParameter("--authenticationMecanism");
             commandLine.addParameter(authenticationMecanism.getMechanismName());

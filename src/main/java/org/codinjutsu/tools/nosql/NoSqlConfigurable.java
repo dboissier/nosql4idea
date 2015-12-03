@@ -36,6 +36,7 @@ import com.intellij.openapi.vfs.CharsetToolkit;
 import com.intellij.ui.*;
 import com.intellij.ui.table.JBTable;
 import org.apache.commons.lang.StringUtils;
+import org.codinjutsu.tools.nosql.commons.view.ServerConfigurationPanelFactory;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,7 +60,8 @@ public class NoSqlConfigurable extends BaseConfigurable {
     private final NoSqlConfiguration configuration;
 
     private final List<ServerConfiguration> configurations;
-    private final DatabaseVendorManager databaseVendorManager;
+    private final ServerConfigurationPanelFactory serverConfigurationPanelFactory;
+    private final DatabaseVendorClientManager databaseVendorClientManager;
 
     private JPanel mainPanel;
     private JBTable table;
@@ -71,7 +73,12 @@ public class NoSqlConfigurable extends BaseConfigurable {
     public NoSqlConfigurable(Project project) {
         this.project = project;
         this.configuration = NoSqlConfiguration.getInstance(project);
-        this.databaseVendorManager = DatabaseVendorManager.getInstance(project);
+        databaseVendorClientManager = DatabaseVendorClientManager.getInstance(project);
+        this.serverConfigurationPanelFactory = new ServerConfigurationPanelFactory(
+                project,
+                databaseVendorClientManager,
+                DatabaseVendorUIManager.getInstance(project)
+        );
         configurations = new LinkedList<>(this.configuration.getServerConfigurations());
         tableModel = new NoSqlServerTableModel(configurations);
         mainPanel = new JPanel(new BorderLayout());
@@ -145,9 +152,22 @@ public class NoSqlConfigurable extends BaseConfigurable {
                             public void run(AnActionButton button) {
                                 stopEditing();
 
-                                ServerConfiguration serverConfiguration = ServerConfiguration.byDefault();
+                                SelectDatabaseVendorDialog databaseVendorDialog = new SelectDatabaseVendorDialog(mainPanel);
+                                databaseVendorDialog.setTitle("Add a NoSql Server");
+                                databaseVendorDialog.show();
+                                if (!databaseVendorDialog.isOK()) {
+                                    return;
+                                }
 
-                                ConfigurationDialog dialog = new ConfigurationDialog(mainPanel, project, databaseVendorManager, serverConfiguration);
+                                DatabaseVendor selectedDatabaseVendor = databaseVendorDialog.getSelectedDatabaseVendor();
+                                ServerConfiguration serverConfiguration = databaseVendorClientManager.get(selectedDatabaseVendor).defaultConfiguration();
+                                serverConfiguration.setDatabaseVendor(selectedDatabaseVendor);
+
+                                ConfigurationDialog dialog = new ConfigurationDialog(
+                                        mainPanel,
+                                        serverConfigurationPanelFactory,
+                                        serverConfiguration
+                                );
                                 dialog.setTitle("Add a NoSql Server");
                                 dialog.show();
                                 if (!dialog.isOK()) {
@@ -175,7 +195,11 @@ public class NoSqlConfigurable extends BaseConfigurable {
                                 ServerConfiguration copiedConfiguration = sourceConfiguration.clone();
 
 
-                                ConfigurationDialog dialog = new ConfigurationDialog(mainPanel, project, databaseVendorManager, copiedConfiguration);
+                                ConfigurationDialog dialog = new ConfigurationDialog(
+                                        mainPanel,
+                                        serverConfigurationPanelFactory,
+                                        copiedConfiguration
+                                );
                                 dialog.setTitle("Edit a NoSql Server");
                                 dialog.show();
                                 if (!dialog.isOK()) {

@@ -76,11 +76,11 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
     private JPanel toolBarPanel;
 
     private final Project project;
-    private final DatabaseVendorManager databaseVendorManager;
+    private final DatabaseVendorClientManager databaseVendorClientManager;
 
-    public NoSqlExplorerPanel(Project project, DatabaseVendorManager databaseVendorManager) {
+    public NoSqlExplorerPanel(Project project, DatabaseVendorClientManager databaseVendorClientManager) {
         this.project = project;
-        this.databaseVendorManager = databaseVendorManager;
+        this.databaseVendorClientManager = databaseVendorClientManager;
 
         treePanel.setLayout(new BorderLayout());
 
@@ -105,7 +105,7 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
     }
 
     public void reloadAllServerConfigurations() {
-        this.databaseVendorManager.cleanUpServers();
+        this.databaseVendorClientManager.cleanUpServers();
         databaseTree.setRootVisible(false);
 
         List<ServerConfiguration> serverConfigurations = getServerConfigurations();
@@ -119,7 +119,7 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
 
         for (ServerConfiguration serverConfiguration : serverConfigurations) {
             DatabaseServer mongoServer = new DatabaseServer(serverConfiguration);
-            this.databaseVendorManager.registerServer(mongoServer);
+            this.databaseVendorClientManager.registerServer(mongoServer);
             DefaultMutableTreeNode serverNode = new DefaultMutableTreeNode(mongoServer);
             rootNode.add(serverNode);
             if (serverConfiguration.isConnectOnIdeStartup()) {
@@ -140,7 +140,7 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
             public void run() {
                 final DatabaseServer databaseServer = (DatabaseServer) serverNode.getUserObject();
                 try {
-                    databaseVendorManager.loadServer(databaseServer);
+                    databaseVendorClientManager.loadServer(databaseServer);
 
                     GuiUtils.runInSwingThread(new Runnable() {
                         @Override
@@ -423,12 +423,12 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
     }
 
     public void dropCollection() {
-//        databaseVendorManager.dropCollection(getConfiguration(), getSelectedCollection());
+//        databaseVendorClientManager.dropCollection(getConfiguration(), getSelectedCollection());
         reloadServerConfiguration(getSelectedServerNode(), true);
     }
 
     public void dropDatabase() {
-//        databaseVendorManager.dropDatabase(getConfiguration(), getSelectedMongoDatabase());
+//        databaseVendorClientManager.dropDatabase(getConfiguration(), getSelectedMongoDatabase());
         reloadServerConfiguration(getSelectedServerNode(), true);
     }
 

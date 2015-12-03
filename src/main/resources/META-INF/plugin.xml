@@ -30,16 +30,28 @@
                         serviceImplementation="org.codinjutsu.tools.nosql.NoSqlConfiguration"/>
         <projectService serviceInterface="org.codinjutsu.tools.nosql.NoSqlWindowManager"
                         serviceImplementation="org.codinjutsu.tools.nosql.NoSqlWindowManager"/>
+        <projectService serviceInterface="org.codinjutsu.tools.nosql.DatabaseVendorUIManager"
+                        serviceImplementation="org.codinjutsu.tools.nosql.DatabaseVendorUIManager"/>
+        <projectService serviceInterface="org.codinjutsu.tools.nosql.DatabaseVendorClientManager"
+                        serviceImplementation="org.codinjutsu.tools.nosql.DatabaseVendorClientManager"/>
 
-        <projectService serviceInterface="org.codinjutsu.tools.nosql.DatabaseVendorManager"
-                        serviceImplementation="org.codinjutsu.tools.nosql.DatabaseVendorManager"/>
+        <!-- Mongo components -->
         <projectService serviceInterface="org.codinjutsu.tools.nosql.mongo.logic.MongoClient"
                         serviceImplementation="org.codinjutsu.tools.nosql.mongo.logic.MongoClient"/>
+        <projectService serviceInterface="org.codinjutsu.tools.nosql.mongo.MongoUI"
+                        serviceImplementation="org.codinjutsu.tools.nosql.mongo.MongoUI"/>
+
+        <!-- Redis components -->
         <projectService serviceInterface="org.codinjutsu.tools.nosql.redis.logic.RedisClient"
                         serviceImplementation="org.codinjutsu.tools.nosql.redis.logic.RedisClient"/>
+        <projectService serviceInterface="org.codinjutsu.tools.nosql.redis.RedisUI"
+                        serviceImplementation="org.codinjutsu.tools.nosql.redis.RedisUI"/>
+
+        <!-- Couchbase components -->
         <projectService serviceInterface="org.codinjutsu.tools.nosql.couchbase.logic.CouchbaseClient"
                         serviceImplementation="org.codinjutsu.tools.nosql.couchbase.logic.CouchbaseClient"/>
-
+        <projectService serviceInterface="org.codinjutsu.tools.nosql.couchbase.CouchbaseUI"
+                        serviceImplementation="org.codinjutsu.tools.nosql.couchbase.CouchbaseUI"/>
 
         <projectConfigurable instance="org.codinjutsu.tools.nosql.NoSqlConfigurable"
                              id="preferences.mongoOptions"/>

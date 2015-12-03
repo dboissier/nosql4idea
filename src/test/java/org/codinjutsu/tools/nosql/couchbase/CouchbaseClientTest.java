@@ -27,12 +27,13 @@ import com.couchbase.client.java.query.N1qlQuery;
 import com.couchbase.client.java.query.N1qlQueryResult;
 import com.couchbase.client.java.query.N1qlQueryRow;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
+import org.codinjutsu.tools.nosql.commons.model.AuthenticationSettings;
 import org.codinjutsu.tools.nosql.commons.model.DatabaseServer;
 import org.codinjutsu.tools.nosql.couchbase.logic.CouchbaseClient;
 import org.junit.Test;
 
-import static com.couchbase.client.java.query.Select.*;
-import static com.couchbase.client.java.query.dsl.Expression.*;
+import static com.couchbase.client.java.query.Select.select;
+import static com.couchbase.client.java.query.dsl.Expression.i;
 
 public class CouchbaseClientTest {
     @Test
@@ -40,8 +41,10 @@ public class CouchbaseClientTest {
         CouchbaseClient couchbaseClient = new CouchbaseClient();
         ServerConfiguration configuration = new ServerConfiguration();
         configuration.setServerUrl("localhost");
-        configuration.setUsername("Administrator");
-        configuration.setPassword("helloworld");
+        AuthenticationSettings authenticationSettings = new AuthenticationSettings();
+        authenticationSettings.setUsername("Administrator");
+        authenticationSettings.setPassword("helloworld");
+        configuration.setAuthenticationSettings(authenticationSettings);
         couchbaseClient.loadServer(new DatabaseServer(configuration));
     }
 

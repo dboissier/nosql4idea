@@ -138,7 +138,7 @@ public class MongoClientTest {
         fillCollectionWithJsonData(dummyCollection, IOUtils.toString(getClass().getResourceAsStream("dummyCollection.json")));
 
         mongoClient = new MongoClient();
-        serverConfiguration = new ServerConfiguration();
+        serverConfiguration = mongoClient.defaultConfiguration();
         serverConfiguration.setServerUrl("localhost:27017");
     }
 

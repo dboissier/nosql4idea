@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package org.codinjutsu.tools.nosql.commons.view;
+package org.codinjutsu.tools.nosql.commons;
 
-import org.codinjutsu.tools.nosql.commons.model.AuthenticationSettings;
+import com.intellij.openapi.project.Project;
+import org.codinjutsu.tools.nosql.commons.view.AuthenticationView;
+import org.codinjutsu.tools.nosql.commons.view.NoSqlResultView;
+import org.codinjutsu.tools.nosql.commons.view.editor.NoSqlDatabaseObjectFile;
 
-import javax.swing.*;
+public interface DatabaseUI {
+    AuthenticationView createAythenticationView();
 
-public interface AuthenticationView {
-
-
-    JPanel getComponent();
-
-    AuthenticationSettings create();
-
-    void load(AuthenticationSettings settings);
+    NoSqlResultView createResultPanel(Project project, NoSqlDatabaseObjectFile objectFile);
 }

@@ -27,9 +27,9 @@ import org.codinjutsu.tools.nosql.redis.logic.RedisClient;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DatabaseVendorManager {
+public class DatabaseVendorClientManager {
 
-    private static final Map<DatabaseVendor, Class<? extends DatabaseClient>> dataClientByVendor = new HashMap<DatabaseVendor, Class<? extends DatabaseClient>>();
+    private static final Map<DatabaseVendor, Class<? extends DatabaseClient>> dataClientByVendor = new HashMap<>();
 
     static {
         dataClientByVendor.put(DatabaseVendor.MONGO, MongoClient.class);
@@ -39,12 +39,12 @@ public class DatabaseVendorManager {
 
     private final Project project;
 
-    public DatabaseVendorManager(Project project) {
+    public DatabaseVendorClientManager(Project project) {
         this.project = project;
     }
 
-    public static DatabaseVendorManager getInstance(Project project) {
-        return ServiceManager.getService(project, DatabaseVendorManager.class);
+    public static DatabaseVendorClientManager getInstance(Project project) {
+        return ServiceManager.getService(project, DatabaseVendorClientManager.class);
     }
 
     public DatabaseClient get(DatabaseVendor databaseVendor) {

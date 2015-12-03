@@ -31,10 +31,11 @@ import com.intellij.openapi.project.Project;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
+import org.codinjutsu.tools.nosql.commons.logic.ConfigurationException;
 import org.codinjutsu.tools.nosql.commons.logic.DatabaseClient;
+import org.codinjutsu.tools.nosql.commons.model.AuthenticationSettings;
 import org.codinjutsu.tools.nosql.commons.model.Database;
 import org.codinjutsu.tools.nosql.commons.model.DatabaseServer;
-import org.codinjutsu.tools.nosql.commons.logic.ConfigurationException;
 import org.codinjutsu.tools.nosql.couchbase.model.CouchbaseDatabase;
 import org.codinjutsu.tools.nosql.couchbase.model.CouchbaseQuery;
 import org.codinjutsu.tools.nosql.couchbase.model.CouchbaseResult;
@@ -82,7 +83,8 @@ public class CouchbaseClient implements DatabaseClient {
                 .builder()
                 .queryEnabled(true)
                 .build());
-        ClusterManager clusterManager = cluster.clusterManager(databaseServer.getConfiguration().getUsername(), databaseServer.getConfiguration().getPassword());
+        AuthenticationSettings authenticationSettings = databaseServer.getConfiguration().getAuthenticationSettings();
+        ClusterManager clusterManager = cluster.clusterManager(authenticationSettings.getUsername(), authenticationSettings.getPassword());
 
         List<Database> couchbaseDatabases = new LinkedList<>();
         String userBucket = databaseServer.getConfiguration().getUserDatabase();
@@ -111,6 +113,13 @@ public class CouchbaseClient implements DatabaseClient {
     @Override
     public void registerServer(DatabaseServer databaseServer) {
 
+    }
+
+    @Override
+    public ServerConfiguration defaultConfiguration() {
+        ServerConfiguration configuration = ServerConfiguration.byDefault();
+        configuration.setAuthenticationSettings(new AuthenticationSettings());
+        return configuration;
     }
 
     public CouchbaseResult loadRecords(ServerConfiguration configuration, CouchbaseDatabase database, CouchbaseQuery couchbaseQuery) {
