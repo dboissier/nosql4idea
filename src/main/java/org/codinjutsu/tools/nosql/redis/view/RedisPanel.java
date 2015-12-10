@@ -33,14 +33,15 @@ import com.intellij.ui.treeStructure.treetable.TreeTableTree;
 import com.intellij.util.ui.tree.TreeUtil;
 import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
-import org.codinjutsu.tools.nosql.commons.view.NoSqlTreeNode;
-import org.codinjutsu.tools.nosql.redis.logic.RedisClient;
-import org.codinjutsu.tools.nosql.redis.model.RedisQuery;
-import org.codinjutsu.tools.nosql.redis.model.RedisDatabase;
-import org.codinjutsu.tools.nosql.redis.model.RedisResult;
-import org.codinjutsu.tools.nosql.mongo.view.JsonTreeTableView;
 import org.codinjutsu.tools.nosql.commons.view.NoSqlResultView;
 import org.codinjutsu.tools.nosql.commons.view.action.ExecuteQuery;
+import org.codinjutsu.tools.nosql.mongo.view.JsonTreeTableView;
+import org.codinjutsu.tools.nosql.redis.logic.RedisClient;
+import org.codinjutsu.tools.nosql.redis.model.RedisDatabase;
+import org.codinjutsu.tools.nosql.redis.model.RedisQuery;
+import org.codinjutsu.tools.nosql.redis.model.RedisResult;
+import org.codinjutsu.tools.nosql.redis.view.action.EnableGroupingAction;
+import org.codinjutsu.tools.nosql.redis.view.action.SetSeparatorAction;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -62,10 +63,10 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
     private final RedisClient redisClient;
     private final ServerConfiguration configuration;
     private final RedisDatabase database;
-    private JBTextField separatorField;
     private JBTextField filterField;
     private RedisResult redisResult;
     private boolean groupData;
+    private String groupSeparator;
 
     public RedisPanel(Project project, RedisClient redisClient, ServerConfiguration configuration, RedisDatabase database) {
         this.project = project;
@@ -80,7 +81,7 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
         loadingDecorator = new LoadingDecorator(resultPanel, this, 0);
 
         containerPanel.add(loadingDecorator.getComponent());
-        loadAndDisplayResults(getFilter(), getSeparator());
+        loadAndDisplayResults(getFilter(), getGroupSeparator());
 
         setLayout(new BorderLayout());
         add(mainPanel);
@@ -91,13 +92,11 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
         updateResultTableTree(redisResult, separator);
     }
 
-    private void buildQueryToolBar() {
+    protected void buildQueryToolBar() {
         toolBarPanel.setLayout(new BorderLayout());
 
         filterField = new JBTextField("*");
         filterField.setColumns(10);
-        separatorField = new JBTextField();
-        separatorField.setColumns(3);
 
         NonOpaquePanel westPanel = new NonOpaquePanel();
 
@@ -106,13 +105,6 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
         filterPanel.add(filterField, BorderLayout.CENTER);
         filterPanel.add(Box.createHorizontalStrut(5), BorderLayout.EAST);
         westPanel.add(filterPanel, BorderLayout.WEST);
-
-        NonOpaquePanel separatorPanel = new NonOpaquePanel();
-//        separatorPanel.add();
-        separatorPanel.add(new JLabel("Separator: "), BorderLayout.WEST);
-        separatorPanel.add(separatorField, BorderLayout.CENTER);
-        separatorPanel.add(Box.createHorizontalStrut(5), BorderLayout.EAST);
-        westPanel.add(separatorPanel, BorderLayout.CENTER);
 
         toolBarPanel.add(westPanel, BorderLayout.WEST);
 
@@ -156,7 +148,10 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
         });
 
         DefaultActionGroup actionResultGroup = new DefaultActionGroup("RedisResultGroup", true);
-        actionResultGroup.add(new ExecuteQuery<RedisPanel>(this));
+        actionResultGroup.add(new ExecuteQuery<>(this));
+        actionResultGroup.addSeparator();
+        actionResultGroup.add(new EnableGroupingAction(this));
+        actionResultGroup.add(new SetSeparatorAction(this));
         actionResultGroup.addSeparator();
         actionResultGroup.add(expandAllAction);
         actionResultGroup.add(collapseAllAction);
@@ -168,15 +163,6 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
         actionToolBarComponent.setOpaque(false);
 
         toolBarPanel.add(actionToolBarComponent, BorderLayout.CENTER);
-    }
-
-    private String getSeparator() {
-        String separator = separatorField.getText();
-        if (StringUtils.isNotBlank(separator)) {
-            return separator;
-        }
-        return null;
-
     }
 
     private String getFilter() {
@@ -197,9 +183,12 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
     }
 
     public void updateResultTableTree(RedisResult redisResult, String separator) {
-        NoSqlTreeNode rootNode = RedisTreeModel.buildTree(redisResult);
-        DefaultMutableTreeNode targetRootNode = RedisFragmentedKeyTreeModel.wrapNodes(rootNode, separator);
-        resultTableView = new JsonTreeTableView(targetRootNode, JsonTreeTableView.COLUMNS_FOR_READING);
+        DefaultMutableTreeNode rootNode = RedisTreeModel.buildTree(redisResult);
+        DefaultMutableTreeNode renderedNode = rootNode;
+        if (groupData) {
+            renderedNode = RedisFragmentedKeyTreeModel.wrapNodes(rootNode, separator);
+        }
+        resultTableView = new JsonTreeTableView(renderedNode, JsonTreeTableView.COLUMNS_FOR_READING);
         resultTableView.setName("resultTreeTable");
 
         resultPanel.invalidate();
@@ -225,7 +214,7 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
 
     @Override
     public void executeQuery() {
-        loadAndDisplayResults(getFilter(), getSeparator());
+        loadAndDisplayResults(getFilter(), getGroupSeparator());
     }
 
     @Override
@@ -239,11 +228,19 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
 
     public void toggleGroupData(boolean state) {
         this.groupData = state;
+
     }
 
     public void renderRecords() {
-        if (this.groupData) {
-            //TODO
-        }
+        updateResultTableTree(redisResult, this.groupSeparator);
+    }
+
+    public String getGroupSeparator() {
+        return groupSeparator;
+    }
+
+    public void setGroupSeparator(String groupSeparator) {
+        this.groupSeparator = groupSeparator;
+        renderRecords();
     }
 }

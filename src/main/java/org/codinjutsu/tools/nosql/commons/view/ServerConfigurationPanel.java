@@ -63,7 +63,8 @@ public class ServerConfigurationPanel extends JPanel {
 
 
     public ServerConfigurationPanel(Project project,
-                                    DatabaseVendor databaseVendor, DatabaseClient databaseClient,
+                                    DatabaseVendor databaseVendor,
+                                    DatabaseClient databaseClient,
                                     AuthenticationView authenticationView) {
         this.project = project;
         this.databaseClient = databaseClient;
@@ -83,10 +84,10 @@ public class ServerConfigurationPanel extends JPanel {
         databaseTipsLabel.setText(databaseVendor.tips);
         feedbackLabel.setName("feedbackLabel");
 
-        authenticationContainer.setBorder(IdeBorderFactory.createTitledBorder("Authentication settings", true));
         serverUrlField.setName("serverUrlField");
         serverUrlField.setText(databaseVendor.defaultUrl);
 
+        authenticationContainer.setBorder(IdeBorderFactory.createTitledBorder("Authentication settings", true));
         userDatabaseField.setName("userDatabaseField");
         userDatabaseField.setToolTipText("If your access is restricted to a specific database (e.g.: MongoLab), you can set it right here");
 

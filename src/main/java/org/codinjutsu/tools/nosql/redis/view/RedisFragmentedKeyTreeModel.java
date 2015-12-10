@@ -21,13 +21,11 @@ import org.codinjutsu.tools.nosql.commons.view.nodedescriptor.NodeDescriptor;
 import org.codinjutsu.tools.nosql.redis.view.nodedescriptor.FragmentedKeyNodeDescriptor;
 import org.codinjutsu.tools.nosql.redis.view.nodedescriptor.RedisKeyValueDescriptor;
 import org.codinjutsu.tools.nosql.commons.utils.StringUtils;
-import org.codinjutsu.tools.nosql.redis.view.nodedescriptor.RedisValueDescriptor;
 
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeNode;
 import java.util.Arrays;
 import java.util.Enumeration;
 
@@ -40,7 +38,7 @@ public class RedisFragmentedKeyTreeModel extends DefaultTreeModel {
 
     private boolean needsUpdate = true;
 
-    public RedisFragmentedKeyTreeModel(TreeNode root) {
+    public RedisFragmentedKeyTreeModel(NoSqlTreeNode root) {
         super(root);
         this.separator = "";
     }
@@ -48,13 +46,13 @@ public class RedisFragmentedKeyTreeModel extends DefaultTreeModel {
     public void setSeparator(String separator) {
         this.separator = separator;
         needsUpdate = true;
-        fireFilterChanged();
+        fireSeparatorChanged();
     }
 
     public void resetSeparator() {
         this.separator = "";
         needsUpdate = true;
-        fireFilterChanged();
+        fireSeparatorChanged();
     }
 
     @Override
@@ -67,7 +65,7 @@ public class RedisFragmentedKeyTreeModel extends DefaultTreeModel {
         super.reload();
         getFragmentedKeyModel().reload();
         needsUpdate = true;
-        fireFilterChanged();
+        fireSeparatorChanged();
     }
 
     @Override
@@ -113,7 +111,7 @@ public class RedisFragmentedKeyTreeModel extends DefaultTreeModel {
     private void updateFilteredModel() {
         DefaultMutableTreeNode sourceRoot = (DefaultMutableTreeNode) super.getRoot();
         DefaultMutableTreeNode targetRoot = (DefaultMutableTreeNode) sourceRoot.clone();
-        wrapNodes(sourceRoot, "targetRoot");
+        wrapNodes(sourceRoot, separator);
         fragmentedKeyModel = new DefaultTreeModel(targetRoot);
         Object[] listeners = listenerList.getListenerList();
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
@@ -121,10 +119,10 @@ public class RedisFragmentedKeyTreeModel extends DefaultTreeModel {
                 fragmentedKeyModel.addTreeModelListener((TreeModelListener) listeners[i + 1]);
             }
         }
-        fireFilterChanged();
+        fireSeparatorChanged();
     }
 
-    private void fireFilterChanged() {
+    private void fireSeparatorChanged() {
         getFragmentedKeyModel().reload();
     }
 
