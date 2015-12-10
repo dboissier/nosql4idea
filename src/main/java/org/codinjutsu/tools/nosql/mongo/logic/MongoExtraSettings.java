@@ -57,7 +57,9 @@ public class MongoExtraSettings {
     }
 
     public void setAuthenticationMechanism(AuthenticationMechanism authenticationMechanism) {
-        extras.put(AUTH_MECHANISM, authenticationMechanism.name());
+        if (authenticationMechanism != null) {
+            extras.put(AUTH_MECHANISM, authenticationMechanism.name());
+        }
     }
 
     public void setSsl(boolean isSsl) {

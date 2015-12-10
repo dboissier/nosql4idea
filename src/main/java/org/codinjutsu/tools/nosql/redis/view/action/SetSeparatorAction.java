@@ -16,6 +16,7 @@
 
 package org.codinjutsu.tools.nosql.redis.view.action;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ui.Messages;
@@ -34,6 +35,7 @@ public class SetSeparatorAction extends AnAction {
 
 
     public SetSeparatorAction(RedisPanel redisPanel) {
+        super(AllIcons.General.Ellipsis);
         this.redisPanel = redisPanel;
         myPredefinedSeparators.add(".");
         myPredefinedSeparators.add(":");
@@ -64,8 +66,9 @@ public class SetSeparatorAction extends AnAction {
     @Override
     public void update(AnActionEvent event) {
         String currentSeparator = redisPanel.getGroupSeparator();
-        System.out.println("current separator=" + currentSeparator);
-        event.getPresentation().setText(currentSeparator == null ? "None" : currentSeparator);
+        String textToDisplay = String.format("Group by '%s'", (currentSeparator == null ? "Nothing" : currentSeparator));
+        event.getPresentation().setText(textToDisplay);
+        event.getPresentation().setDescription(textToDisplay);
         event.getPresentation().setEnabled(redisPanel.isGroupDataEnabled());
     }
 }

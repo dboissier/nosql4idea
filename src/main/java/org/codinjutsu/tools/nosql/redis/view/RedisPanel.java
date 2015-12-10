@@ -81,15 +81,15 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
         loadingDecorator = new LoadingDecorator(resultPanel, this, 0);
 
         containerPanel.add(loadingDecorator.getComponent());
-        loadAndDisplayResults(getFilter(), getGroupSeparator());
+        loadAndDisplayResults(getFilter(), this.groupData, this.groupSeparator);
 
         setLayout(new BorderLayout());
         add(mainPanel);
     }
 
-    private void loadAndDisplayResults(String filter, String separator) {
+    private void loadAndDisplayResults(String filter, boolean groupByPrefix,  String separator) {
         redisResult = redisClient.loadRecords(configuration, database, new RedisQuery(filter));
-        updateResultTableTree(redisResult, separator);
+        updateResultTableTree(redisResult, groupByPrefix, separator);
     }
 
     protected void buildQueryToolBar() {
@@ -182,10 +182,10 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
         TreeUtil.collapseAll(tree, 1);
     }
 
-    public void updateResultTableTree(RedisResult redisResult, String separator) {
+    public void updateResultTableTree(RedisResult redisResult, boolean groupByPrefix, String separator) {
         DefaultMutableTreeNode rootNode = RedisTreeModel.buildTree(redisResult);
         DefaultMutableTreeNode renderedNode = rootNode;
-        if (groupData) {
+        if (groupByPrefix && StringUtils.isNotBlank(separator)) {
             renderedNode = RedisFragmentedKeyTreeModel.wrapNodes(rootNode, separator);
         }
         resultTableView = new JsonTreeTableView(renderedNode, JsonTreeTableView.COLUMNS_FOR_READING);
@@ -214,7 +214,7 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
 
     @Override
     public void executeQuery() {
-        loadAndDisplayResults(getFilter(), getGroupSeparator());
+        loadAndDisplayResults(getFilter(), isGroupDataEnabled(), getGroupSeparator());
     }
 
     @Override
@@ -226,13 +226,9 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
         return this.groupData;
     }
 
-    public void toggleGroupData(boolean state) {
-        this.groupData = state;
-
-    }
-
-    public void renderRecords() {
-        updateResultTableTree(redisResult, this.groupSeparator);
+    public void toggleGroupData(boolean enabled) {
+        this.groupData = enabled;
+        updateResultTableTree(redisResult, this.groupData, this.groupSeparator);
     }
 
     public String getGroupSeparator() {
@@ -241,6 +237,6 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
 
     public void setGroupSeparator(String groupSeparator) {
         this.groupSeparator = groupSeparator;
-        renderRecords();
+        updateResultTableTree(redisResult, this.groupData, this.groupSeparator);
     }
 }

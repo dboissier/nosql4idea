@@ -74,7 +74,7 @@ public class RedisPanelTest {
     @Test
     public void displayTreeWithEachSupportedKeyType() throws Exception {
 
-        redisPanelWrapper.updateResultTableTree(createRedisResults(), "");
+        redisPanelWrapper.updateResultTableTree(createRedisResults(), false, "");
 
         frameFixture.table("resultTreeTable").cellReader(new TableCellReader())
                 .requireColumnCount(2)
@@ -101,7 +101,7 @@ public class RedisPanelTest {
 
     @Test
     public void testDisplayTreeWithFragmentedKey() throws Exception {
-        redisPanelWrapper.updateResultTableTree(createRedisResults(), ":");
+        redisPanelWrapper.updateResultTableTree(createRedisResults(), true,  ":");
         redisPanelWrapper.expandAll();
 
 
