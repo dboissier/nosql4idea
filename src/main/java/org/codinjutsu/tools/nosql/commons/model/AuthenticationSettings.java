@@ -59,7 +59,7 @@ public class AuthenticationSettings {
 
         if (username != null ? !username.equals(that.username) : that.username != null) return false;
         if (password != null ? !password.equals(that.password) : that.password != null) return false;
-        return extras.equals(that.extras);
+        return !(extras != null ? !extras.equals(that.extras) : that.extras != null);
 
     }
 
@@ -67,7 +67,7 @@ public class AuthenticationSettings {
     public int hashCode() {
         int result = username != null ? username.hashCode() : 0;
         result = 31 * result + (password != null ? password.hashCode() : 0);
-        result = 31 * result + extras.hashCode();
+        result = 31 * result + (extras != null ? extras.hashCode() : 0);
         return result;
     }
 }

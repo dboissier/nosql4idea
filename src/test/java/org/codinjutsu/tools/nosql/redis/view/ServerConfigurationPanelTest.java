@@ -76,7 +76,6 @@ public class ServerConfigurationPanelTest {
         frameFixture.label("databaseTipsLabel").requireText("format: host:port. If cluster: host:port1,host:port2,...");
 
         frameFixture.textBox("serverUrlField").setText("localhost:25");
-        frameFixture.textBox("usernameField").setText("john");
         frameFixture.textBox("passwordField").setText("johnpassword");
 
         frameFixture.textBox("userDatabaseField").setText("0");
@@ -91,7 +90,6 @@ public class ServerConfigurationPanelTest {
         assertEquals("localhost:25", configuration.getServerUrl());
 
         AuthenticationSettings authenticationSettings = configuration.getAuthenticationSettings();
-        assertEquals("john", authenticationSettings.getUsername());
         assertEquals("johnpassword", authenticationSettings.getPassword());
 
         assertEquals("0", configuration.getUserDatabase());
@@ -106,7 +104,6 @@ public class ServerConfigurationPanelTest {
         configuration.setServerUrl("localhost:25");
 
         AuthenticationSettings authenticationSettings = new AuthenticationSettings();
-        authenticationSettings.setUsername("john");
         authenticationSettings.setPassword("johnpassword");
         configuration.setAuthenticationSettings(authenticationSettings);
 
@@ -116,7 +113,6 @@ public class ServerConfigurationPanelTest {
         frameFixture.label("databaseVendorLabel").requireText("RedisDB");
         frameFixture.label("databaseTipsLabel").requireText("format: host:port. If cluster: host:port1,host:port2,...");
         frameFixture.textBox("serverUrlField").requireText("localhost:25");
-        frameFixture.textBox("usernameField").requireText("john");
         frameFixture.textBox("passwordField").requireText("johnpassword");
     }
 }

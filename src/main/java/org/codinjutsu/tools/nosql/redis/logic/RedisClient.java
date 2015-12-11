@@ -86,6 +86,7 @@ public class RedisClient implements DatabaseClient {
 
     public RedisResult loadRecords(ServerConfiguration serverConfiguration, RedisDatabase database, RedisQuery query) {
         Jedis jedis = createJedis(serverConfiguration);
+        jedis.connect();
         RedisResult redisResult = new RedisResult();
         int index = Integer.parseInt(database.getName());
         jedis.select(index);
@@ -114,7 +115,12 @@ public class RedisClient implements DatabaseClient {
     }
 
     private Jedis createJedis(ServerConfiguration serverConfiguration) {
-        String[] url_port = serverConfiguration.getServerUrl().split(":");
-        return new Jedis(url_port[0], Integer.valueOf(url_port[1]));
+        String redisUri = "redis://";
+        String password = serverConfiguration.getAuthenticationSettings().getPassword();
+        if (StringUtils.isNotEmpty(password)) {
+            redisUri+= ":" + password + "@";
+        }
+        redisUri+=serverConfiguration.getServerUrl();
+        return new Jedis(redisUri);
     }
 }

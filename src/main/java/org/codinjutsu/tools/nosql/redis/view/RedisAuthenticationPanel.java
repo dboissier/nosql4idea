@@ -24,12 +24,10 @@ import javax.swing.*;
 
 public class RedisAuthenticationPanel implements AuthenticationView {
 
-    private JTextField usernameField;
     private JPasswordField passwordField;
     private JPanel mainPanel;
 
     public RedisAuthenticationPanel() {
-        usernameField.setName("usernameField");
         passwordField.setName("passwordField");
     }
 
@@ -41,23 +39,13 @@ public class RedisAuthenticationPanel implements AuthenticationView {
     @Override
     public AuthenticationSettings create() {
         AuthenticationSettings authenticationSettings = new AuthenticationSettings();
-        authenticationSettings.setUsername(getUsername());
         authenticationSettings.setPassword(getPassword());
         return authenticationSettings;
     }
 
     @Override
     public void load(AuthenticationSettings settings) {
-        usernameField.setText(settings.getUsername());
         passwordField.setText(settings.getPassword());
-    }
-
-    private String getUsername() {
-        String username = usernameField.getText();
-        if (StringUtils.isNotBlank(username)) {
-            return username;
-        }
-        return null;
     }
 
     private String getPassword() {
