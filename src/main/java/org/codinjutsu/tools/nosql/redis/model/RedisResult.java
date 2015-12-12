@@ -26,7 +26,6 @@ import java.util.Set;
 public class RedisResult {
 
     private final List<RedisRecord> redisRecords = new LinkedList<RedisRecord>();
-    private String separator;
 
 
     public void addString(String key, String value) {
@@ -53,7 +52,4 @@ public class RedisResult {
         return redisRecords;
     }
 
-    public void setSeparator(String separator) {
-        this.separator = separator;
-    }
 }

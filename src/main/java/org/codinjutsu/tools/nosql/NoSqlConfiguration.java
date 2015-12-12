@@ -72,6 +72,6 @@ public class NoSqlConfiguration implements PersistentStateComponent<NoSqlConfigu
     }
 
     public void setShellPath(DatabaseVendor databaseVendor, String shellPath) {
-        shellPathByDatabaseVendor.put(databaseVendor,shellPath);
+        shellPathByDatabaseVendor.put(databaseVendor, shellPath);
     }
 }

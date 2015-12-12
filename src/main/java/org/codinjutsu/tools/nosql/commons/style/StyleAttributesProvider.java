@@ -19,9 +19,7 @@ package org.codinjutsu.tools.nosql.commons.style;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
-import org.codinjutsu.tools.nosql.commons.utils.GuiUtils;
 
-import javax.swing.*;
 import java.awt.*;
 
 public class StyleAttributesProvider {

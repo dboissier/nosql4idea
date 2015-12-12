@@ -22,8 +22,8 @@ import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.components.JBCheckBox;
 import com.mongodb.util.JSON;
 import org.apache.commons.lang.StringUtils;
-import org.codinjutsu.tools.nosql.mongo.model.JsonDataType;
 import org.codinjutsu.tools.nosql.commons.view.table.DateTimePicker;
+import org.codinjutsu.tools.nosql.mongo.model.JsonDataType;
 
 import javax.swing.*;
 import java.awt.*;

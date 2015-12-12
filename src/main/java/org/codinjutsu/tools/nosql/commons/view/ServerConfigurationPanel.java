@@ -85,7 +85,6 @@ public class ServerConfigurationPanel extends JPanel {
         feedbackLabel.setName("feedbackLabel");
 
         serverUrlField.setName("serverUrlField");
-        serverUrlField.setText(databaseVendor.defaultUrl);
 
         authenticationContainer.setBorder(IdeBorderFactory.createTitledBorder("Authentication settings", true));
         userDatabaseField.setName("userDatabaseField");
@@ -153,7 +152,7 @@ public class ServerConfigurationPanel extends JPanel {
 
     @NotNull
     private ServerConfiguration createServerConfigurationForTesting() {
-        ServerConfiguration configuration = ServerConfiguration.byDefault();
+        ServerConfiguration configuration = new ServerConfiguration();
         configuration.setDatabaseVendor(databaseVendor);
         configuration.setServerUrl(getServerUrls());
         configuration.setAuthenticationSettings(authenticationView.create());

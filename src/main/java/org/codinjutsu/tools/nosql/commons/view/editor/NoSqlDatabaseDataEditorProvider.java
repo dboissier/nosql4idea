@@ -55,10 +55,12 @@ public class NoSqlDatabaseDataEditorProvider implements FileEditorProvider, Appl
     }
 
     @Override
-    public void initComponent() { }
+    public void initComponent() {
+    }
 
     @Override
-    public void disposeComponent() { }
+    public void disposeComponent() {
+    }
 
     @NotNull
     @Override
@@ -67,7 +69,8 @@ public class NoSqlDatabaseDataEditorProvider implements FileEditorProvider, Appl
     }
 
     @Override
-    public void writeState(@NotNull FileEditorState state, @NotNull Project project, @NotNull Element targetElement) { }
+    public void writeState(@NotNull FileEditorState state, @NotNull Project project, @NotNull Element targetElement) {
+    }
 
     @NotNull
     @Override

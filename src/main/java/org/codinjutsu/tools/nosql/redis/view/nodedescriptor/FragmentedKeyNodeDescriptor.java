@@ -20,8 +20,8 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ui.ColoredTableCellRenderer;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
-import org.codinjutsu.tools.nosql.commons.view.nodedescriptor.NodeDescriptor;
 import org.codinjutsu.tools.nosql.commons.style.StyleAttributesProvider;
+import org.codinjutsu.tools.nosql.commons.view.nodedescriptor.NodeDescriptor;
 
 public class FragmentedKeyNodeDescriptor implements NodeDescriptor {
 

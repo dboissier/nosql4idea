@@ -96,7 +96,7 @@ public class MongoRunConfigurationEditor extends SettingsEditor<MongoRunConfigur
                     return;
                 }
                 databaseCombobox.removeAllItems();
-                for (Database mongoDatabase: selectedServer.getDatabases()) {
+                for (Database mongoDatabase : selectedServer.getDatabases()) {
                     databaseCombobox.addItem(mongoDatabase);
                 }
             }

@@ -137,10 +137,10 @@ public class MongoEditionPanel extends JPanel implements Disposable {
         }
 
         Enumeration children = parentNode.children();
-        while(children.hasMoreElements()) {
+        while (children.hasMoreElements()) {
             NoSqlTreeNode childNode = (NoSqlTreeNode) children.nextElement();
             NodeDescriptor descriptor = childNode.getDescriptor();
-            if(descriptor instanceof MongoKeyValueDescriptor) {
+            if (descriptor instanceof MongoKeyValueDescriptor) {
                 MongoKeyValueDescriptor keyValueDescriptor = (MongoKeyValueDescriptor) descriptor;
                 if (StringUtils.equals(key, keyValueDescriptor.getKey())) {
                     return true;
@@ -156,7 +156,7 @@ public class MongoEditionPanel extends JPanel implements Disposable {
         NoSqlTreeNode treeNode = new NoSqlTreeNode(MongoKeyValueDescriptor.createDescriptor(key, value));
 
         if (value instanceof DBObject) {
-             JsonTreeModel.processDbObject(treeNode, (DBObject) value);
+            JsonTreeModel.processDbObject(treeNode, (DBObject) value);
         }
 
         node.add(treeNode);

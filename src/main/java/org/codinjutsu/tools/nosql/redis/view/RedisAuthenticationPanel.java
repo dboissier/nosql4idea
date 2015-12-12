@@ -16,7 +16,6 @@
 
 package org.codinjutsu.tools.nosql.redis.view;
 
-import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.nosql.commons.model.AuthenticationSettings;
 import org.codinjutsu.tools.nosql.commons.view.AuthenticationView;
 

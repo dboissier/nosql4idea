@@ -81,13 +81,4 @@ public class RedisClientTest {
     public void tearDown() throws Exception {
         jedis.close();
     }
-
-    public static void main(String[] args) {
-        Jedis jedis = new Jedis("pub-redis-10840.us-east-1-3.3.ec2.garantiadata.com", 10840);
-        jedis.auth("nosql4idea");
-        jedis.select(0);
-        jedis.sadd("codinjutsu:s:books", "eXtrem Programming", "Haskell for Dummies");
-        Set<String> books = jedis.smembers("codinjutsu:s:books");
-        System.out.println("books = " + books);
-    }
 }

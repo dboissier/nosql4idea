@@ -176,7 +176,7 @@ public class CouchbasePanel extends NoSqlResultView<CouchbaseDatabase> {
         TreeTableTree tree = resultTableView.getTree();
         TreeUtil.collapseAll(tree, 1);
     }
-    
+
     @Override
     public void showResults() {
 

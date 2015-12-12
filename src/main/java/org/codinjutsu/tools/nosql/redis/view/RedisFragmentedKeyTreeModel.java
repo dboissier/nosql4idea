@@ -16,11 +16,11 @@
 
 package org.codinjutsu.tools.nosql.redis.view;
 
+import org.codinjutsu.tools.nosql.commons.utils.StringUtils;
 import org.codinjutsu.tools.nosql.commons.view.NoSqlTreeNode;
 import org.codinjutsu.tools.nosql.commons.view.nodedescriptor.NodeDescriptor;
 import org.codinjutsu.tools.nosql.redis.view.nodedescriptor.FragmentedKeyNodeDescriptor;
 import org.codinjutsu.tools.nosql.redis.view.nodedescriptor.RedisKeyValueDescriptor;
-import org.codinjutsu.tools.nosql.commons.utils.StringUtils;
 
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -29,7 +29,7 @@ import javax.swing.tree.MutableTreeNode;
 import java.util.Arrays;
 import java.util.Enumeration;
 
-import static org.apache.commons.lang.StringUtils.*;
+import static org.apache.commons.lang.StringUtils.isEmpty;
 
 public class RedisFragmentedKeyTreeModel extends DefaultTreeModel {
 
@@ -172,7 +172,7 @@ public class RedisFragmentedKeyTreeModel extends DefaultTreeModel {
             String nodeKey;
             if (descriptor instanceof FragmentedKeyNodeDescriptor) {
                 nodeKey = ((FragmentedKeyNodeDescriptor) descriptor).getKeyFragment();
-            } else if (descriptor instanceof RedisKeyValueDescriptor){
+            } else if (descriptor instanceof RedisKeyValueDescriptor) {
                 nodeKey = ((RedisKeyValueDescriptor) descriptor).getKey();
             } else {
                 return null;

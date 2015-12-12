@@ -17,7 +17,6 @@
 package org.codinjutsu.tools.nosql;
 
 import com.intellij.util.ui.ItemRemovable;
-import org.codinjutsu.tools.nosql.ServerConfiguration;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.List;

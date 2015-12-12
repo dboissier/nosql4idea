@@ -20,10 +20,10 @@ import com.intellij.ui.ColoredTableCellRenderer;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import com.mongodb.DBObject;
-import org.codinjutsu.tools.nosql.commons.view.nodedescriptor.NodeDescriptor;
+import org.codinjutsu.tools.nosql.commons.style.StyleAttributesProvider;
 import org.codinjutsu.tools.nosql.commons.utils.DateUtils;
 import org.codinjutsu.tools.nosql.commons.utils.StringUtils;
-import org.codinjutsu.tools.nosql.commons.style.StyleAttributesProvider;
+import org.codinjutsu.tools.nosql.commons.view.nodedescriptor.NodeDescriptor;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -53,7 +53,7 @@ public class MongoValueDescriptor implements NodeDescriptor {
             return new MongoValueDescriptor(index, value, StyleAttributesProvider.getNumberAttribute()) {
                 @Override
                 public void setValue(Object value) {
-                    this.value = Integer.parseInt((String)value);
+                    this.value = Integer.parseInt((String) value);
                 }
             };
         } else if (value instanceof Date) {

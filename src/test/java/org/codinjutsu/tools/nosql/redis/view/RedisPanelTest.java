@@ -136,7 +136,6 @@ public class RedisPanelTest {
 
     private RedisResult createRedisResults() {
         RedisResult redisResult = new RedisResult();
-        redisResult.setSeparator(":");
         redisResult.addString("foo:bar", "john");
         redisResult.addList("stuff:bar", Arrays.asList("drink", "some", "beer"));
         Set<String> countries = new HashSet<>();

@@ -31,8 +31,8 @@ import org.codinjutsu.tools.nosql.commons.view.NoSqlTreeNode;
 import org.codinjutsu.tools.nosql.commons.view.nodedescriptor.NodeDescriptor;
 import org.codinjutsu.tools.nosql.commons.view.renderer.KeyCellRenderer;
 import org.codinjutsu.tools.nosql.commons.view.renderer.ValueCellRenderer;
-import org.codinjutsu.tools.nosql.mongo.view.table.MongoDatePickerCellEditor;
 import org.codinjutsu.tools.nosql.commons.view.table.CellEditor;
+import org.codinjutsu.tools.nosql.mongo.view.table.MongoDatePickerCellEditor;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.table.TableCellEditor;

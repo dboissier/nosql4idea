@@ -16,15 +16,15 @@
 
 /**
  * This is licensed under LGPL.  License can be found here:  http://www.gnu.org/licenses/lgpl-3.0.txt
- *
+ * <p/>
  * This is provided as is.  If you have questions please direct them to charlie.hubbard at gmail dot you know what.
  */
 package org.codinjutsu.tools.nosql.commons.view.table;
 
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.UIUtil;
-import org.codinjutsu.tools.nosql.commons.utils.DateUtils;
 import org.codinjutsu.tools.nosql.commons.style.StyleAttributesProvider;
+import org.codinjutsu.tools.nosql.commons.utils.DateUtils;
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXMonthView;
 import org.jdesktop.swingx.calendar.SingleDaySelectionModel;

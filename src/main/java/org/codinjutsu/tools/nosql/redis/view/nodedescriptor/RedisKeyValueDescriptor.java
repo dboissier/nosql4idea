@@ -20,11 +20,11 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ui.ColoredTableCellRenderer;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
+import org.codinjutsu.tools.nosql.commons.style.StyleAttributesProvider;
+import org.codinjutsu.tools.nosql.commons.utils.StringUtils;
 import org.codinjutsu.tools.nosql.commons.view.nodedescriptor.NodeDescriptor;
 import org.codinjutsu.tools.nosql.redis.RedisUtils;
 import org.codinjutsu.tools.nosql.redis.model.RedisKeyType;
-import org.codinjutsu.tools.nosql.commons.utils.StringUtils;
-import org.codinjutsu.tools.nosql.commons.style.StyleAttributesProvider;
 import redis.clients.jedis.Tuple;
 
 import javax.swing.*;
@@ -46,6 +46,10 @@ public class RedisKeyValueDescriptor implements NodeDescriptor {
         return new RedisKeyValueDescriptor(keyType, key, value, StyleAttributesProvider.getStringAttribute());
     }
 
+    public static NodeDescriptor createDescriptor(String key, String value) {
+        return createDescriptor(null, key, value);
+    }
+
     public RedisKeyValueDescriptor(RedisKeyType keyType, String key, Object value, SimpleTextAttributes valueTextAttributes) {
         this.keyType = keyType;
         this.key = key;
@@ -57,11 +61,12 @@ public class RedisKeyValueDescriptor implements NodeDescriptor {
     private Icon findIcon(Object object) {
         if (object instanceof List) {
             return AllIcons.Json.Property_brackets;
-        } else if(object instanceof Set || object instanceof Map) {
+        } else if (object instanceof Set || object instanceof Map) {
             return AllIcons.Json.Property_braces;
         }
         return null;
     }
+
 
     @Override
     public void renderValue(ColoredTableCellRenderer cellRenderer, boolean isNodeExpanded) {
@@ -70,9 +75,12 @@ public class RedisKeyValueDescriptor implements NodeDescriptor {
         }
     }
 
-
     public void renderNode(ColoredTreeCellRenderer cellRenderer) {
         cellRenderer.setIcon(this.icon);
+        if (this.keyType != null) {
+            cellRenderer.append(this.keyType.name(), StyleAttributesProvider.getIndexAttribute());
+            cellRenderer.append(" ");
+        }
         cellRenderer.append(getFormattedKey(), StyleAttributesProvider.getKeyValueAttribute());
     }
 

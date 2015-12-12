@@ -87,7 +87,7 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
         add(mainPanel);
     }
 
-    private void loadAndDisplayResults(String filter, boolean groupByPrefix,  String separator) {
+    private void loadAndDisplayResults(String filter, boolean groupByPrefix, String separator) {
         redisResult = redisClient.loadRecords(configuration, database, new RedisQuery(filter));
         updateResultTableTree(redisResult, groupByPrefix, separator);
     }

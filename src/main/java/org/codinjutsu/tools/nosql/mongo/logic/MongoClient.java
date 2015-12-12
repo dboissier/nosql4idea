@@ -22,13 +22,17 @@ import com.mongodb.*;
 import com.mongodb.client.MongoIterable;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.codinjutsu.tools.nosql.DatabaseVendor;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
 import org.codinjutsu.tools.nosql.commons.logic.ConfigurationException;
 import org.codinjutsu.tools.nosql.commons.logic.DatabaseClient;
 import org.codinjutsu.tools.nosql.commons.model.AuthenticationSettings;
 import org.codinjutsu.tools.nosql.commons.model.Database;
 import org.codinjutsu.tools.nosql.commons.model.DatabaseServer;
-import org.codinjutsu.tools.nosql.mongo.model.*;
+import org.codinjutsu.tools.nosql.mongo.model.MongoCollection;
+import org.codinjutsu.tools.nosql.mongo.model.MongoDatabase;
+import org.codinjutsu.tools.nosql.mongo.model.MongoQueryOptions;
+import org.codinjutsu.tools.nosql.mongo.model.MongoResult;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -79,7 +83,10 @@ public class MongoClient implements DatabaseClient {
 
     @Override
     public ServerConfiguration defaultConfiguration() {
-        return ServerConfiguration.byDefault();
+        ServerConfiguration serverConfiguration = new ServerConfiguration();
+        serverConfiguration.setDatabaseVendor(DatabaseVendor.MONGO);
+        serverConfiguration.setServerUrl(DatabaseVendor.MONGO.defaultUrl);
+        return serverConfiguration;
     }
 
     public List<DatabaseServer> getServers() {

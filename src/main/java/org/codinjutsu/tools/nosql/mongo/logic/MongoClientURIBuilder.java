@@ -57,7 +57,7 @@ public class MongoClientURIBuilder {
 
     public String build() {
         StringBuilder strBuilder = new StringBuilder();
-        Map<String,String> options = new HashMap<String, String>();
+        Map<String, String> options = new HashMap<String, String>();
         if (StringUtils.isEmpty(username)) {
             strBuilder.append(String.format("mongodb://%s/", this.serverUrls));
         } else {

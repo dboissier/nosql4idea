@@ -31,7 +31,7 @@ public class SetSeparatorAction extends AnAction {
 
     private final RedisPanel redisPanel;
 
-    private final Set<String> myPredefinedSeparators = new LinkedHashSet<>();
+    private static final Set<String> myPredefinedSeparators = new LinkedHashSet<>();
 
 
     public SetSeparatorAction(RedisPanel redisPanel) {

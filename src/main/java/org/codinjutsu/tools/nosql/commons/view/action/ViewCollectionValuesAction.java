@@ -21,7 +21,6 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAware;
 import org.codinjutsu.tools.nosql.NoSqlExplorerPanel;
-import org.codinjutsu.tools.nosql.commons.style.StyleAttributesProvider;
 
 import javax.swing.*;
 
@@ -32,7 +31,7 @@ public class ViewCollectionValuesAction extends AnAction implements DumbAware {
     private final NoSqlExplorerPanel noSqlExplorerPanel;
 
     public ViewCollectionValuesAction(NoSqlExplorerPanel noSqlExplorerPanel) {
-        super("View collection content", "View collection content",  ICON);
+        super("View collection content", "View collection content", ICON);
         this.noSqlExplorerPanel = noSqlExplorerPanel;
     }
 

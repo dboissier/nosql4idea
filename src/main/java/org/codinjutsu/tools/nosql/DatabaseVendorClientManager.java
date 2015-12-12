@@ -52,7 +52,7 @@ public class DatabaseVendorClientManager {
     }
 
     public void cleanUpServers() {
-        for (DatabaseVendor databaseVendor: dataClientByVendor.keySet()) {
+        for (DatabaseVendor databaseVendor : dataClientByVendor.keySet()) {
             this.get(databaseVendor).cleanUpServers();
         }
     }

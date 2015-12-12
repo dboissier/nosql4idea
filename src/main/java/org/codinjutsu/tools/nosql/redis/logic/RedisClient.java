@@ -19,14 +19,15 @@ package org.codinjutsu.tools.nosql.redis.logic;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import org.apache.commons.lang.StringUtils;
+import org.codinjutsu.tools.nosql.DatabaseVendor;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
+import org.codinjutsu.tools.nosql.commons.logic.DatabaseClient;
 import org.codinjutsu.tools.nosql.commons.model.AuthenticationSettings;
 import org.codinjutsu.tools.nosql.commons.model.Database;
-import org.codinjutsu.tools.nosql.commons.logic.DatabaseClient;
 import org.codinjutsu.tools.nosql.commons.model.DatabaseServer;
-import org.codinjutsu.tools.nosql.redis.model.RedisQuery;
 import org.codinjutsu.tools.nosql.redis.model.RedisDatabase;
 import org.codinjutsu.tools.nosql.redis.model.RedisKeyType;
+import org.codinjutsu.tools.nosql.redis.model.RedisQuery;
 import org.codinjutsu.tools.nosql.redis.model.RedisResult;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Tuple;
@@ -47,6 +48,12 @@ public class RedisClient implements DatabaseClient {
     public void connect(ServerConfiguration serverConfiguration) {
         Jedis jedis = createJedis(serverConfiguration);
         jedis.connect();
+        String userDatabase = serverConfiguration.getUserDatabase();
+        int index = 0;
+        if (StringUtils.isNotEmpty(userDatabase)) {
+            index = Integer.parseInt(userDatabase);
+        }
+        jedis.select(index);
     }
 
     @Override
@@ -59,8 +66,8 @@ public class RedisClient implements DatabaseClient {
             databases.add(new RedisDatabase(userDatabase));
         } else {
             int totalNumberOfDatabase = Integer.parseInt(databaseNumberTuple.get(1));
-            for (int i = 0; i < totalNumberOfDatabase; i++) {
-                databases.add(new RedisDatabase(String.valueOf(i)));
+            for (int databaseNumber = 0; databaseNumber < totalNumberOfDatabase; databaseNumber++) {
+                databases.add(new RedisDatabase(String.valueOf(databaseNumber)));
             }
         }
         databaseServer.setDatabases(databases);
@@ -78,7 +85,9 @@ public class RedisClient implements DatabaseClient {
 
     @Override
     public ServerConfiguration defaultConfiguration() {
-        ServerConfiguration configuration = ServerConfiguration.byDefault();
+        ServerConfiguration configuration = new ServerConfiguration();
+        configuration.setDatabaseVendor(DatabaseVendor.REDIS);
+        configuration.setServerUrl(DatabaseVendor.REDIS.defaultUrl);
         configuration.setAuthenticationSettings(new AuthenticationSettings());
         return configuration;
     }
@@ -118,9 +127,9 @@ public class RedisClient implements DatabaseClient {
         String redisUri = "redis://";
         String password = serverConfiguration.getAuthenticationSettings().getPassword();
         if (StringUtils.isNotEmpty(password)) {
-            redisUri+= ":" + password + "@";
+            redisUri += ":" + password + "@";
         }
-        redisUri+=serverConfiguration.getServerUrl();
+        redisUri += serverConfiguration.getServerUrl();
         return new Jedis(redisUri);
     }
 }

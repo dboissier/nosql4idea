@@ -35,8 +35,11 @@ import org.codinjutsu.tools.nosql.commons.logic.ConfigurationException;
 import org.codinjutsu.tools.nosql.commons.model.Database;
 import org.codinjutsu.tools.nosql.commons.model.DatabaseServer;
 import org.codinjutsu.tools.nosql.commons.utils.GuiUtils;
+import org.codinjutsu.tools.nosql.commons.view.action.NoSqlDatabaseConsoleAction;
 import org.codinjutsu.tools.nosql.commons.view.action.OpenPluginSettingsAction;
 import org.codinjutsu.tools.nosql.commons.view.action.RefreshServerAction;
+import org.codinjutsu.tools.nosql.commons.view.action.ViewCollectionValuesAction;
+import org.codinjutsu.tools.nosql.commons.view.editor.NoSqlDatabaseFileSystem;
 import org.codinjutsu.tools.nosql.commons.view.editor.NoSqlDatabaseObjectFile;
 import org.codinjutsu.tools.nosql.couchbase.model.CouchbaseDatabase;
 import org.codinjutsu.tools.nosql.couchbase.view.editor.CouchbaseObjectFile;
@@ -44,9 +47,6 @@ import org.codinjutsu.tools.nosql.mongo.model.MongoCollection;
 import org.codinjutsu.tools.nosql.mongo.model.MongoDatabase;
 import org.codinjutsu.tools.nosql.mongo.view.action.DropCollectionAction;
 import org.codinjutsu.tools.nosql.mongo.view.action.DropDatabaseAction;
-import org.codinjutsu.tools.nosql.commons.view.action.NoSqlDatabaseConsoleAction;
-import org.codinjutsu.tools.nosql.commons.view.action.ViewCollectionValuesAction;
-import org.codinjutsu.tools.nosql.commons.view.editor.NoSqlDatabaseFileSystem;
 import org.codinjutsu.tools.nosql.mongo.view.editor.MongoObjectFile;
 import org.codinjutsu.tools.nosql.redis.model.RedisDatabase;
 import org.codinjutsu.tools.nosql.redis.view.editor.RedisObjectFile;
@@ -167,8 +167,7 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
                             MessageType.ERROR,
                             String.format("Error when connecting on %s", databaseServer.getLabel()),
                             Balloon.Position.atLeft);
-                }
-                finally {
+                } finally {
                     databaseTree.setPaintBusy(false);
                 }
             }

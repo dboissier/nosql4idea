@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2015 David Boissier
  *
@@ -131,7 +130,8 @@ public class MongoConsoleRunner extends AbstractConsoleRunnerWithHistory<NoSqlCo
                 return "NoSql.Shell.Execute";
             }
         };
-        new ConsoleHistoryController(new ConsoleRootType("Mongo Shell", null) {}, null, getConsoleView()).install();
+        new ConsoleHistoryController(new ConsoleRootType("Mongo Shell", null) {
+        }, null, getConsoleView()).install();
         return handler;
     }
 }

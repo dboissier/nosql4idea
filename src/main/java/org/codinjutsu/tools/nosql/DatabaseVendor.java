@@ -22,7 +22,7 @@ import javax.swing.*;
 
 public enum DatabaseVendor {
 
-    MONGO("MongoDB","mongodb.png", "localhost:27017", "format: host:port. If replicat set: host:port1,host:port2,..."),
+    MONGO("MongoDB", "mongodb.png", "localhost:27017", "format: host:port. If replicat set: host:port1,host:port2,..."),
     REDIS("RedisDB", "redis.png", "localhost:6379", "format: host:port. If cluster: host:port1,host:port2,..."),
     COUCHBASE("Couchbase", "couchbase.png", "localhost:23232", "format: host:port. If cluster: host:port1,host:port2,...");
 
@@ -40,6 +40,6 @@ public enum DatabaseVendor {
 
     @Override
     public String toString() {
-        return "DatabaseVendor{name='" + name  + "'}";
+        return "DatabaseVendor{name='" + name + "'}";
     }
 }

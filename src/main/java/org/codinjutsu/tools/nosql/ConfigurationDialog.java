@@ -16,7 +16,6 @@
 
 package org.codinjutsu.tools.nosql;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import org.codinjutsu.tools.nosql.commons.logic.ConfigurationException;
 import org.codinjutsu.tools.nosql.commons.view.ServerConfigurationPanel;

@@ -63,7 +63,7 @@ public class NoSqlDatabaseConsoleAction extends AnAction implements DumbAware {
         );
         e.getPresentation().setEnabled(
                 noSqlExplorerPanel.getSelectedMongoDatabase() != null ||
-                noSqlExplorerPanel.getSelectedRedisDatabase() != null
+                        noSqlExplorerPanel.getSelectedRedisDatabase() != null
         );
     }
 

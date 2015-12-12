@@ -30,6 +30,7 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.codinjutsu.tools.nosql.DatabaseVendor;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
 import org.codinjutsu.tools.nosql.commons.logic.ConfigurationException;
 import org.codinjutsu.tools.nosql.commons.logic.DatabaseClient;
@@ -117,7 +118,9 @@ public class CouchbaseClient implements DatabaseClient {
 
     @Override
     public ServerConfiguration defaultConfiguration() {
-        ServerConfiguration configuration = ServerConfiguration.byDefault();
+        ServerConfiguration configuration = new ServerConfiguration();
+        configuration.setDatabaseVendor(DatabaseVendor.COUCHBASE);
+        configuration.setServerUrl(DatabaseVendor.COUCHBASE.defaultUrl);
         configuration.setAuthenticationSettings(new AuthenticationSettings());
         return configuration;
     }

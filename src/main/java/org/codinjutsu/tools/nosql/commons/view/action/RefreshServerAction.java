@@ -20,8 +20,8 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAware;
-import org.codinjutsu.tools.nosql.commons.utils.GuiUtils;
 import org.codinjutsu.tools.nosql.NoSqlExplorerPanel;
+import org.codinjutsu.tools.nosql.commons.utils.GuiUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -54,7 +54,7 @@ public class RefreshServerAction extends AnAction implements DumbAware {
             return;
         }
         boolean isConnected = selectedServerNode.getChildCount() > 0;
-        event.getPresentation().setIcon(isConnected ? REFRESH_ICON  : CONNECT_ICON);
+        event.getPresentation().setIcon(isConnected ? REFRESH_ICON : CONNECT_ICON);
         event.getPresentation().setText(isConnected ? REFRESH_TEXT : CONNECT_TEXT);
     }
 }

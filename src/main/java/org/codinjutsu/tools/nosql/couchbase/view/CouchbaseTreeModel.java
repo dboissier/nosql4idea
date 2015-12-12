@@ -26,14 +26,14 @@ import org.codinjutsu.tools.nosql.couchbase.view.nodedescriptor.CouchbaseValueDe
 
 import javax.swing.tree.DefaultTreeModel;
 
-public class CouchbaseTreeModel extends DefaultTreeModel{
+public class CouchbaseTreeModel extends DefaultTreeModel {
     public CouchbaseTreeModel(CouchbaseResult result) {
         super(buildTree(result));
     }
 
     public static NoSqlTreeNode buildTree(CouchbaseResult couchbaseResult) {
         NoSqlTreeNode resultTreeNode = new NoSqlTreeNode(new CouchbaseResultDescriptor(couchbaseResult.getName()));
-        for (JsonObject record: couchbaseResult.getRecords()) {
+        for (JsonObject record : couchbaseResult.getRecords()) {
             processRecord(resultTreeNode, record);
         }
 
@@ -41,7 +41,7 @@ public class CouchbaseTreeModel extends DefaultTreeModel{
     }
 
     private static void processRecord(NoSqlTreeNode parentNode, JsonObject record) {
-        for (String key: record.getNames()) {
+        for (String key : record.getNames()) {
             Object value = record.get(key);
             NoSqlTreeNode currentNode = new NoSqlTreeNode(CouchbaseKeyValueDescriptor.createDescriptor(key, value));
             if (value instanceof JsonArray) {
@@ -56,7 +56,7 @@ public class CouchbaseTreeModel extends DefaultTreeModel{
 
     private static void processRecordListValues(NoSqlTreeNode parentNode, JsonArray values) {
         int index = 0;
-        for (Object value: values) {
+        for (Object value : values) {
             NoSqlTreeNode currentValueNode = new NoSqlTreeNode(CouchbaseValueDescriptor.createDescriptor(index++, value));
             if (value instanceof JsonArray) {
                 processRecordListValues(currentValueNode, (JsonArray) value);

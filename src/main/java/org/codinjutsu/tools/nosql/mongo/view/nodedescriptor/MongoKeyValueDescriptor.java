@@ -21,10 +21,10 @@ import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
-import org.codinjutsu.tools.nosql.commons.view.nodedescriptor.NodeDescriptor;
+import org.codinjutsu.tools.nosql.commons.style.StyleAttributesProvider;
 import org.codinjutsu.tools.nosql.commons.utils.DateUtils;
 import org.codinjutsu.tools.nosql.commons.utils.StringUtils;
-import org.codinjutsu.tools.nosql.commons.style.StyleAttributesProvider;
+import org.codinjutsu.tools.nosql.commons.view.nodedescriptor.NodeDescriptor;
 
 import java.text.DateFormat;
 import java.util.Date;

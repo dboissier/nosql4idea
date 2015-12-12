@@ -18,7 +18,6 @@ package org.codinjutsu.tools.nosql.redis.view.action;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import org.codinjutsu.tools.nosql.redis.view.RedisPanel;
 
