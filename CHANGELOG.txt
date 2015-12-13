@@ -1,4 +1,4 @@
 0.1.0 - Initial version
   * RedisDB: view database content with filter (KEYS instruction is temporary used) and group with separator pattern
   * Couchbase: view bucket content with row limit options
-  * MongoDB: all features from the mongo4idea-0.7.2 ;)
+  * MongoDB: all features from the mongo4idea-0.7.3 ;)

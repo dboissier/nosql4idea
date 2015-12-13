@@ -90,7 +90,7 @@
     <description><![CDATA[
     <p>
         This tool allows accessing to NoSql databases and provides CRUD operations.<br>
-        Documentation is available on the <a href="https://github.com/dboissier/mongo4idea/blob/mongo4idea-0.7.2/README.md">GitHub project</a>
+        Documentation is available on the <a href="https://github.com/dboissier/nosql4idea/">GitHub project</a>
     </p>
             <br>
             <br>
@@ -101,6 +101,6 @@
 ]]> </description>
 
     <change-notes><![CDATA[
-<a href="https://github.com/dboissier/mongo4idea/blob/nosql4idea-0.1.0/CHANGELOG.txt">Changelog</a>
+<a href="https://github.com/dboissier/nosql4idea/blob/master/CHANGELOG.txt">Changelog</a>
 ]]> </change-notes>
 </idea-plugin>
