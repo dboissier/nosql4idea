@@ -16,17 +16,6 @@ The plugin has been tested with the following databases:
 * Redis 2.8.21
 * Couchbase Community 4.0.0
 
-## Roadmap
-
-### 0.1.0
-
-* integrate Redis : view results with 'Group by prefix' feature like **properties editor**
-* integrate Couchbase : view results 
-
-### 0.2.0
-
-* delete, update and add features for Redis and Couchbase
-
 ## Installation 
  
 To install it : `Settings > Plugins > Install plugin from Disk`
@@ -70,6 +59,17 @@ Double click on the database icon from your couchbase server and the results wil
 ![CouchbaseResults](https://github.com/dboissier/nosql4idea/raw/master/doc/couchbase_results.png)
 
 **Important note**
-To get the results from each bucket, an **Index** must be created. Otherwise an error message is raised. 
+To get the results from each bucket, an **Index** must be created. Otherwise an error message is raised.
+
+## Roadmap
+
+### 0.1.0
+
+* integrate Redis : view results with 'Group by prefix' feature like **properties editor**
+* integrate Couchbase : view results 
+
+### 0.2.0
+
+* delete, update and add features for Redis and Couchbase
 
 
