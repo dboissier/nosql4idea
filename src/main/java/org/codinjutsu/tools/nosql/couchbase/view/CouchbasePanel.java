@@ -16,6 +16,7 @@
 
 package org.codinjutsu.tools.nosql.couchbase.view;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.ide.CommonActionsManager;
 import com.intellij.ide.TreeExpander;
 import com.intellij.openapi.Disposable;
@@ -23,15 +24,23 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.LoadingDecorator;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.NumberDocument;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.panels.NonOpaquePanel;
 import com.intellij.ui.treeStructure.treetable.TreeTableTree;
+import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.tree.TreeUtil;
+import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
+import org.codinjutsu.tools.nosql.commons.utils.GuiUtils;
+import org.codinjutsu.tools.nosql.commons.view.ErrorPanel;
 import org.codinjutsu.tools.nosql.commons.view.NoSqlResultView;
 import org.codinjutsu.tools.nosql.commons.view.NoSqlTreeNode;
 import org.codinjutsu.tools.nosql.commons.view.action.ExecuteQuery;
@@ -40,6 +49,7 @@ import org.codinjutsu.tools.nosql.couchbase.model.CouchbaseDatabase;
 import org.codinjutsu.tools.nosql.couchbase.model.CouchbaseQuery;
 import org.codinjutsu.tools.nosql.couchbase.model.CouchbaseResult;
 import org.codinjutsu.tools.nosql.mongo.view.JsonTreeTableView;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -48,6 +58,7 @@ public class CouchbasePanel extends NoSqlResultView<CouchbaseDatabase> {
     private JPanel mainPanel;
     private JPanel toolBarPanel;
     private JPanel containerPanel;
+    private JPanel errorPanel;
     private JPanel resultPanel;
     private final LoadingDecorator loadingDecorator;
     private final JTextField rowLimitField = new JTextField("");
@@ -74,14 +85,15 @@ public class CouchbasePanel extends NoSqlResultView<CouchbaseDatabase> {
 
         initToolbar();
 
-        loadAndDisplayResults(getLimit());
-
         setLayout(new BorderLayout());
         add(mainPanel);
     }
 
-    private void loadAndDisplayResults(int limit) {
+    private void loadAndDisplayResults(final int limit) throws Exception {
         couchbaseResult = couchbaseClient.loadRecords(configuration, database, new CouchbaseQuery(limit));
+        if (couchbaseResult.hasErrors()) {
+            throw new Exception(StringUtils.join(couchbaseResult.getErrors(), " ")); //TODO need to improve it
+        }
         updateResultTableTree(couchbaseResult);
     }
 
@@ -179,7 +191,7 @@ public class CouchbasePanel extends NoSqlResultView<CouchbaseDatabase> {
 
     @Override
     public void showResults() {
-
+        executeQuery();
     }
 
     @Override
@@ -194,7 +206,33 @@ public class CouchbasePanel extends NoSqlResultView<CouchbaseDatabase> {
 
     @Override
     public void executeQuery() {
-        loadAndDisplayResults(getLimit());
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Executing query", true)  { //TODO need to abstract this method
+            @Override
+            public void run(@NotNull final ProgressIndicator indicator) {
+                try {
+                    loadAndDisplayResults(getLimit());
+                }  catch (final Exception ex) {
+                    GuiUtils.runInSwingThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            errorPanel.invalidate();
+                            errorPanel.removeAll();
+                            errorPanel.add(new ErrorPanel(ex), BorderLayout.CENTER);
+                            errorPanel.validate();
+                            errorPanel.setVisible(true);
+                        }
+                    });
+                } finally {
+                    GuiUtils.runInSwingThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadingDecorator.stopLoading();
+                        }
+                    });
+                }
+            }
+        });
+
     }
 
     @Override

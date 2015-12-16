@@ -17,7 +17,7 @@
 package org.codinjutsu.tools.nosql;
 
 import com.intellij.openapi.ui.DialogWrapper;
-import org.codinjutsu.tools.nosql.commons.logic.ConfigurationException;
+import com.intellij.openapi.ui.ValidationInfo;
 import org.codinjutsu.tools.nosql.commons.view.ServerConfigurationPanel;
 import org.codinjutsu.tools.nosql.commons.view.ServerConfigurationPanelFactory;
 import org.jetbrains.annotations.Nullable;
@@ -49,14 +49,14 @@ class ConfigurationDialog extends DialogWrapper {
         return serverConfigurationPanel;
     }
 
+    @Nullable
+    @Override
+    protected ValidationInfo doValidate() {
+        return serverConfigurationPanel.validateInputs();
+    }
 
     @Override
     protected void doOKAction() {
-        try {
-            serverConfigurationPanel.applyConfigurationData(configuration);
-        } catch (ConfigurationException confEx) {
-            serverConfigurationPanel.setErrorMessage(confEx.getMessage());
-        }
-        super.doOKAction();
+        serverConfigurationPanel.applyConfigurationData(configuration);
     }
 }

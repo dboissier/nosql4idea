@@ -43,16 +43,11 @@ public class CouchbaseClientTest {
         configuration.setServerUrl("localhost");
         AuthenticationSettings authenticationSettings = new AuthenticationSettings();
         authenticationSettings.setUsername("Administrator");
-        authenticationSettings.setPassword("helloworld");
+        authenticationSettings.setPassword("helloworld2015");
         configuration.setAuthenticationSettings(authenticationSettings);
         couchbaseClient.loadServer(new DatabaseServer(configuration));
     }
 
-    @Test
-    public void testName() throws Exception {
-
-
-    }
 
     public static void main(String[] args) {
         Cluster cluster = CouchbaseCluster.create(DefaultCouchbaseEnvironment

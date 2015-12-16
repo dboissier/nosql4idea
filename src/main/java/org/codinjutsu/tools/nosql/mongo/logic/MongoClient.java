@@ -121,10 +121,8 @@ public class MongoClient implements DatabaseClient {
             }
 
             return mongoDatabases;
-        } catch (MongoException mongoEx) {
+        } catch (MongoException | UnknownHostException mongoEx) {
             throw new ConfigurationException(mongoEx);
-        } catch (UnknownHostException unknownHostEx) {
-            throw new ConfigurationException(unknownHostEx);
         } finally {
             if (mongo != null) {
                 mongo.close();

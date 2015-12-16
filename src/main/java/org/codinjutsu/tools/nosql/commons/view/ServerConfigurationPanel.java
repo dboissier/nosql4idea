@@ -20,10 +20,7 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.ComponentWithBrowseButton;
-import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.ui.TextComponentAccessor;
-import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.ui.*;
 import com.intellij.openapi.util.Ref;
 import com.intellij.ui.IdeBorderFactory;
 import com.intellij.ui.RawCommandLineEditor;
@@ -42,7 +39,6 @@ import java.awt.event.ActionListener;
 public class ServerConfigurationPanel extends JPanel {
 
     private JPanel rootPanel;
-    private JLabel feedbackLabel;
     private JTextField labelField;
     private JPanel authenticationContainer;
     private JTextField serverUrlField;
@@ -82,7 +78,6 @@ public class ServerConfigurationPanel extends JPanel {
 
         databaseTipsLabel.setName("databaseTipsLabel");
         databaseTipsLabel.setText(databaseVendor.tips);
-        feedbackLabel.setName("feedbackLabel");
 
         serverUrlField.setName("serverUrlField");
 
@@ -105,35 +100,31 @@ public class ServerConfigurationPanel extends JPanel {
         testConnectionButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    validateUrls();
-                    final Ref<Exception> excRef = new Ref<>();
-                    final ProgressManager progressManager = ProgressManager.getInstance();
-                    progressManager.runProcessWithProgressSynchronously(new Runnable() {
-                        @Override
-                        public void run() {
-                            ServerConfiguration configuration = createServerConfigurationForTesting();
 
-                            final ProgressIndicator progressIndicator = progressManager.getProgressIndicator();
-                            if (progressIndicator != null) {
-                                progressIndicator.setText("Connecting to " + configuration.getServerUrl());
-                            }
-                            try {
-                                databaseClient.connect(configuration);
-                            } catch (Exception ex) {
-                                excRef.set(ex);
-                            }
+                final Ref<Exception> excRef = new Ref<>();
+                final ProgressManager progressManager = ProgressManager.getInstance();
+                progressManager.runProcessWithProgressSynchronously(new Runnable() {
+                    @Override
+                    public void run() {
+                        ServerConfiguration configuration = createServerConfigurationForTesting();
+
+                        final ProgressIndicator progressIndicator = progressManager.getProgressIndicator();
+                        if (progressIndicator != null) {
+                            progressIndicator.setText("Connecting to " + configuration.getServerUrl());
                         }
-
-                    }, "Testing connection for " + databaseVendor.name, true, ServerConfigurationPanel.this.project);
-
-                    if (!excRef.isNull()) {
-                        Messages.showErrorDialog(rootPanel, excRef.get().getMessage(), "Connection test failed");
-                    } else {
-                        Messages.showInfoMessage(rootPanel, "Connection test successful for " + databaseVendor.name, "Connection test successful");
+                        try {
+                            databaseClient.connect(configuration);
+                        } catch (Exception ex) {
+                            excRef.set(ex);
+                        }
                     }
-                } catch (ConfigurationException ex) {
-                    setErrorMessage(ex.getMessage());
+
+                }, "Testing connection for " + databaseVendor.name, true, ServerConfigurationPanel.this.project);
+
+                if (!excRef.isNull()) {
+                    Messages.showErrorDialog(rootPanel, excRef.get().getMessage(), "Connection test failed");
+                } else {
+                    Messages.showInfoMessage(rootPanel, "Connection test successful for " + databaseVendor.name, "Connection test successful");
                 }
             }
         });
@@ -161,8 +152,6 @@ public class ServerConfigurationPanel extends JPanel {
     }
 
     public void applyConfigurationData(ServerConfiguration configuration) {
-        validateLabel();
-        validateUrls();
 
         configuration.setLabel(getLabel());
         configuration.setDatabaseVendor(databaseVendor);
@@ -175,10 +164,15 @@ public class ServerConfigurationPanel extends JPanel {
         configuration.setConnectOnIdeStartup(isAutoConnect());
     }
 
-    private void validateLabel() {
+    public ValidationInfo validateInputs() {
         if (StringUtils.isEmpty(getLabel())) {
-            throw new ConfigurationException("Label should be set");
+            return new ValidationInfo("Label should be set");
         }
+        String serverUrl = getServerUrls();
+        if (serverUrl == null) {
+            return new ValidationInfo("URL(s) should be set");
+        }
+        return null;
     }
 
 
@@ -261,9 +255,5 @@ public class ServerConfigurationPanel extends JPanel {
                         TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
         shellWorkingDirField.addBrowseFolderListener(null, browseFolderActionListener, false);
         shellWorkingDirField.setName("shellWorkingDirField");
-    }
-
-    public void setErrorMessage(String message) {
-        feedbackLabel.setText(message);
     }
 }

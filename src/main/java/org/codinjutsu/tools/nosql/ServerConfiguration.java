@@ -91,13 +91,6 @@ public class ServerConfiguration implements Cloneable {
         this.shellWorkingDir = shellWorkingDir;
     }
 
-    public static ServerConfiguration byDefault() {
-        ServerConfiguration serverConfiguration = new ServerConfiguration();
-        serverConfiguration.setDatabaseVendor(DatabaseVendor.MONGO);
-        serverConfiguration.setServerUrl(DatabaseVendor.MONGO.defaultUrl);
-        return serverConfiguration;
-    }
-
     public boolean isSingleServer() {
         return serverUrl.split(",").length == 1;
     }

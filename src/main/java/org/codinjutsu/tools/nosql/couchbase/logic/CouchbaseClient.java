@@ -18,6 +18,7 @@ package org.codinjutsu.tools.nosql.couchbase.logic;
 
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
+import com.couchbase.client.java.ConnectionString;
 import com.couchbase.client.java.CouchbaseCluster;
 import com.couchbase.client.java.cluster.BucketSettings;
 import com.couchbase.client.java.cluster.ClusterManager;
@@ -41,15 +42,15 @@ import org.codinjutsu.tools.nosql.couchbase.model.CouchbaseDatabase;
 import org.codinjutsu.tools.nosql.couchbase.model.CouchbaseQuery;
 import org.codinjutsu.tools.nosql.couchbase.model.CouchbaseResult;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.couchbase.client.java.query.Select.select;
 import static com.couchbase.client.java.query.dsl.Expression.i;
 
 public class CouchbaseClient implements DatabaseClient {
-
-    private static final Logger LOG = Logger.getLogger(CouchbaseClient.class);
 
     public static CouchbaseClient getInstance(Project project) {
         return ServiceManager.getService(project, CouchbaseClient.class);
@@ -80,10 +81,7 @@ public class CouchbaseClient implements DatabaseClient {
 
     @Override
     public void loadServer(DatabaseServer databaseServer) {
-        Cluster cluster = CouchbaseCluster.create(DefaultCouchbaseEnvironment
-                .builder()
-                .queryEnabled(true)
-                .build());
+        Cluster cluster = CouchbaseCluster.create(databaseServer.getConfiguration().getServerUrl());
         AuthenticationSettings authenticationSettings = databaseServer.getConfiguration().getAuthenticationSettings();
         ClusterManager clusterManager = cluster.clusterManager(authenticationSettings.getUsername(), authenticationSettings.getPassword());
 
@@ -120,7 +118,7 @@ public class CouchbaseClient implements DatabaseClient {
     public ServerConfiguration defaultConfiguration() {
         ServerConfiguration configuration = new ServerConfiguration();
         configuration.setDatabaseVendor(DatabaseVendor.COUCHBASE);
-        configuration.setServerUrl(DatabaseVendor.COUCHBASE.defaultUrl);
+        configuration.setServerUrl("localhost");
         configuration.setAuthenticationSettings(new AuthenticationSettings());
         return configuration;
     }
@@ -129,15 +127,19 @@ public class CouchbaseClient implements DatabaseClient {
         Cluster cluster = CouchbaseCluster.create(DefaultCouchbaseEnvironment
                 .builder()
                 .queryEnabled(true)
-                .build());
+                .build(),
+                configuration.getServerUrl());
+//        AuthenticationSettings authenticationSettings = configuration.getAuthenticationSettings();
+//        ClusterManager clusterManager = cluster.clusterManager(authenticationSettings.getUsername(), authenticationSettings.getPassword());
 
-        Bucket beerBucket = cluster.openBucket(database.getName());
+        Bucket beerBucket = cluster.openBucket(database.getName(), 10, TimeUnit.SECONDS);
         N1qlQueryResult queryResult = beerBucket.query(N1qlQuery.simple(select("*").from(i(database.getName())).limit(couchbaseQuery.getLimit())));
 
-
+//TODO dirty zone :(
         CouchbaseResult result = new CouchbaseResult(database.getName());
         List<JsonObject> errors = queryResult.errors();
         if (!errors.isEmpty()) {
+            cluster.disconnect();
             result.addErrors(errors);
             return result;
         }
@@ -145,9 +147,7 @@ public class CouchbaseClient implements DatabaseClient {
         for (N1qlQueryRow row : queryResult.allRows()) {
             result.add(row.value());
         }
-
         cluster.disconnect();
-
         return result;
     }
 }

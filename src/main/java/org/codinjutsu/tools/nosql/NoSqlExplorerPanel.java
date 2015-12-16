@@ -32,6 +32,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.tree.TreeUtil;
 import org.codinjutsu.tools.nosql.commons.logic.ConfigurationException;
+import org.codinjutsu.tools.nosql.commons.logic.DatabaseClient;
 import org.codinjutsu.tools.nosql.commons.model.Database;
 import org.codinjutsu.tools.nosql.commons.model.DatabaseServer;
 import org.codinjutsu.tools.nosql.commons.utils.GuiUtils;
@@ -43,6 +44,7 @@ import org.codinjutsu.tools.nosql.commons.view.editor.NoSqlDatabaseFileSystem;
 import org.codinjutsu.tools.nosql.commons.view.editor.NoSqlDatabaseObjectFile;
 import org.codinjutsu.tools.nosql.couchbase.model.CouchbaseDatabase;
 import org.codinjutsu.tools.nosql.couchbase.view.editor.CouchbaseObjectFile;
+import org.codinjutsu.tools.nosql.mongo.logic.MongoClient;
 import org.codinjutsu.tools.nosql.mongo.model.MongoCollection;
 import org.codinjutsu.tools.nosql.mongo.model.MongoDatabase;
 import org.codinjutsu.tools.nosql.mongo.view.action.DropCollectionAction;
@@ -411,7 +413,7 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
     }
 
     @NotNull
-    private NoSqlDatabaseObjectFile createNoSqlObjectFile() {
+    private NoSqlDatabaseObjectFile createNoSqlObjectFile() { // TODO need to put in the database UI manager
         ServerConfiguration selectedConfiguration = getConfiguration();
         if (DatabaseVendor.MONGO.equals(selectedConfiguration.getDatabaseVendor())) {
             return new MongoObjectFile(project, selectedConfiguration, getSelectedCollection());
@@ -421,13 +423,15 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
         return new RedisObjectFile(project, selectedConfiguration, getSelectedRedisDatabase());
     }
 
-    public void dropCollection() {
-//        databaseVendorClientManager.dropCollection(getConfiguration(), getSelectedCollection());
+    public void dropCollection() {// TODO need to put in a customizer
+        MongoClient databaseClient = (MongoClient) databaseVendorClientManager.get(DatabaseVendor.MONGO);
+        databaseClient.dropCollection(getConfiguration(), getSelectedCollection());
         reloadServerConfiguration(getSelectedServerNode(), true);
     }
 
-    public void dropDatabase() {
-//        databaseVendorClientManager.dropDatabase(getConfiguration(), getSelectedMongoDatabase());
+    public void dropDatabase() {// TODO need to put in a customizer
+        MongoClient databaseClient = (MongoClient) databaseVendorClientManager.get(DatabaseVendor.MONGO);
+        databaseClient.dropDatabase(getConfiguration(), getSelectedMongoDatabase());
         reloadServerConfiguration(getSelectedServerNode(), true);
     }
 

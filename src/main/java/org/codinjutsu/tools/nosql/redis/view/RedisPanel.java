@@ -23,6 +23,9 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.LoadingDecorator;
 import com.intellij.openapi.util.Disposer;
@@ -33,6 +36,8 @@ import com.intellij.ui.treeStructure.treetable.TreeTableTree;
 import com.intellij.util.ui.tree.TreeUtil;
 import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
+import org.codinjutsu.tools.nosql.commons.utils.GuiUtils;
+import org.codinjutsu.tools.nosql.commons.view.ErrorPanel;
 import org.codinjutsu.tools.nosql.commons.view.NoSqlResultView;
 import org.codinjutsu.tools.nosql.commons.view.action.ExecuteQuery;
 import org.codinjutsu.tools.nosql.mongo.view.JsonTreeTableView;
@@ -87,7 +92,7 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
         add(mainPanel);
     }
 
-    private void loadAndDisplayResults(String filter, boolean groupByPrefix, String separator) {
+    private void loadAndDisplayResults(final String filter, final boolean groupByPrefix, final String separator) {
         redisResult = redisClient.loadRecords(configuration, database, new RedisQuery(filter));
         updateResultTableTree(redisResult, groupByPrefix, separator);
     }
@@ -199,7 +204,7 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
 
     @Override
     public void showResults() {
-
+        executeQuery();
     }
 
     @Override
@@ -214,7 +219,42 @@ public class RedisPanel extends NoSqlResultView<RedisResult> {
 
     @Override
     public void executeQuery() {
-        loadAndDisplayResults(getFilter(), isGroupDataEnabled(), getGroupSeparator());
+        errorPanel.setVisible(false);
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Executing query", true)  {
+            @Override
+            public void run(ProgressIndicator indicator) {
+                try {
+                    GuiUtils.runInSwingThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadingDecorator.startLoading(false);
+                        }
+                    });
+
+
+                    loadAndDisplayResults(getFilter(), isGroupDataEnabled(), getGroupSeparator());
+                } catch (final Exception ex) {
+                    GuiUtils.runInSwingThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            errorPanel.invalidate();
+                            errorPanel.removeAll();
+                            errorPanel.add(new ErrorPanel(ex), BorderLayout.CENTER);
+                            errorPanel.validate();
+                            errorPanel.setVisible(true);
+                        }
+                    });
+                } finally {
+                    GuiUtils.runInSwingThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadingDecorator.stopLoading();
+                        }
+                    });
+                }
+            }
+        });
+
     }
 
     @Override

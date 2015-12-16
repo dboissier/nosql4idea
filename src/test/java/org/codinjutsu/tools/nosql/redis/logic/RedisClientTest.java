@@ -16,19 +16,14 @@
 
 package org.codinjutsu.tools.nosql.redis.logic;
 
-import org.codinjutsu.tools.nosql.ServerConfiguration;
 import org.codinjutsu.tools.nosql.DatabaseVendor;
-import org.codinjutsu.tools.nosql.redis.model.RedisQuery;
-import org.codinjutsu.tools.nosql.redis.model.RedisDatabase;
-import org.codinjutsu.tools.nosql.redis.model.RedisKeyType;
-import org.codinjutsu.tools.nosql.redis.model.RedisRecord;
-import org.codinjutsu.tools.nosql.redis.model.RedisResult;
+import org.codinjutsu.tools.nosql.ServerConfiguration;
+import org.codinjutsu.tools.nosql.redis.model.*;
 import org.junit.Before;
 import org.junit.Test;
 import redis.clients.jedis.Jedis;
 
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
@@ -59,15 +54,38 @@ public class RedisClientTest {
         assertEquals(RedisKeyType.SET, redisRecord.getKeyType());
         assertEquals("books", redisRecord.getKey());
         redisRecord = redisRecords.get(1);
-        assertEquals(RedisKeyType.STRING, redisRecord.getKeyType());
-        assertEquals("status", redisRecord.getKey());
-        redisRecord = redisRecords.get(2);
         assertEquals(RedisKeyType.ZSET, redisRecord.getKeyType());
         assertEquals("reviews", redisRecord.getKey());
-        redisRecord = redisRecords.get(3);
+        redisRecord = redisRecords.get(2);
         assertEquals(RedisKeyType.LIST, redisRecord.getKeyType());
         assertEquals("todos", redisRecord.getKey());
+        redisRecord = redisRecords.get(3);
+        assertEquals(RedisKeyType.STRING, redisRecord.getKeyType());
+        assertEquals("status", redisRecord.getKey());
+    }
 
+    @Test
+    public void loadWithFilter() throws Exception {
+        jedis.sadd("books", "eXtreme Programming", "Haskell for Dummies");
+        jedis.set("status", "online");
+        jedis.lpush("todos", "coffee", "code", "drink", "sleep");
+        jedis.zadd("reviews", 12.0d, "writing");
+        jedis.zadd("reviews", 14.0d, "reading");
+        jedis.zadd("reviews", 15.0d, "maths");
+
+        RedisClient redisClient = new RedisClient();
+        ServerConfiguration serverConfiguration = new ServerConfiguration();
+        serverConfiguration.setDatabaseVendor(DatabaseVendor.REDIS);
+        serverConfiguration.setServerUrl("localhost:6379");
+
+        RedisQuery query = new RedisQuery("reviews");
+        RedisResult result = redisClient.loadRecords(serverConfiguration, new RedisDatabase("1"), query);
+
+        List<RedisRecord> redisRecords = result.getResults();
+        assertEquals(1, redisRecords.size());
+        RedisRecord redisRecord = redisRecords.get(0);
+        assertEquals(RedisKeyType.ZSET, redisRecord.getKeyType());
+        assertEquals("reviews", redisRecord.getKey());
     }
 
     @Before

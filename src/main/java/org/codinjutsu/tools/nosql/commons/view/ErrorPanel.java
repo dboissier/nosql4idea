@@ -30,8 +30,9 @@ public class ErrorPanel extends JPanel {
 
     public ErrorPanel(final Exception ex) {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        setBackground(JBColor.RED);
-        add(new JBLabel("Error during query execution"));
+        JBLabel comp = new JBLabel("Error during query execution:");
+        comp.setForeground(JBColor.RED);
+        add(comp);
         final HoverHyperlinkLabel hoverHyperlinkLabel = new HoverHyperlinkLabel("more detail...");
         hoverHyperlinkLabel.addHyperlinkListener(new HyperlinkListener() {
             @Override

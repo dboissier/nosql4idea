@@ -45,4 +45,12 @@ public class CouchbaseResult {
     public List<JsonObject> getRecords() {
         return jsonObjects;
     }
+
+    public boolean hasErrors() {
+        return !errors.isEmpty();
+    }
+
+    public List<JsonObject> getErrors() {
+        return errors;
+    }
 }

@@ -101,7 +101,7 @@ public class ServerConfigurationPanelTest {
         ServerConfiguration configuration = new ServerConfiguration();
         configuration.setLabel("Localhost");
         configuration.setDatabaseVendor(DatabaseVendor.REDIS);
-        configuration.setServerUrl("localhost:25");
+        configuration.setServerUrl("localhost:6379");
 
         AuthenticationSettings authenticationSettings = new AuthenticationSettings();
         authenticationSettings.setPassword("johnpassword");
@@ -112,7 +112,7 @@ public class ServerConfigurationPanelTest {
         frameFixture.textBox("labelField").requireText("Localhost");
         frameFixture.label("databaseVendorLabel").requireText("RedisDB");
         frameFixture.label("databaseTipsLabel").requireText("format: host:port. If cluster: host:port1,host:port2,...");
-        frameFixture.textBox("serverUrlField").requireText("localhost:25");
+        frameFixture.textBox("serverUrlField").requireText("localhost:6379");
         frameFixture.textBox("passwordField").requireText("johnpassword");
     }
 }

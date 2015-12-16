@@ -24,6 +24,9 @@ import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.LoadingDecorator;
 import com.intellij.openapi.ui.Splitter;
@@ -40,6 +43,7 @@ import org.codinjutsu.tools.nosql.mongo.logic.MongoClient;
 import org.codinjutsu.tools.nosql.mongo.model.MongoCollection;
 import org.codinjutsu.tools.nosql.mongo.model.MongoResult;
 import org.codinjutsu.tools.nosql.mongo.view.action.*;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -55,11 +59,13 @@ public class MongoPanel extends NoSqlResultView<MongoCollection> {
     private final MongoResultPanel resultPanel;
     private final QueryPanel queryPanel;
 
+    private final Project project;
     private final MongoClient mongoClient;
     private final ServerConfiguration configuration;
     private final MongoCollection mongoCollection;
 
     public MongoPanel(Project project, final MongoClient mongoClient, final ServerConfiguration configuration, final MongoCollection mongoCollection) {
+        this.project = project;
         this.mongoClient = mongoClient;
         this.mongoCollection = mongoCollection;
         this.configuration = configuration;
@@ -191,9 +197,9 @@ public class MongoPanel extends NoSqlResultView<MongoCollection> {
     public void executeQuery() {
         errorPanel.setVisible(false);
         validateQuery();
-        ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Executing query", true)  {
             @Override
-            public void run() {
+            public void run(@NotNull final ProgressIndicator indicator) {
                 try {
                     GuiUtils.runInSwingThread(new Runnable() {
                         @Override
@@ -207,7 +213,6 @@ public class MongoPanel extends NoSqlResultView<MongoCollection> {
                         @Override
                         public void run() {
                             resultPanel.updateResultTableTree(mongoResult);
-
                         }
                     });
                 } catch (final Exception ex) {
@@ -231,7 +236,6 @@ public class MongoPanel extends NoSqlResultView<MongoCollection> {
                 }
             }
         });
-
     }
 
     private void validateQuery() {
