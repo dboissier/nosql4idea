@@ -24,7 +24,7 @@ import com.mongodb.util.JSON;
 import org.apache.commons.io.IOUtils;
 import org.bson.Document;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
-import org.codinjutsu.tools.nosql.mongo.model.MongoCollection;
+import org.codinjutsu.tools.nosql.mongo.model.SingleMongoCollection;
 import org.codinjutsu.tools.nosql.mongo.model.MongoResult;
 import org.codinjutsu.tools.nosql.mongo.model.MongoQueryOptions;
 import org.junit.Before;
@@ -36,9 +36,9 @@ import java.util.List;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 
-public class MongoClientTest {
+public class SingleMongoClientTest {
 
-    private MongoClient mongoClient;
+    private SingleMongoClient singleMongoClient;
     private ServerConfiguration serverConfiguration;
 
 
@@ -46,7 +46,7 @@ public class MongoClientTest {
     public void loadCollectionsWithEmptyFilter() throws Exception {
         MongoQueryOptions mongoQueryOptions = new MongoQueryOptions();
         mongoQueryOptions.setResultLimit(3);
-        MongoResult mongoResult = mongoClient.loadCollectionValues(serverConfiguration, new MongoCollection("dummyCollection", "test"), mongoQueryOptions);
+        MongoResult mongoResult = singleMongoClient.loadCollectionValues(serverConfiguration, new SingleMongoCollection("dummyCollection", "test"), mongoQueryOptions);
         assertNotNull(mongoResult);
         assertEquals(3, mongoResult.getMongoObjects().size());
     }
@@ -57,10 +57,10 @@ public class MongoClientTest {
         mongoQueryOptions.setFilter("{\"label\":\"tata\"}");
         mongoQueryOptions.setProjection("{\"label\":1, \"_id\": 0}");
         mongoQueryOptions.setResultLimit(3);
-        MongoResult mongoResult = mongoClient.loadCollectionValues(serverConfiguration, new MongoCollection("dummyCollection", "test"), mongoQueryOptions);
+        MongoResult mongoResult = singleMongoClient.loadCollectionValues(serverConfiguration, new SingleMongoCollection("dummyCollection", "test"), mongoQueryOptions);
         assertNotNull(mongoResult);
         assertEquals(2, mongoResult.getMongoObjects().size());
-        assertEquals("[{ \"label\" : \"tata\"}, { \"label\" : \"tata\"}]", mongoResult.getMongoObjects().toString());
+        assertEquals("[Document{{label=tata}}, Document{{label=tata}}]", mongoResult.getMongoObjects().toString());
     }
 
     @Test
@@ -70,28 +70,28 @@ public class MongoClientTest {
         mongoQueryOptions.setProjection("{\"label\": 1, \"_id\": 0, \"price\": 1}");
         mongoQueryOptions.setSort("{\"price\": 1}");
         mongoQueryOptions.setResultLimit(3);
-        MongoResult mongoResult = mongoClient.loadCollectionValues(serverConfiguration, new MongoCollection("dummyCollection", "test"), mongoQueryOptions);
+        MongoResult mongoResult = singleMongoClient.loadCollectionValues(serverConfiguration, new SingleMongoCollection("dummyCollection", "test"), mongoQueryOptions);
         assertNotNull(mongoResult);
         assertEquals(2, mongoResult.getMongoObjects().size());
-        assertEquals("[{ \"label\" : \"tata\" , \"price\" : 10}, { \"label\" : \"tata\" , \"price\" : 15}]", mongoResult.getMongoObjects().toString());
+        assertEquals("[Document{{label=tata, price=10}}, Document{{label=tata, price=15}}]", mongoResult.getMongoObjects().toString());
     }
 
     @Test
     public void updateMongoDocument() throws Exception {
         MongoQueryOptions mongoQueryOptions = new MongoQueryOptions();
         mongoQueryOptions.setFilter("{'label': 'tete'}");
-        MongoCollection mongoCollection = new MongoCollection("dummyCollection", "test");
-        MongoResult initialData = mongoClient.loadCollectionValues(serverConfiguration, mongoCollection, mongoQueryOptions);
+        SingleMongoCollection singleMongoCollection = new SingleMongoCollection("dummyCollection", "test");
+        MongoResult initialData = singleMongoClient.loadCollectionValues(serverConfiguration, singleMongoCollection, mongoQueryOptions);
         assertEquals(1, initialData.getMongoObjects().size());
-        DBObject initialMongoDocument = initialData.getMongoObjects().get(0);
+        Document initialMongoDocument = initialData.getMongoObjects().get(0);
 
         initialMongoDocument.put("price", 25);
-        mongoClient.update(serverConfiguration, mongoCollection, initialMongoDocument);
+        singleMongoClient.update(serverConfiguration, singleMongoCollection, initialMongoDocument);
 
-        MongoResult updatedResult = mongoClient.loadCollectionValues(serverConfiguration, mongoCollection, mongoQueryOptions);
-        List<DBObject> updatedMongoDocuments = updatedResult.getMongoObjects();
+        MongoResult updatedResult = singleMongoClient.loadCollectionValues(serverConfiguration, singleMongoCollection, mongoQueryOptions);
+        List<Document> updatedMongoDocuments = updatedResult.getMongoObjects();
         assertEquals(1, updatedMongoDocuments.size());
-        DBObject updatedMongoDocument = updatedMongoDocuments.get(0);
+        Document updatedMongoDocument = updatedMongoDocuments.get(0);
 
         assertEquals(25, updatedMongoDocument.get("price"));
     }
@@ -101,15 +101,15 @@ public class MongoClientTest {
     public void deleteMongoDocument() throws Exception {
         MongoQueryOptions mongoQueryOptions = new MongoQueryOptions();
         mongoQueryOptions.setFilter("{'label': 'tete'}");
-        MongoCollection mongoCollection = new MongoCollection("dummyCollection", "test");
-        MongoResult initialData = mongoClient.loadCollectionValues(serverConfiguration, mongoCollection, mongoQueryOptions);
+        SingleMongoCollection singleMongoCollection = new SingleMongoCollection("dummyCollection", "test");
+        MongoResult initialData = singleMongoClient.loadCollectionValues(serverConfiguration, singleMongoCollection, mongoQueryOptions);
         assertEquals(1, initialData.getMongoObjects().size());
-        DBObject initialMongoDocument = initialData.getMongoObjects().get(0);
+        Document initialMongoDocument = initialData.getMongoObjects().get(0);
 
-        mongoClient.delete(serverConfiguration, mongoCollection, initialMongoDocument.get("_id"));
+        singleMongoClient.delete(serverConfiguration, singleMongoCollection, initialMongoDocument.get("_id"));
 
-        MongoResult deleteResult = mongoClient.loadCollectionValues(serverConfiguration, mongoCollection, mongoQueryOptions);
-        List<DBObject> updatedMongoDocuments = deleteResult.getMongoObjects();
+        MongoResult deleteResult = singleMongoClient.loadCollectionValues(serverConfiguration, singleMongoCollection, mongoQueryOptions);
+        List<Document> updatedMongoDocuments = deleteResult.getMongoObjects();
         assertEquals(0, updatedMongoDocuments.size());
     }
 
@@ -118,14 +118,14 @@ public class MongoClientTest {
     public void loadCollectionsWithAggregateOperators() throws Exception {
         MongoQueryOptions mongoQueryOptions = new MongoQueryOptions();
         mongoQueryOptions.setOperations("[{'$match': {'price': 15}}, {'$project': {'label': 1, 'price': 1}}, {'$group': {'_id': '$label', 'total': {'$sum': '$price'}}}]");
-        MongoResult mongoResult = mongoClient.loadCollectionValues(serverConfiguration, new MongoCollection("dummyCollection", "test"), mongoQueryOptions);
+        MongoResult mongoResult = singleMongoClient.loadCollectionValues(serverConfiguration, new SingleMongoCollection("dummyCollection", "test"), mongoQueryOptions);
         assertNotNull(mongoResult);
 
-        List<DBObject> mongoObjects = mongoResult.getMongoObjects();
+        List<Document> mongoObjects = mongoResult.getMongoObjects();
 
         assertEquals(2, mongoObjects.size());
-        assertEquals("{ \"_id\" : \"tutu\" , \"total\" : 15}", mongoObjects.get(0).toString());
-        assertEquals("{ \"_id\" : \"tata\" , \"total\" : 15}", mongoObjects.get(1).toString());
+        assertEquals("Document{{_id=tutu, total=15}}", mongoObjects.get(0).toString());
+        assertEquals("Document{{_id=tata, total=15}}", mongoObjects.get(1).toString());
     }
 
     @Before
@@ -137,8 +137,8 @@ public class MongoClientTest {
         dummyCollection.deleteMany(new BasicDBObject());
         fillCollectionWithJsonData(dummyCollection, IOUtils.toString(getClass().getResourceAsStream("dummyCollection.json")));
 
-        mongoClient = new MongoClient();
-        serverConfiguration = mongoClient.defaultConfiguration();
+        singleMongoClient = new SingleMongoClient();
+        serverConfiguration = singleMongoClient.defaultConfiguration();
         serverConfiguration.setServerUrl("localhost:27017");
     }
 

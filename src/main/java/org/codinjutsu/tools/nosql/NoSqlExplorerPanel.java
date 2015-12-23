@@ -32,7 +32,6 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.tree.TreeUtil;
 import org.codinjutsu.tools.nosql.commons.logic.ConfigurationException;
-import org.codinjutsu.tools.nosql.commons.logic.DatabaseClient;
 import org.codinjutsu.tools.nosql.commons.model.Database;
 import org.codinjutsu.tools.nosql.commons.model.DatabaseServer;
 import org.codinjutsu.tools.nosql.commons.utils.GuiUtils;
@@ -44,9 +43,9 @@ import org.codinjutsu.tools.nosql.commons.view.editor.NoSqlDatabaseFileSystem;
 import org.codinjutsu.tools.nosql.commons.view.editor.NoSqlDatabaseObjectFile;
 import org.codinjutsu.tools.nosql.couchbase.model.CouchbaseDatabase;
 import org.codinjutsu.tools.nosql.couchbase.view.editor.CouchbaseObjectFile;
-import org.codinjutsu.tools.nosql.mongo.logic.MongoClient;
-import org.codinjutsu.tools.nosql.mongo.model.MongoCollection;
-import org.codinjutsu.tools.nosql.mongo.model.MongoDatabase;
+import org.codinjutsu.tools.nosql.mongo.logic.SingleMongoClient;
+import org.codinjutsu.tools.nosql.mongo.model.SingleMongoCollection;
+import org.codinjutsu.tools.nosql.mongo.model.SingleMongoDatabase;
 import org.codinjutsu.tools.nosql.mongo.view.action.DropCollectionAction;
 import org.codinjutsu.tools.nosql.mongo.view.action.DropDatabaseAction;
 import org.codinjutsu.tools.nosql.mongo.view.editor.MongoObjectFile;
@@ -179,9 +178,9 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
     private void addDatabasesIfAny(DatabaseServer databaseServer, DefaultMutableTreeNode serverNode) {
         for (Database database : databaseServer.getDatabases()) {
             DefaultMutableTreeNode databaseNode = new DefaultMutableTreeNode(database);
-            if (database instanceof MongoDatabase) {
-                MongoDatabase mongoDatabase = (MongoDatabase) database;
-                for (MongoCollection collection : mongoDatabase.getCollections()) {
+            if (database instanceof SingleMongoDatabase) {
+                SingleMongoDatabase singleMongoDatabase = (SingleMongoDatabase) database;
+                for (SingleMongoCollection collection : singleMongoDatabase.getCollections()) {
                     databaseNode.add(new DefaultMutableTreeNode(collection));
                 }
             }
@@ -272,7 +271,7 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
                     if (treeNode.getUserObject() instanceof DatabaseServer && treeNode.getChildCount() == 0) {
                         reloadServerConfiguration(getSelectedServerNode(), true);
                     }
-                    if (treeNode.getUserObject() instanceof MongoCollection) {
+                    if (treeNode.getUserObject() instanceof SingleMongoCollection) {
                         loadRecords();
                     }
                     if (treeNode.getUserObject() instanceof RedisDatabase) {
@@ -304,7 +303,7 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
         DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) databaseTree.getLastSelectedPathComponent();
         if (treeNode != null) {
             Object userObject = treeNode.getUserObject();
-            if (userObject instanceof MongoCollection) {
+            if (userObject instanceof SingleMongoCollection) {
                 return (DefaultMutableTreeNode) treeNode.getParent().getParent();
             }
 
@@ -324,7 +323,7 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
         DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) databaseTree.getLastSelectedPathComponent();
         if (treeNode != null) {
             Object userObject = treeNode.getUserObject();
-//            if (userObject instanceof MongoCollection) {
+//            if (userObject instanceof SingleMongoCollection) {
 //                return (DefaultMutableTreeNode) treeNode.getParent();
 //            }
 
@@ -340,7 +339,7 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
         DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) databaseTree.getLastSelectedPathComponent();
         if (treeNode != null) {
             Object userObject = treeNode.getUserObject();
-            if (userObject instanceof MongoCollection) {
+            if (userObject instanceof SingleMongoCollection) {
                 return treeNode;
             }
         }
@@ -384,28 +383,28 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
         return (CouchbaseDatabase) database;
     }
 
-    public MongoDatabase getSelectedMongoDatabase() {
+    public SingleMongoDatabase getSelectedMongoDatabase() {
         DefaultMutableTreeNode databaseNode = getSelectedDatabaseNode();
         if (databaseNode == null) {
             return null;
         }
 
         Object database = databaseNode.getUserObject();
-        if (!(database instanceof MongoDatabase)) {
+        if (!(database instanceof SingleMongoDatabase)) {
             return null;
         }
 
-        return (MongoDatabase) databaseNode.getUserObject();
+        return (SingleMongoDatabase) databaseNode.getUserObject();
 
     }
 
-    public MongoCollection getSelectedCollection() {
+    public SingleMongoCollection getSelectedCollection() {
         DefaultMutableTreeNode collectionNode = getSelectedCollectionNode();
         if (collectionNode == null) {
             return null;
         }
 
-        return (MongoCollection) collectionNode.getUserObject();
+        return (SingleMongoCollection) collectionNode.getUserObject();
     }
 
     public void loadRecords() {
@@ -424,13 +423,13 @@ public class NoSqlExplorerPanel extends JPanel implements Disposable {
     }
 
     public void dropCollection() {// TODO need to put in a customizer
-        MongoClient databaseClient = (MongoClient) databaseVendorClientManager.get(DatabaseVendor.MONGO);
+        SingleMongoClient databaseClient = (SingleMongoClient) databaseVendorClientManager.get(DatabaseVendor.MONGO);
         databaseClient.dropCollection(getConfiguration(), getSelectedCollection());
         reloadServerConfiguration(getSelectedServerNode(), true);
     }
 
     public void dropDatabase() {// TODO need to put in a customizer
-        MongoClient databaseClient = (MongoClient) databaseVendorClientManager.get(DatabaseVendor.MONGO);
+        SingleMongoClient databaseClient = (SingleMongoClient) databaseVendorClientManager.get(DatabaseVendor.MONGO);
         databaseClient.dropDatabase(getConfiguration(), getSelectedMongoDatabase());
         reloadServerConfiguration(getSelectedServerNode(), true);
     }

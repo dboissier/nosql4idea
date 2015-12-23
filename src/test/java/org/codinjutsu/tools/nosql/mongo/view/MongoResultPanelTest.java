@@ -18,10 +18,10 @@ package org.codinjutsu.tools.nosql.mongo.view;
 
 import com.intellij.openapi.command.impl.DummyProject;
 import com.intellij.util.ui.tree.TreeUtil;
-import com.mongodb.DBObject;
-import com.mongodb.util.JSON;
 import org.apache.commons.io.IOUtils;
+import org.bson.Document;
 import org.codinjutsu.tools.nosql.commons.view.TableCellReader;
+import org.codinjutsu.tools.nosql.mongo.MongoUtils;
 import org.codinjutsu.tools.nosql.mongo.model.MongoResult;
 import org.fest.swing.edt.GuiActionRunner;
 import org.fest.swing.edt.GuiQuery;
@@ -34,6 +34,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -201,17 +202,24 @@ public class MongoResultPanelTest {
                 });
 
         assertEquals("[ " +
-                "{ \"id\" : 0 , \"label\" : \"toto\" , \"visible\" : false , \"doc\" : { \"title\" : \"hello\" , \"nbPages\" : 10 , \"keyWord\" : [ \"toto\" , true , 10]}} , " +
-                "{ \"id\" : 1 , \"label\" : \"tata\" , \"visible\" : true , \"doc\" : { \"title\" : \"ola\" , \"nbPages\" : 1 , \"keyWord\" : [ \"tutu\" , false , 10]}}" +
-                " ]",
+                        "{ \"id\" : 0 , \"label\" : \"toto\" , \"visible\" : false , \"doc\" : { \"title\" : \"hello\" , \"nbPages\" : 10 , \"keyWord\" : [ \"toto\" , true , 10]}} , " +
+                        "{ \"id\" : 1 , \"label\" : \"tata\" , \"visible\" : true , \"doc\" : { \"title\" : \"ola\" , \"nbPages\" : 1 , \"keyWord\" : [ \"tutu\" , false , 10]}}" +
+                        " ]",
                 mongoResultPanel.getSelectedNodeStringifiedValue());
     }
 
     private MongoResult createCollectionResults(String data, String collectionName) throws IOException {
-        DBObject jsonObject = (DBObject) JSON.parse(IOUtils.toString(getClass().getResourceAsStream(data)));
+        Object jsonObject = MongoUtils.parseJSON(IOUtils.toString(getClass().getResourceAsStream(data)));
 
         MongoResult mongoResult = new MongoResult(collectionName);
-        mongoResult.add(jsonObject);
+
+        if (jsonObject instanceof List) {
+            for (Object document : ((List) jsonObject)) {
+                mongoResult.add((Document) document);
+            }
+        } else {
+            mongoResult.add((Document) jsonObject);
+        }
 
         return mongoResult;
     }

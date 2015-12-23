@@ -29,8 +29,8 @@ import com.intellij.ui.PopupHandler;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.treeStructure.treetable.TreeTableTree;
 import com.intellij.util.ui.tree.TreeUtil;
-import com.mongodb.DBObject;
 import org.apache.commons.lang.StringUtils;
+import org.bson.Document;
 import org.codinjutsu.tools.nosql.commons.utils.GuiUtils;
 import org.codinjutsu.tools.nosql.commons.view.NoSqlTreeNode;
 import org.codinjutsu.tools.nosql.commons.view.nodedescriptor.NodeDescriptor;
@@ -133,7 +133,7 @@ public class MongoResultPanel extends JPanel implements Disposable {
 
     public void editSelectedMongoDocument() {
 
-        DBObject mongoDocument = getSelectedMongoDocument();
+        Document mongoDocument = getSelectedMongoDocument();
 
         if (mongoDocument == null) {
             return;
@@ -150,7 +150,7 @@ public class MongoResultPanel extends JPanel implements Disposable {
         splitter.setSecondComponent(mongoEditionPanel);
     }
 
-    private DBObject getSelectedMongoDocument() {
+    private Document getSelectedMongoDocument() {
         TreeTableTree tree = resultTableView.getTree();
         NoSqlTreeNode treeNode = (NoSqlTreeNode) tree.getLastSelectedPathComponent();
         if (treeNode == null) {
@@ -216,7 +216,7 @@ public class MongoResultPanel extends JPanel implements Disposable {
     }
 
     private String stringifyResult(DefaultMutableTreeNode selectedResultNode) {
-        List<Object> stringifiedObjects = new LinkedList<Object>();
+        List<Object> stringifiedObjects = new LinkedList<>();
         for (int i = 0; i < selectedResultNode.getChildCount(); i++) {
             DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) selectedResultNode.getChildAt(i);
             stringifiedObjects.add(childNode.getUserObject());

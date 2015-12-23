@@ -36,8 +36,8 @@
                         serviceImplementation="org.codinjutsu.tools.nosql.DatabaseVendorClientManager"/>
 
         <!-- Mongo components -->
-        <projectService serviceInterface="org.codinjutsu.tools.nosql.mongo.logic.MongoClient"
-                        serviceImplementation="org.codinjutsu.tools.nosql.mongo.logic.MongoClient"/>
+        <projectService serviceInterface="org.codinjutsu.tools.nosql.mongo.logic.SingleMongoClient"
+                        serviceImplementation="org.codinjutsu.tools.nosql.mongo.logic.SingleMongoClient"/>
         <projectService serviceInterface="org.codinjutsu.tools.nosql.mongo.MongoUI"
                         serviceImplementation="org.codinjutsu.tools.nosql.mongo.MongoUI"/>
 

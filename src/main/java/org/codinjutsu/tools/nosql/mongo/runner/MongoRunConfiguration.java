@@ -35,7 +35,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.codinjutsu.tools.nosql.DatabaseVendor;
 import org.codinjutsu.tools.nosql.NoSqlConfiguration;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
-import org.codinjutsu.tools.nosql.mongo.model.MongoDatabase;
+import org.codinjutsu.tools.nosql.mongo.model.SingleMongoDatabase;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,7 +49,7 @@ class MongoRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMod
     private String scriptPath;
     private String shellParameters;
     private ServerConfiguration serverConfiguration;
-    private MongoDatabase database;
+    private SingleMongoDatabase database;
     private String shellWorkingDir;
 
 
@@ -157,11 +157,11 @@ class MongoRunConfiguration extends ModuleBasedConfiguration<RunConfigurationMod
         return mongoShell;
     }
 
-    public MongoDatabase getDatabase() {
+    public SingleMongoDatabase getDatabase() {
         return this.database;
     }
 
-    public void setDatabase(MongoDatabase database) {
+    public void setDatabase(SingleMongoDatabase database) {
         this.database = database;
     }
 

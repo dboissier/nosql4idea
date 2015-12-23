@@ -35,7 +35,7 @@ import org.codinjutsu.tools.nosql.commons.model.AuthenticationSettings;
 import org.codinjutsu.tools.nosql.commons.view.console.NoSqlConsoleView;
 import org.codinjutsu.tools.nosql.mongo.MongoUtils;
 import org.codinjutsu.tools.nosql.mongo.logic.MongoExtraSettings;
-import org.codinjutsu.tools.nosql.mongo.model.MongoDatabase;
+import org.codinjutsu.tools.nosql.mongo.model.SingleMongoDatabase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,10 +44,10 @@ public class MongoConsoleRunner extends AbstractConsoleRunnerWithHistory<NoSqlCo
 
     private static final Key<Boolean> MONGO_SHELL_FILE = Key.create("MONGO_SHELL_FILE");
     private final ServerConfiguration serverConfiguration;
-    private final MongoDatabase database;
+    private final SingleMongoDatabase database;
 
 
-    public MongoConsoleRunner(@NotNull Project project, ServerConfiguration serverConfiguration, MongoDatabase database) {
+    public MongoConsoleRunner(@NotNull Project project, ServerConfiguration serverConfiguration, SingleMongoDatabase database) {
         super(project, "Mongo Shell", "/tmp");
 
         this.serverConfiguration = serverConfiguration;

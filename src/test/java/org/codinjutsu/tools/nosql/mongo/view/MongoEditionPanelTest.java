@@ -16,9 +16,8 @@
 
 package org.codinjutsu.tools.nosql.mongo.view;
 
-import com.mongodb.DBObject;
-import com.mongodb.util.JSON;
 import org.apache.commons.io.IOUtils;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.codinjutsu.tools.nosql.commons.view.nodedescriptor.NodeDescriptor;
 import org.fest.swing.data.TableCell;
@@ -93,11 +92,13 @@ public class MongoEditionPanelTest {
 
         frameFixture.button("saveButton").click();
 
-        ArgumentCaptor<DBObject> argument = ArgumentCaptor.forClass(DBObject.class);
+        ArgumentCaptor<Document> argument = ArgumentCaptor.forClass(Document.class);
         verify(mockMongoOperations).updateMongoDocument(argument.capture());
 
-        Assert.assertEquals("{ \"_id\" : { \"$oid\" : \"50b8d63414f85401b9268b99\"} , \"label\" : \"Hello\" , \"visible\" : false , \"image\" :  null }",
+        Assert.assertEquals("Document{{_id=50b8d63414f85401b9268b99, label=Hello, visible=false, image=null}}",
                 argument.getValue().toString());
+
+        Assert.assertTrue(argument.getValue().get("_id") instanceof ObjectId);
 
         verify(mockActionCallback, times(1)).onOperationSuccess(any(String.class));
     }
@@ -110,7 +111,7 @@ public class MongoEditionPanelTest {
         editionTreeTable.enterValue(TableCell.row(1).column(1), "Hello");
 
         frameFixture.button("cancelButton").click();
-        verify(mockMongoOperations, times(0)).updateMongoDocument(any(DBObject.class));
+        verify(mockMongoOperations, times(0)).updateMongoDocument(any(Document.class));
 
         verify(mockActionCallback, times(1)).onOperationCancelled(any(String.class));
     }
@@ -145,14 +146,14 @@ public class MongoEditionPanelTest {
         editionTreeTable.requireContents(new String[][]{
                 {"_id", "50b8d63414f85401b9268b99"},
                 {"title", "XP by example"},
-                {"tags", "[ \"pair programming\" , \"tdd\" , \"agile\"]"},
+                {"tags", "[pair programming, tdd, agile]"},
                 {"[0]", "pair programming"},
                 {"[1]", "tdd"},
                 {"[2]", "agile"},
-                {"innerList", "[ [ 1 , 2 , 3 , 4] , [ false , true] , [ { \"tagName\" : \"pouet\"} , { \"tagName\" : \"paf\"}]]"},
-                {"[0]", "[ 1 , 2 , 3 , 4]"},
-                {"[1]", "[ false , true]"},
-                {"[2]", "[ { \"tagName\" : \"pouet\"} , { \"tagName\" : \"paf\"}]"}});
+                {"innerList", "[[1, 2, 3, 4], [false, true], [Document{{tagName=pouet}}, Document{{tagName=paf}}]]"},
+                {"[0]", "[1, 2, 3, 4]"},
+                {"[1]", "[false, true]"},
+                {"[2]", "[Document{{tagName=pouet}}, Document{{tagName=paf}}]"}});
 
         editionTreeTable.selectCell(TableCell.row(3).column(1));
         mongoEditionPanel.addValue("refactor");
@@ -160,15 +161,15 @@ public class MongoEditionPanelTest {
         editionTreeTable.requireContents(new String[][]{
                 {"_id", "50b8d63414f85401b9268b99"},
                 {"title", "XP by example"},
-                {"tags", "[ \"pair programming\" , \"tdd\" , \"agile\"]"},
+                {"tags", "[pair programming, tdd, agile]"},
                 {"[0]", "pair programming"},
                 {"[1]", "tdd"},
                 {"[2]", "agile"},
                 {"[3]", "refactor"},
-                {"innerList", "[ [ 1 , 2 , 3 , 4] , [ false , true] , [ { \"tagName\" : \"pouet\"} , { \"tagName\" : \"paf\"}]]"},
-                {"[0]", "[ 1 , 2 , 3 , 4]"},
-                {"[1]", "[ false , true]"},
-                {"[2]", "[ { \"tagName\" : \"pouet\"} , { \"tagName\" : \"paf\"}]"}});
+                {"innerList", "[[1, 2, 3, 4], [false, true], [Document{{tagName=pouet}}, Document{{tagName=paf}}]]"},
+                {"[0]", "[1, 2, 3, 4]"},
+                {"[1]", "[false, true]"},
+                {"[2]", "[Document{{tagName=pouet}}, Document{{tagName=paf}}]"}});
 
     }
 
@@ -187,8 +188,8 @@ public class MongoEditionPanelTest {
 
     }
 
-    private DBObject buildDocument(String jsonFile) throws IOException {
-        DBObject mongoDocument = (DBObject) JSON.parse(IOUtils.toString(getClass().getResourceAsStream(jsonFile)));
+    private Document buildDocument(String jsonFile) throws IOException {
+        Document mongoDocument = Document.parse(IOUtils.toString(getClass().getResourceAsStream(jsonFile)));
         mongoDocument.put("_id", new ObjectId(String.valueOf(mongoDocument.get("_id"))));
         return mongoDocument;
     }

@@ -23,7 +23,7 @@ import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.nosql.commons.model.Database;
 import org.codinjutsu.tools.nosql.commons.model.DatabaseServer;
 import org.codinjutsu.tools.nosql.commons.utils.GuiUtils;
-import org.codinjutsu.tools.nosql.mongo.model.MongoCollection;
+import org.codinjutsu.tools.nosql.mongo.model.SingleMongoCollection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -57,9 +57,9 @@ public class NoSqlTreeRenderer extends ColoredTreeCellRenderer {
             Database noSqlDatabase = (Database) userObject;
             append(noSqlDatabase.getName());
             setIcon(DATABASE);
-        } else if (userObject instanceof MongoCollection) {
-            MongoCollection mongoCollection = (MongoCollection) userObject;
-            append(mongoCollection.getName());
+        } else if (userObject instanceof SingleMongoCollection) {
+            SingleMongoCollection singleMongoCollection = (SingleMongoCollection) userObject;
+            append(singleMongoCollection.getName());
             setIcon(MONGO_COLLECTION);
         }
     }

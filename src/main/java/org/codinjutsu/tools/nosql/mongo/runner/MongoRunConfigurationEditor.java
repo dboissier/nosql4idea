@@ -29,8 +29,8 @@ import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
 import org.codinjutsu.tools.nosql.commons.model.Database;
 import org.codinjutsu.tools.nosql.commons.model.DatabaseServer;
-import org.codinjutsu.tools.nosql.mongo.logic.MongoClient;
-import org.codinjutsu.tools.nosql.mongo.model.MongoDatabase;
+import org.codinjutsu.tools.nosql.mongo.logic.SingleMongoClient;
+import org.codinjutsu.tools.nosql.mongo.model.SingleMongoDatabase;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -78,11 +78,11 @@ public class MongoRunConfigurationEditor extends SettingsEditor<MongoRunConfigur
         databaseCombobox.setRenderer(new ColoredListCellRenderer() {
             @Override
             protected void customizeCellRenderer(JList list, Object value, int index, boolean selected, boolean hasFocus) {
-                MongoDatabase mongoDatabase = (MongoDatabase) value;
+                SingleMongoDatabase singleMongoDatabase = (SingleMongoDatabase) value;
                 if (value == null) {
                     return;
                 }
-                append(mongoDatabase.getName());
+                append(singleMongoDatabase.getName());
             }
         });
 
@@ -107,8 +107,8 @@ public class MongoRunConfigurationEditor extends SettingsEditor<MongoRunConfigur
     }
 
     private DatabaseServer[] getAvailableMongoServers(Project project) {
-        List<DatabaseServer> mongoServers = MongoClient.getInstance(project).getServers();
-        List<DatabaseServer> availableMongoServers = new LinkedList<DatabaseServer>();
+        List<DatabaseServer> mongoServers = SingleMongoClient.getInstance(project).getServers();
+        List<DatabaseServer> availableMongoServers = new LinkedList<>();
         for (DatabaseServer mongoServer : mongoServers) {
             if (mongoServer.hasDatabases()) {
                 availableMongoServers.add(mongoServer);
@@ -146,8 +146,8 @@ public class MongoRunConfigurationEditor extends SettingsEditor<MongoRunConfigur
         return selectedServer == null ? null : selectedServer.getConfiguration();
     }
 
-    public MongoDatabase getSelectedDatabase() {
-        return (MongoDatabase) databaseCombobox.getSelectedItem();
+    public SingleMongoDatabase getSelectedDatabase() {
+        return (SingleMongoDatabase) databaseCombobox.getSelectedItem();
     }
 
     private String getShellWorkingDir() {

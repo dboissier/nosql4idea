@@ -24,8 +24,8 @@ import com.intellij.ui.IdeBorderFactory;
 import com.intellij.ui.PopupHandler;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.tree.TreeUtil;
-import com.mongodb.DBObject;
 import org.apache.commons.lang.StringUtils;
+import org.bson.Document;
 import org.codinjutsu.tools.nosql.commons.view.NoSqlTreeNode;
 import org.codinjutsu.tools.nosql.commons.view.nodedescriptor.NodeDescriptor;
 import org.codinjutsu.tools.nosql.mongo.view.action.edition.AddKeyAction;
@@ -101,7 +101,7 @@ public class MongoEditionPanel extends JPanel implements Disposable {
         return this;
     }
 
-    public void updateEditionTree(DBObject mongoDocument) {
+    public void updateEditionTree(Document mongoDocument) {
         String panelTitle = "New document";
         if (mongoDocument != null) {
             panelTitle = "Edition";
@@ -152,11 +152,11 @@ public class MongoEditionPanel extends JPanel implements Disposable {
 
     public void addKey(String key, Object value) {
 
-        List<TreeNode> node = new LinkedList<TreeNode>();
+        List<TreeNode> node = new LinkedList<>();
         NoSqlTreeNode treeNode = new NoSqlTreeNode(MongoKeyValueDescriptor.createDescriptor(key, value));
 
-        if (value instanceof DBObject) {
-            JsonTreeModel.processDbObject(treeNode, (DBObject) value);
+        if (value instanceof Document || value instanceof List) {
+            JsonTreeModel.processDocument(treeNode, value);
         }
 
         node.add(treeNode);
@@ -171,13 +171,15 @@ public class MongoEditionPanel extends JPanel implements Disposable {
     }
 
     public void addValue(Object value) {
-        List<TreeNode> node = new LinkedList<TreeNode>();
+        List<TreeNode> node = new LinkedList<>();
 
         NoSqlTreeNode parentNode = getParentNode();
 
+        assert parentNode != null;
+
         NoSqlTreeNode treeNode = new NoSqlTreeNode(MongoValueDescriptor.createDescriptor(parentNode.getChildCount(), value));
-        if (value instanceof DBObject) {
-            JsonTreeModel.processDbObject(treeNode, (DBObject) value);
+        if (value instanceof Document || value instanceof List) {
+            JsonTreeModel.processDocument(treeNode, value);
         }
 
         node.add(treeNode);
@@ -224,9 +226,9 @@ public class MongoEditionPanel extends JPanel implements Disposable {
 
     }
 
-    private DBObject buildMongoDocument() {
+    private Document buildMongoDocument() {
         NoSqlTreeNode rootNode = (NoSqlTreeNode) editTableView.getTree().getModel().getRoot();
-        return JsonTreeModel.buildDBObject(rootNode);
+        return JsonTreeModel.buildDBDocument(rootNode);
     }
 
     @Override

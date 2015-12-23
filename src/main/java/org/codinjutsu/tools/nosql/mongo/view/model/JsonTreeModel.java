@@ -16,10 +16,8 @@
 
 package org.codinjutsu.tools.nosql.mongo.view.model;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import org.apache.commons.lang.StringUtils;
+import org.bson.Document;
 import org.codinjutsu.tools.nosql.commons.view.NoSqlTreeNode;
 import org.codinjutsu.tools.nosql.commons.view.nodedescriptor.NodeDescriptor;
 import org.codinjutsu.tools.nosql.mongo.model.MongoResult;
@@ -29,6 +27,7 @@ import org.codinjutsu.tools.nosql.mongo.view.nodedescriptor.MongoValueDescriptor
 
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -43,89 +42,105 @@ public class JsonTreeModel extends DefaultTreeModel {
     public static TreeNode buildJsonTree(MongoResult mongoResult) {
         NoSqlTreeNode rootNode = new NoSqlTreeNode(new MongoResultDescriptor(mongoResult.getCollectionName()));
 
-        List<DBObject> mongoObjects = mongoResult.getMongoObjects();
+        List<Document> mongoObjects = mongoResult.getMongoObjects();
         int i = 0;
-        for (DBObject mongoObject : mongoObjects) {
-            if (mongoObject instanceof BasicDBList) {
-                processDbObject(rootNode, mongoObject);
-            } else if (mongoObject instanceof BasicDBObject) {//dead code?
-                NoSqlTreeNode currentNode = new NoSqlTreeNode(MongoValueDescriptor.createDescriptor(i++, mongoObject));
-                processDbObject(currentNode, mongoObject);
-                rootNode.add(currentNode);
-            }
+        for (Document mongoObject : mongoObjects) {
+            processDocument(rootNode, mongoObject);
+
+            // todo; re-visit and check
+//            if (mongoObject instanceof BasicDBList) {
+//                processDocument(rootNode, mongoObject);
+//            } else if (mongoObject instanceof BasicDBObject) {//dead code?
+//                NoSqlTreeNode currentNode = new NoSqlTreeNode(MongoValueDescriptor.createDescriptor(i++, mongoObject));
+//                processDocument(currentNode, mongoObject);
+//                rootNode.add(currentNode);
+//            }
         }
         return rootNode;
     }
 
-    public static TreeNode buildJsonTree(DBObject mongoObject) {
+    public static TreeNode buildJsonTree(Object mongoObject) {
         NoSqlTreeNode rootNode = new NoSqlTreeNode(new MongoResultDescriptor());//TODO crappy
-        processDbObject(rootNode, mongoObject);
+        processDocument(rootNode, mongoObject);
         return rootNode;
     }
 
-    public static void processDbObject(NoSqlTreeNode parentNode, DBObject mongoObject) {
-        if (mongoObject instanceof BasicDBList) {
-            BasicDBList mongoObjectList = (BasicDBList) mongoObject;
-            for (int i = 0; i < mongoObjectList.size(); i++) {
-                Object mongoObjectOfList = mongoObjectList.get(i);
-                NoSqlTreeNode currentNode = new NoSqlTreeNode(MongoValueDescriptor.createDescriptor(i, mongoObjectOfList));
-                if (mongoObjectOfList instanceof DBObject) {
-                    processDbObject(currentNode, (DBObject) mongoObjectOfList);
-                }
-                parentNode.add(currentNode);
+    private static void processDocument(NoSqlTreeNode parentNode, List documentList) {
+        for (int i = 0; i < documentList.size(); i++) {
+            Object mongoObjectOfList = documentList.get(i);
+            NoSqlTreeNode currentNode = new NoSqlTreeNode(MongoValueDescriptor.createDescriptor(i, mongoObjectOfList));
+            if (mongoObjectOfList instanceof Document) {
+                processDocument(currentNode, (Document) mongoObjectOfList);
+            } else if (mongoObjectOfList instanceof List) {
+                processDocument(currentNode, (List) mongoObjectOfList);
             }
-        } else if (mongoObject instanceof BasicDBObject) {
-            BasicDBObject basicDBObject = (BasicDBObject) mongoObject;
-            for (String key : basicDBObject.keySet()) {
-                Object value = basicDBObject.get(key);
-                NoSqlTreeNode currentNode = new NoSqlTreeNode(MongoKeyValueDescriptor.createDescriptor(key, value));
-                if (value instanceof DBObject) {
-                    processDbObject(currentNode, (DBObject) value);
-                }
-                parentNode.add(currentNode);
-            }
+
+            parentNode.add(currentNode);
         }
     }
 
-    public static DBObject buildDBObject(NoSqlTreeNode rootNode) {
-        BasicDBObject basicDBObject = new BasicDBObject();
+    public static void processDocument(NoSqlTreeNode parentNode, Object object) {
+        if (object instanceof Document) {
+            processDocument(parentNode, (Document) object);
+        } else if (object instanceof List) {
+            processDocument(parentNode, (List) object);
+        } else {
+            throw new RuntimeException("Unsupported object to process");
+        }
+    }
+
+    public static void processDocument(NoSqlTreeNode parentNode, Document document) {
+        for (String key : document.keySet()) {
+            Object value = document.get(key);
+            NoSqlTreeNode currentNode = new NoSqlTreeNode(MongoKeyValueDescriptor.createDescriptor(key, value));
+
+            if (value instanceof Document) {
+                processDocument(currentNode, (Document) value);
+            } else if (value instanceof List) {
+                processDocument(currentNode, (List) value);
+            }
+            parentNode.add(currentNode);
+        }
+    }
+
+    public static Document buildDBDocument(NoSqlTreeNode rootNode) {
+        final Document document = new Document();
         Enumeration children = rootNode.children();
         while (children.hasMoreElements()) {
             NoSqlTreeNode node = (NoSqlTreeNode) children.nextElement();
             MongoKeyValueDescriptor descriptor = (MongoKeyValueDescriptor) node.getDescriptor();
             Object value = descriptor.getValue();
-            if (value instanceof DBObject) {
-                if (value instanceof BasicDBList) {
-                    basicDBObject.put(descriptor.getKey(), buildDBList(node));
-                } else {
-                    basicDBObject.put(descriptor.getKey(), buildDBObject(node));
-                }
+
+            if (value instanceof Document) {
+                document.put(descriptor.getKey(), buildDBDocument(node));
+            } else if (value instanceof List) {
+                document.put(descriptor.getKey(), buildDBList(node));
             } else {
-                basicDBObject.put(descriptor.getKey(), value);
+                document.put(descriptor.getKey(), value);
             }
         }
 
-        return basicDBObject;
+        return document;
     }
 
-    private static DBObject buildDBList(NoSqlTreeNode parentNode) {
-        BasicDBList basicDBList = new BasicDBList();
+    @SuppressWarnings("unchecked") // Since we're adding heterogeneous items in our list
+    private static List buildDBList(NoSqlTreeNode parentNode) {
+        final List list = new ArrayList();
         Enumeration children = parentNode.children();
         while (children.hasMoreElements()) {
             NoSqlTreeNode node = (NoSqlTreeNode) children.nextElement();
             MongoValueDescriptor descriptor = (MongoValueDescriptor) node.getDescriptor();
             Object value = descriptor.getValue();
-            if (value instanceof DBObject) {
-                if (value instanceof BasicDBList) {
-                    basicDBList.add(buildDBList(node));
-                } else {
-                    basicDBList.add(buildDBObject(node));
-                }
+
+            if (value instanceof Document) {
+                list.add(buildDBDocument(node));
+            } else if (value instanceof List) {
+                list.add(buildDBList(node));
             } else {
-                basicDBList.add(value);
+                list.add(value);
             }
         }
-        return basicDBList;
+        return list;
     }
 
     public static NoSqlTreeNode findObjectIdNode(NoSqlTreeNode treeNode) {
