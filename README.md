@@ -5,7 +5,8 @@ This plugin is a fork from [mongo4idea](https://github.com/dboissier/mongo4idea)
 
 ## Current status: EAP
 
-[Download the current SNAPSHOT](https://github.com/dboissier/nosql4idea/raw/master/snapshot/nosql4idea-0.1.0-SNAPSHOT-distribution.zip).
+* [Download the current SNAPSHOT for Idea 14](https://github.com/dboissier/nosql4idea/raw/master/snapshot/nosql4idea-0.1.0-SNAPSHOT-distribution.zip)
+* [Download the current SNAPSHOT for Idea 15](https://github.com/dboissier/nosql4idea/raw/master/snapshot/nosql4idea-0.1.0-SNAPSHOT-Idea15-distribution.zip)
 
 ## Plugin Compatibility
 
