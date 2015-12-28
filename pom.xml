@@ -14,6 +14,8 @@
 
         <intellij.sdk.name>141.2735.5</intellij.sdk.name>
         <intellij.sdk.version>14.1</intellij.sdk.version>
+        <!--<intellij.sdk.name>143.381.42</intellij.sdk.name>-->
+        <!--<intellij.sdk.version>15.0</intellij.sdk.version>-->
         <intellij.lib.path>${env.IDEA_HOME}/lib</intellij.lib.path>
     </properties>
 

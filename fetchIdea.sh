@@ -4,6 +4,8 @@
 
 ideaVersion='14.1.5'
 ideaVersionForMaven='14.1'
+#ideaVersion='15.0'
+#ideaVersionForMaven='15.0'
 
 rm -rf ./idea-IC
 
