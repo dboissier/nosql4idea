@@ -57,6 +57,7 @@ class ConfigurationDialog extends DialogWrapper {
 
     @Override
     protected void doOKAction() {
+        super.doOKAction();
         serverConfigurationPanel.applyConfigurationData(configuration);
     }
 }
