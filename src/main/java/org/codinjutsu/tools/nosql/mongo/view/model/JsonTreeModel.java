@@ -45,9 +45,12 @@ public class JsonTreeModel extends DefaultTreeModel {
         List<Document> mongoObjects = mongoResult.getMongoObjects();
         int i = 0;
         for (Document mongoObject : mongoObjects) {
-            processDocument(rootNode, mongoObject);
+            NoSqlTreeNode currentNode = new NoSqlTreeNode(MongoValueDescriptor.createDescriptor(i++, mongoObject));
+            processDocument(currentNode, mongoObject);
+            rootNode.add(currentNode);
 
-            // todo; re-visit and check
+            // todo: do we really need to support array here?
+            // old code
 //            if (mongoObject instanceof BasicDBList) {
 //                processDocument(rootNode, mongoObject);
 //            } else if (mongoObject instanceof BasicDBObject) {//dead code?

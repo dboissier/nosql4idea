@@ -90,7 +90,7 @@ public class MongoResultPanelTest {
         frameFixture.table("resultTreeTable").cellReader(new TableCellReader())
                 .requireColumnCount(2)
                 .requireContents(new String[][]{
-                        {"[0]", "{ \"_id\" : \"50b8d63414f85401b9268b99\" , \"label\" : \"toto\" , \"visible\" : false , \"image\" :  null }"},
+                        {"[0]", "Document{{_id=50b8d63414f85401b9268b99, label=toto, visible=false, image=null}}"},
                         {"_id", "\"50b8d63414f85401b9268b99\""},
                         {"label", "\"toto\""},
                         {"visible", "false"},
@@ -106,14 +106,14 @@ public class MongoResultPanelTest {
         frameFixture.table("resultTreeTable").cellReader(new TableCellReader())
                 .requireColumnCount(2)
                 .requireContents(new String[][]{
-                        {"[0]", "{ \"id\" : 0 , \"label\" : \"toto\" , \"visible\" : false , \"doc\" : { \"title\" : \"hello\" , \"nbPages\" : 10 , \"keyWord\" : [ \"toto\" , true , 10]}}"},
+                        {"[0]", "Document{{id=0, label=toto, visible=false, doc=Document{{title=hello, nbPages=10, keyWord=[toto, true, 10]}}}}"},
                         {"id", "0"},
                         {"label", "\"toto\""},
                         {"visible", "false"},
-                        {"doc", "{ \"title\" : \"hello\" , \"nbPages\" : 10 , \"keyWord\" : [ \"toto\" , true , 10]}"},
+                        {"doc", "Document{{title=hello, nbPages=10, keyWord=[toto, true, 10]}}"},
                         {"title", "\"hello\""},
                         {"nbPages", "10"},
-                        {"keyWord", "[ \"toto\" , true , 10]"},
+                        {"keyWord", "[toto, true, 10]"},
                         {"[0]", "\"toto\""},
                         {"[1]", "true"},
                         {"[2]", "10"},
@@ -129,25 +129,25 @@ public class MongoResultPanelTest {
         frameFixture.table("resultTreeTable").cellReader(new TableCellReader())
                 .requireContents(new String[][]{
 
-                        {"[0]", "{ \"id\" : 0 , \"label\" : \"toto\" , \"visible\" : false , \"doc\" : { \"title\" : \"hello\" , \"nbPages\" : 10 , \"keyWord\" : [ \"toto\" , true , 10]}}"},
+                        {"[0]", "Document{{id=0, label=toto, visible=false, doc=Document{{title=hello, nbPages=10, keyWord=[toto, true, 10]}}}}"},
                         {"id", "0"},
                         {"label", "\"toto\""},
                         {"visible", "false"},
-                        {"doc", "{ \"title\" : \"hello\" , \"nbPages\" : 10 , \"keyWord\" : [ \"toto\" , true , 10]}"},
+                        {"doc", "Document{{title=hello, nbPages=10, keyWord=[toto, true, 10]}}"},
                         {"title", "\"hello\""},
                         {"nbPages", "10"},
-                        {"keyWord", "[ \"toto\" , true , 10]"},
+                        {"keyWord", "[toto, true, 10]"},
                         {"[0]", "\"toto\""},
                         {"[1]", "true"},
                         {"[2]", "10"},
-                        {"[1]", "{ \"id\" : 1 , \"label\" : \"tata\" , \"visible\" : true , \"doc\" : { \"title\" : \"ola\" , \"nbPages\" : 1 , \"keyWord\" : [ \"tutu\" , false , 10]}}"},
+                        {"[1]", "Document{{id=1, label=tata, visible=true, doc=Document{{title=ola, nbPages=1, keyWord=[tutu, false, 10]}}}}"},
                         {"id", "1"},
                         {"label", "\"tata\""},
                         {"visible", "true"},
-                        {"doc", "{ \"title\" : \"ola\" , \"nbPages\" : 1 , \"keyWord\" : [ \"tutu\" , false , 10]}"},
+                        {"doc", "Document{{title=ola, nbPages=1, keyWord=[tutu, false, 10]}}"},
                         {"title", "\"ola\""},
                         {"nbPages", "1"},
-                        {"keyWord", "[ \"tutu\" , false , 10]"},
+                        {"keyWord", "[tutu, false, 10]"},
                         {"[0]", "\"tutu\""},
                         {"[1]", "false"},
                         {"[2]", "10"},
@@ -160,13 +160,13 @@ public class MongoResultPanelTest {
         TreeUtil.expandAll(mongoResultPanel.resultTableView.getTree());
 
         mongoResultPanel.resultTableView.setRowSelectionInterval(0, 0);
-        assertEquals("{ \"id\" : 0 , \"label\" : \"toto\" , \"visible\" : false , \"doc\" : { \"title\" : \"hello\" , \"nbPages\" : 10 , \"keyWord\" : [ \"toto\" , true , 10]}}", mongoResultPanel.getSelectedNodeStringifiedValue());
+        assertEquals("Document{{id=0, label=toto, visible=false, doc=Document{{title=hello, nbPages=10, keyWord=[toto, true, 10]}}}}", mongoResultPanel.getSelectedNodeStringifiedValue());
 
         mongoResultPanel.resultTableView.setRowSelectionInterval(2, 2);
         assertEquals("\"label\" : \"toto\"", mongoResultPanel.getSelectedNodeStringifiedValue());
 
         mongoResultPanel.resultTableView.setRowSelectionInterval(4, 4);
-        assertEquals("\"doc\" : { \"title\" : \"hello\" , \"nbPages\" : 10 , \"keyWord\" : [ \"toto\" , true , 10]}", mongoResultPanel.getSelectedNodeStringifiedValue());
+        assertEquals("\"doc\" : Document{{title=hello, nbPages=10, keyWord=[toto, true, 10]}}", mongoResultPanel.getSelectedNodeStringifiedValue());
     }
 
     @Test
@@ -177,33 +177,33 @@ public class MongoResultPanelTest {
 
         frameFixture.table("resultTreeTable").cellReader(new TableCellReader())
                 .requireContents(new String[][]{
-                        {"[0]", "{ \"id\" : 0 , \"label\" : \"toto\" , \"visible\" : false , \"doc\" : { \"title\" : \"hello\" , \"nbPages\" : 10 , \"keyWord\" : [ \"toto\" , true , 10]}}"},
+                        {"[0]", "Document{{id=0, label=toto, visible=false, doc=Document{{title=hello, nbPages=10, keyWord=[toto, true, 10]}}}}"},
                         {"id", "0"},
                         {"label", "\"toto\""},
                         {"visible", "false"},
-                        {"doc", "{ \"title\" : \"hello\" , \"nbPages\" : 10 , \"keyWord\" : [ \"toto\" , true , 10]}"},
+                        {"doc", "Document{{title=hello, nbPages=10, keyWord=[toto, true, 10]}}"},
                         {"title", "\"hello\""},
                         {"nbPages", "10"},
-                        {"keyWord", "[ \"toto\" , true , 10]"},
+                        {"keyWord", "[toto, true, 10]"},
                         {"[0]", "\"toto\""},
                         {"[1]", "true"},
                         {"[2]", "10"},
-                        {"[1]", "{ \"id\" : 1 , \"label\" : \"tata\" , \"visible\" : true , \"doc\" : { \"title\" : \"ola\" , \"nbPages\" : 1 , \"keyWord\" : [ \"tutu\" , false , 10]}}"},
+                        {"[1]", "Document{{id=1, label=tata, visible=true, doc=Document{{title=ola, nbPages=1, keyWord=[tutu, false, 10]}}}}"},
                         {"id", "1"},
                         {"label", "\"tata\""},
                         {"visible", "true"},
-                        {"doc", "{ \"title\" : \"ola\" , \"nbPages\" : 1 , \"keyWord\" : [ \"tutu\" , false , 10]}"},
+                        {"doc", "Document{{title=ola, nbPages=1, keyWord=[tutu, false, 10]}}"},
                         {"title", "\"ola\""},
                         {"nbPages", "1"},
-                        {"keyWord", "[ \"tutu\" , false , 10]"},
+                        {"keyWord", "[tutu, false, 10]"},
                         {"[0]", "\"tutu\""},
                         {"[1]", "false"},
                         {"[2]", "10"},
                 });
 
         assertEquals("[ " +
-                        "{ \"id\" : 0 , \"label\" : \"toto\" , \"visible\" : false , \"doc\" : { \"title\" : \"hello\" , \"nbPages\" : 10 , \"keyWord\" : [ \"toto\" , true , 10]}} , " +
-                        "{ \"id\" : 1 , \"label\" : \"tata\" , \"visible\" : true , \"doc\" : { \"title\" : \"ola\" , \"nbPages\" : 1 , \"keyWord\" : [ \"tutu\" , false , 10]}}" +
+                        "Document{{id=0, label=toto, visible=false, doc=Document{{title=hello, nbPages=10, keyWord=[toto, true, 10]}}}} , " +
+                        "Document{{id=1, label=tata, visible=true, doc=Document{{title=ola, nbPages=1, keyWord=[tutu, false, 10]}}}}" +
                         " ]",
                 mongoResultPanel.getSelectedNodeStringifiedValue());
     }
