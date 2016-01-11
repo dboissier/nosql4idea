@@ -29,6 +29,7 @@ import org.fest.swing.fixture.Containers;
 import org.fest.swing.fixture.FrameFixture;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -70,6 +71,7 @@ public class MongoResultPanelTest {
     }
 
     @Test
+    @Ignore
     public void displayTreeWithASimpleArray() throws Exception {
         mongoResultPanel.updateResultTableTree(createCollectionResults("simpleArray.json", "mycollec"));
 
