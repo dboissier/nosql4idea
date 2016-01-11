@@ -21,7 +21,7 @@ import org.codinjutsu.tools.nosql.commons.DatabaseUI;
 import org.codinjutsu.tools.nosql.commons.view.AuthenticationView;
 import org.codinjutsu.tools.nosql.commons.view.NoSqlResultView;
 import org.codinjutsu.tools.nosql.commons.view.editor.NoSqlDatabaseObjectFile;
-import org.codinjutsu.tools.nosql.mongo.logic.MongoClient;
+import org.codinjutsu.tools.nosql.mongo.logic.SingleMongoClient;
 import org.codinjutsu.tools.nosql.mongo.view.MongoAuthenticationPanel;
 import org.codinjutsu.tools.nosql.mongo.view.MongoPanel;
 import org.codinjutsu.tools.nosql.mongo.view.editor.MongoObjectFile;
@@ -38,7 +38,7 @@ public class MongoUI implements DatabaseUI {
     public NoSqlResultView createResultPanel(Project project, NoSqlDatabaseObjectFile objectFile) {
         MongoObjectFile mongoObjectFile = (MongoObjectFile) objectFile;
         return new MongoPanel(project,
-                MongoClient.getInstance(project),
+                SingleMongoClient.getInstance(project),
                 mongoObjectFile.getConfiguration(),
                 mongoObjectFile.getCollection());
     }

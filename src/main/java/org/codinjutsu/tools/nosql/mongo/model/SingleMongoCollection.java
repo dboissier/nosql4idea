@@ -18,12 +18,12 @@ package org.codinjutsu.tools.nosql.mongo.model;
 
 import org.jetbrains.annotations.NotNull;
 
-public class MongoCollection implements Comparable<MongoCollection> {
+public class SingleMongoCollection implements Comparable<SingleMongoCollection> {
 
     private final String name;
     private final String databaseName;
 
-    public MongoCollection(String name, String databaseName) {
+    public SingleMongoCollection(String name, String databaseName) {
         this.name = name;
         this.databaseName = databaseName;
     }
@@ -37,7 +37,7 @@ public class MongoCollection implements Comparable<MongoCollection> {
     }
 
     @Override
-    public int compareTo(@NotNull MongoCollection otherCollection) {
+    public int compareTo(@NotNull SingleMongoCollection otherCollection) {
         return this.name.compareTo(otherCollection.getName());
     }
 }

@@ -17,12 +17,11 @@
 package org.codinjutsu.tools.nosql.mongo.logic;
 
 import com.mongodb.AuthenticationMechanism;
-import org.codinjutsu.tools.nosql.mongo.logic.MongoClientURIBuilder;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class MongoClientURIBuilderTest {
+public class SingleMongoClientURIBuilderTest {
 
     @Test
     public void withoutAuthentication() throws Exception {

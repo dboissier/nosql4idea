@@ -16,11 +16,12 @@
 
 package org.codinjutsu.tools.nosql.mongo.model;
 
-import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 import org.apache.commons.lang.StringUtils;
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.codinjutsu.tools.nosql.mongo.MongoUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -30,11 +31,11 @@ public class MongoQueryOptions {
     private static final int DEFAULT_RESULT_LIMIT = 300;
 
     private static final BasicDBObject EMPTY_FILTER = new BasicDBObject();
-    private final List<Object> operations = new LinkedList<Object>();
+    private final List<Document> operations = new LinkedList<>();
 
-    private DBObject filter = EMPTY_FILTER;
-    private DBObject projection = null;
-    private DBObject sort;
+    private Bson filter = EMPTY_FILTER;
+    private Bson projection = null;
+    private Bson sort;
 
     private int resultLimit = DEFAULT_RESULT_LIMIT;
 
@@ -42,44 +43,45 @@ public class MongoQueryOptions {
         return !operations.isEmpty();
     }
 
-    public List getOperations() {
+    public List<Document> getOperations() {
         return operations;
     }
 
     public void setOperations(String aggregateQuery) {
         operations.clear();
-        BasicDBList operations = (BasicDBList) JSON.parse(aggregateQuery);
+        List operations = (List)MongoUtils.parseJSON(aggregateQuery);
+        //noinspection unchecked - safe to ignore - it parses it to a List<Document>
         this.operations.addAll(operations);
     }
 
     public void setFilter(String query) {
         if (!StringUtils.isBlank(query)) {
-            filter = (DBObject) JSON.parse(query);
+            filter = (Bson) JSON.parse(query);
         }
     }
 
-    public DBObject getFilter() {
+    public Bson getFilter() {
         return filter;
     }
 
     public void setProjection(String query) {
         if (!StringUtils.isBlank(query)) {
-            projection = (DBObject) JSON.parse(query);
+            projection = (Bson) JSON.parse(query);
         }
     }
 
 
-    public DBObject getProjection() {
+    public Bson getProjection() {
         return projection;
     }
 
     public void setSort(String query) {
         if (!StringUtils.isBlank(query)) {
-            sort = (DBObject) JSON.parse(query);
+            sort = (Bson) JSON.parse(query);
         }
     }
 
-    public DBObject getSort() {
+    public Bson getSort() {
         return sort;
     }
 

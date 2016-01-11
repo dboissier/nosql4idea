@@ -28,7 +28,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
 import org.codinjutsu.tools.nosql.mongo.MongoUtils;
-import org.codinjutsu.tools.nosql.mongo.model.MongoDatabase;
+import org.codinjutsu.tools.nosql.mongo.model.SingleMongoDatabase;
 import org.jetbrains.annotations.NotNull;
 
 class MongoCommandLineState extends CommandLineState {
@@ -56,7 +56,7 @@ class MongoCommandLineState extends CommandLineState {
         commandLine.setExePath(exePath);
 
         ServerConfiguration serverConfiguration = mongoRunConfiguration.getServerConfiguration();
-        MongoDatabase database = mongoRunConfiguration.getDatabase();
+        SingleMongoDatabase database = mongoRunConfiguration.getDatabase();
         commandLine.addParameter(MongoUtils.buildMongoUrl(serverConfiguration, database));
 
         VirtualFile scriptPath = mongoRunConfiguration.getScriptPath();

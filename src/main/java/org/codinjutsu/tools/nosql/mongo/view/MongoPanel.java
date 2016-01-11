@@ -33,22 +33,22 @@ import com.intellij.openapi.ui.Splitter;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.NumberDocument;
 import com.intellij.ui.components.panels.NonOpaquePanel;
-import com.mongodb.DBObject;
+import org.bson.Document;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
 import org.codinjutsu.tools.nosql.commons.utils.GuiUtils;
 import org.codinjutsu.tools.nosql.commons.view.ErrorPanel;
 import org.codinjutsu.tools.nosql.commons.view.NoSqlResultView;
 import org.codinjutsu.tools.nosql.commons.view.action.ExecuteQuery;
-import org.codinjutsu.tools.nosql.mongo.logic.MongoClient;
-import org.codinjutsu.tools.nosql.mongo.model.MongoCollection;
+import org.codinjutsu.tools.nosql.mongo.logic.SingleMongoClient;
 import org.codinjutsu.tools.nosql.mongo.model.MongoResult;
+import org.codinjutsu.tools.nosql.mongo.model.SingleMongoCollection;
 import org.codinjutsu.tools.nosql.mongo.view.action.*;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class MongoPanel extends NoSqlResultView<MongoCollection> {
+public class MongoPanel extends NoSqlResultView<SingleMongoCollection> {
 
     private final LoadingDecorator loadingDecorator;
     private JPanel rootPanel;
@@ -60,14 +60,14 @@ public class MongoPanel extends NoSqlResultView<MongoCollection> {
     private final QueryPanel queryPanel;
 
     private final Project project;
-    private final MongoClient mongoClient;
+    private final SingleMongoClient singleMongoClient;
     private final ServerConfiguration configuration;
-    private final MongoCollection mongoCollection;
+    private final SingleMongoCollection singleMongoCollection;
 
-    public MongoPanel(Project project, final MongoClient mongoClient, final ServerConfiguration configuration, final MongoCollection mongoCollection) {
+    public MongoPanel(Project project, final SingleMongoClient singleMongoClient, final ServerConfiguration configuration, final SingleMongoCollection singleMongoCollection) {
         this.project = project;
-        this.mongoClient = mongoClient;
-        this.mongoCollection = mongoCollection;
+        this.singleMongoClient = singleMongoClient;
+        this.singleMongoCollection = singleMongoCollection;
         this.configuration = configuration;
 
         errorPanel.setLayout(new BorderLayout());
@@ -77,17 +77,17 @@ public class MongoPanel extends NoSqlResultView<MongoCollection> {
 
         resultPanel = createResultPanel(project, new MongoDocumentOperations() {
 
-            public DBObject getMongoDocument(Object _id) {
-                return mongoClient.findMongoDocument(configuration, mongoCollection, _id);
+            public Document getMongoDocument(Object _id) {
+                return singleMongoClient.findMongoDocument(configuration, singleMongoCollection, _id);
             }
 
-            public void updateMongoDocument(DBObject mongoDocument) {
-                mongoClient.update(configuration, mongoCollection, mongoDocument);
+            public void updateMongoDocument(Document mongoDocument) {
+                singleMongoClient.update(configuration, singleMongoCollection, mongoDocument);
                 executeQuery();
             }
 
             public void deleteMongoDocument(Object objectId) {
-                mongoClient.delete(configuration, mongoCollection, objectId);
+                singleMongoClient.delete(configuration, singleMongoCollection, objectId);
                 executeQuery();
             }
         });
@@ -128,7 +128,7 @@ public class MongoPanel extends NoSqlResultView<MongoCollection> {
     void installResultPanelActions() {
         DefaultActionGroup actionResultGroup = new DefaultActionGroup("MongoResultGroup", true);
         if (ApplicationManager.getApplication() != null) {
-            actionResultGroup.add(new ExecuteQuery<MongoPanel>(this));
+            actionResultGroup.add(new ExecuteQuery<>(this));
             actionResultGroup.add(new OpenFindAction(this));
             actionResultGroup.add(new EnableAggregateAction(queryPanel));
             actionResultGroup.addSeparator();
@@ -185,8 +185,8 @@ public class MongoPanel extends NoSqlResultView<MongoCollection> {
         toolBar.add(actionToolBarComponent, BorderLayout.CENTER);
     }
 
-    public MongoCollection getRecords() {
-        return mongoCollection;
+    public SingleMongoCollection getRecords() {
+        return singleMongoCollection;
     }
 
 
@@ -197,7 +197,7 @@ public class MongoPanel extends NoSqlResultView<MongoCollection> {
     public void executeQuery() {
         errorPanel.setVisible(false);
         validateQuery();
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Executing query", true)  {
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Executing Query", true)  {
             @Override
             public void run(@NotNull final ProgressIndicator indicator) {
                 try {
@@ -208,7 +208,7 @@ public class MongoPanel extends NoSqlResultView<MongoCollection> {
                         }
                     });
 
-                    final MongoResult mongoResult = mongoClient.loadCollectionValues(configuration, mongoCollection, queryPanel.getQueryOptions(rowLimitField.getText()));
+                    final MongoResult mongoResult = singleMongoClient.loadCollectionValues(configuration, singleMongoCollection, queryPanel.getQueryOptions(rowLimitField.getText()));
                     GuiUtils.runInSwingThread(new Runnable() {
                         @Override
                         public void run() {
@@ -276,10 +276,10 @@ public class MongoPanel extends NoSqlResultView<MongoCollection> {
     }
 
     interface MongoDocumentOperations {
-        DBObject getMongoDocument(Object _id);
+        Document getMongoDocument(Object _id);
 
-        void deleteMongoDocument(Object mongoDocument);
+        void deleteMongoDocument(Object mongoDocumentID);
 
-        void updateMongoDocument(DBObject mongoDocument);
+        void updateMongoDocument(Document mongoDocument);
     }
 }

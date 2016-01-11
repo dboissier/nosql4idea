@@ -16,15 +16,26 @@
 
 package org.codinjutsu.tools.nosql.mongo;
 
+import org.bson.Document;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
-import org.codinjutsu.tools.nosql.mongo.model.MongoDatabase;
+import org.codinjutsu.tools.nosql.mongo.model.SingleMongoDatabase;
 
 public class MongoUtils {
 
     private MongoUtils() {
     }
 
-    public static String buildMongoUrl(ServerConfiguration serverConfiguration, MongoDatabase database) {
+    public static Object parseJSON(String json) {
+        // todo: hacky, but works for now.
+        // Need to find a better way to do this
+        if (json.startsWith("[")) {
+            return Document.parse("{'x':" + json + "}").get("x");
+        }
+
+        return Document.parse(json);
+    }
+
+    public static String buildMongoUrl(ServerConfiguration serverConfiguration, SingleMongoDatabase database) {
         return String.format("%s/%s", serverConfiguration.getServerUrl(), database == null ? "test" : database.getName());
     }
 }

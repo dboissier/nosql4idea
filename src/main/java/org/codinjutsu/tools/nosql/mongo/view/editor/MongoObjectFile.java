@@ -20,14 +20,14 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import org.codinjutsu.tools.nosql.ServerConfiguration;
 import org.codinjutsu.tools.nosql.commons.view.editor.NoSqlDatabaseObjectFile;
-import org.codinjutsu.tools.nosql.mongo.model.MongoCollection;
+import org.codinjutsu.tools.nosql.mongo.model.SingleMongoCollection;
 import org.jetbrains.annotations.NotNull;
 
 public class MongoObjectFile extends NoSqlDatabaseObjectFile {
 
-    private MongoCollection collection;
+    private SingleMongoCollection collection;
 
-    public MongoObjectFile(Project project, ServerConfiguration configuration, MongoCollection collection) {
+    public MongoObjectFile(Project project, ServerConfiguration configuration, SingleMongoCollection collection) {
         super(project, configuration, String.format("%s/%s/%s", configuration.getLabel(), collection.getDatabaseName(), collection.getName()));
         this.collection = collection;
 
@@ -39,7 +39,7 @@ public class MongoObjectFile extends NoSqlDatabaseObjectFile {
     }
 
 
-    public MongoCollection getCollection() {
+    public SingleMongoCollection getCollection() {
         return collection;
     }
 }

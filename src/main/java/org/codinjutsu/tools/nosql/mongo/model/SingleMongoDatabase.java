@@ -22,11 +22,11 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-public class MongoDatabase extends Database {
+public class SingleMongoDatabase extends Database {
 
-    private final SortedSet<MongoCollection> collections = new TreeSet<MongoCollection>();
+    private final SortedSet<SingleMongoCollection> collections = new TreeSet<SingleMongoCollection>();
 
-    public MongoDatabase(String name) {
+    public SingleMongoDatabase(String name) {
         super(name);
     }
 
@@ -34,11 +34,11 @@ public class MongoDatabase extends Database {
         return name;
     }
 
-    public Set<MongoCollection> getCollections() {
+    public Set<SingleMongoCollection> getCollections() {
         return collections;
     }
 
-    public void addCollection(MongoCollection mongoCollection) {
-        collections.add(mongoCollection);
+    public void addCollection(SingleMongoCollection singleMongoCollection) {
+        collections.add(singleMongoCollection);
     }
 }

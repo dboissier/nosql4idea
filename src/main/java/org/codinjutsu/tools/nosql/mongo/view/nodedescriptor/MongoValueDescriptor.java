@@ -19,7 +19,7 @@ package org.codinjutsu.tools.nosql.mongo.view.nodedescriptor;
 import com.intellij.ui.ColoredTableCellRenderer;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
-import com.mongodb.DBObject;
+import org.bson.Document;
 import org.codinjutsu.tools.nosql.commons.style.StyleAttributesProvider;
 import org.codinjutsu.tools.nosql.commons.utils.DateUtils;
 import org.codinjutsu.tools.nosql.commons.utils.StringUtils;
@@ -58,7 +58,7 @@ public class MongoValueDescriptor implements NodeDescriptor {
             };
         } else if (value instanceof Date) {
             return new MongoDateValueDescriptor(index, (Date) value);
-        } else if (value instanceof DBObject) {
+        } else if (value instanceof Document) {
             return new MongoValueDescriptor(index, value, StyleAttributesProvider.getObjectAttribute());
         } else {
             return new MongoValueDescriptor(index, value, StyleAttributesProvider.getStringAttribute());

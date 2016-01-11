@@ -16,7 +16,7 @@
 
 package org.codinjutsu.tools.nosql.mongo.model;
 
-import com.mongodb.DBObject;
+import org.bson.Document;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -24,17 +24,17 @@ import java.util.List;
 public class MongoResult {
 
     private final String collectionName;
-    private final List<DBObject> mongoObjects = new LinkedList<DBObject>();
+    private final List<Document> mongoObjects = new LinkedList<>();
 
     public MongoResult(String collectionName) {
         this.collectionName = collectionName;
     }
 
-    public void add(DBObject dbObject) {
+    public void add(Document dbObject) {
         mongoObjects.add(dbObject);
     }
 
-    public List<DBObject> getMongoObjects() {
+    public List<Document> getMongoObjects() {
         return mongoObjects;
     }
 
